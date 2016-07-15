@@ -12,3 +12,4 @@ I am a rising sophomore attending Cornell University studying Computer Science a
 
 + vim, nvim, ex, and ed
 + ocaml, java, perl, and shell scripting
++ dominion, hearthstone, minecraft
