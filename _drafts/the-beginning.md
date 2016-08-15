@@ -10,6 +10,8 @@ This is my first blog post! I've been wanting to start a programming blog for a 
 # Who am I?
 I am a rising sophomore attending Cornell University studying Computer Science and Biology. As far as programming goes I like and use:
 
-+ vim, nvim, ex, and ed
-+ ocaml, java, perl, and shell scripting
-+ dominion, hearthstone, minecraft
++ vim, nvim, ex, ed
++ java, ocaml, perl, shell scripts
++ super smash bros. melee, dominion, hearthstone, minecraft
++ tmux, zsh, iTerm2
++ macOS, ubuntu, gnu/hurd
