@@ -1,6 +1,11 @@
 ---
 layout: default
 ---
+<head>
+    <script type="text/javascript" async
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+</head>
 <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
@@ -10,6 +15,10 @@ layout: default
 
   <div class="post-content" itemprop="articleBody">
     {{ content }}
+  </div>
+
+  <div class="post-tags">
+    {% include post-tags.html tags=page.tags %}
   </div>
 
 </article>
