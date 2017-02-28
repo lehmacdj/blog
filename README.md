@@ -1,4 +1,3 @@
 # Blog
-
-+ Go [here](https://lehmacdj.github.io/blog) to see the blog.
-+ This branch is for the currently released site.
+My assorted ramblings, concepts that I am trying to improve my understanding of,
+and stuff that I made.
