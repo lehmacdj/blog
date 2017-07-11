@@ -1,5 +1,5 @@
 # Blog
+My assorted ramblings, concepts that I am trying to improve my understanding of,
+and stuff that I made.
 
-+ Go [here](https://lehmacdj.github.io/blog) to see the blog.
-
-**This branch is empty: goto gh-pages for the current release version.**
+Take a look at the blog over at [https://lehmacdj.github.io/blog/](https://lehmacdj.github.io/blog/).
