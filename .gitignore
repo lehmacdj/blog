@@ -1,3 +1,5 @@
 _site
 .sass-cache
 .jekyll-metadata
+# drafts should not be made available on the website until they are done
+_drafts
