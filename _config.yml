@@ -6,11 +6,12 @@
 # 'jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-title: λx.x
-email: djl329@cornell.edu
-description: > # this means to ignore newlines until "baseurl:"
-  My assorted ramblings, concepts that I am trying to improve my understanding
-  of, and stuff that I made.
+title: UnformedDelta
+email: lehmacdj@gmail.com
+description: >
+  The UnformedDelta is the place where my thoughts and learnings collect like
+  sand and soil at a river delta. Mostly the distillation of things I've learned
+  or figured out.
 baseurl: "/blog" # the subpath of your site, e.g. /blog
 url: "https://lehmacdj.github.io" # the base hostname & protocol for your site
 github_username: lehmacdj
