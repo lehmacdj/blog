@@ -12,7 +12,7 @@ description: >
   The UnformedDelta is the place where my thoughts and learnings collect like
   sand and soil at a river delta. Mostly the distillation of things I've learned
   or figured out.
-baseurl: "/blog" # the subpath of your site, e.g. /blog
+baseurl: "/"
 url: "https://lehmacdj.github.io" # the base hostname & protocol for your site
 github_username: lehmacdj
 permalink: /:year/:month/:day/:title.html
