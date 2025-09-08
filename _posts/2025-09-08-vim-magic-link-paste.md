@@ -6,7 +6,9 @@ tags: [vim, wiki]
 ---
 
 I'm releasing [vim-magic-link-paste](https://github.com/lehmacdj/vim-magic-link-paste) today. When pasting a link over visually selected markdown text it creates markdown syntax for a link. See the video for an example of what the plugin can do:
-![A video that demos using the plugin in vim](</images/vim-magic-link-paste-demo.mov>)
+<video width=400 controls alt="A video that demos using the plugin in vim">
+  <source src="/images/vim-magic-link-paste-demo.mov" />
+</video>
 
 I originally built this functionality because I wanted a GitHub/Slack/Discord-like experience while adding links to my notes/blog posts. I've found it to be a huge quality of life improvement, and it encourages me to add more links.
 
