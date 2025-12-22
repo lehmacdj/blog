@@ -121,6 +121,8 @@ def extract_title(body: str) -> tuple[str, str]:
     for i, line in enumerate(lines):
         if line.startswith("# "):
             title = line[2:].strip()
+            # Remove backticks (they don't render correctly in titles)
+            title = title.replace("`", "")
             remaining = lines[i + 1 :]
             while remaining and not remaining[0].strip():
                 remaining.pop(0)

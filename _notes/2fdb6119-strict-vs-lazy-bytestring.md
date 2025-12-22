@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Strict vs Lazy `ByteString`"
+title: "Strict vs Lazy ByteString"
 date: 2025-09-01 00:35 -0400
 permalink: /2fdb6119/strict-vs-lazy-bytestring
 redirect_from:
