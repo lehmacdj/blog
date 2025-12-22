@@ -223,8 +223,8 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     if not jekyll_content.endswith("\n"):
         jekyll_content += "\n"
 
-    # Write to _notes
-    note_filename = f"{note_id}.md"
+    # Write to _notes (filename includes slug for readability)
+    note_filename = f"{note_id}-{slug}.md"
     note_path = NOTES_DIR / note_filename
     note_path.write_text(jekyll_content)
     print(f"Created: {note_path}")

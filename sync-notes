@@ -139,13 +139,28 @@ def parse_tags(tags_str: str) -> list[str]:
 
 def get_blog_tags(note_id: str) -> list[str]:
     """Get current tags from the blog version of the note."""
-    blog_path = NOTES_DIR / f"{note_id}.md"
-    if not blog_path.exists():
+    blog_path = find_blog_note(note_id)
+    if not blog_path:
         return []
 
     content = blog_path.read_text()
     metadata, _ = parse_frontmatter(content)
     return parse_tags(metadata.get("tags", ""))
+
+
+def find_blog_note(note_id: str) -> Path | None:
+    """Find the blog note file for a given note ID (handles slug in filename)."""
+    # Look for files starting with the note ID
+    matches = list(NOTES_DIR.glob(f"{note_id}*.md"))
+    if len(matches) == 1:
+        return matches[0]
+    elif len(matches) > 1:
+        # Prefer exact match or shortest match
+        for m in matches:
+            if m.stem == note_id:
+                return m
+        return sorted(matches, key=lambda p: len(p.name))[0]
+    return None
 
 
 def sync_note(note_id: str) -> bool:
@@ -155,14 +170,14 @@ def sync_note(note_id: str) -> bool:
     Returns True if changes were made, False otherwise.
     """
     wiki_path = WIKI_DIR / f"{note_id}.md"
-    blog_path = NOTES_DIR / f"{note_id}.md"
+    blog_path = find_blog_note(note_id)
 
     if not wiki_path.exists():
         print(f"  Warning: wiki note not found: {wiki_path}")
         return False
 
-    if not blog_path.exists():
-        print(f"  Warning: blog note not found (use publish-note first): {blog_path}")
+    if not blog_path:
+        print(f"  Warning: blog note not found (use publish-note first)")
         return False
 
     # Read wiki note
@@ -235,13 +250,26 @@ def sync_note(note_id: str) -> bool:
     if not new_content.endswith("\n"):
         new_content += "\n"
 
-    # Check if content changed
-    if new_content == blog_content:
+    # Determine the correct filename (may have changed if title changed)
+    new_filename = f"{note_id}-{slug}.md"
+    new_blog_path = NOTES_DIR / new_filename
+
+    # Check if content changed or filename needs updating
+    content_changed = new_content != blog_content
+    filename_changed = blog_path != new_blog_path
+
+    if not content_changed and not filename_changed:
         return False
 
     # Write updated blog note
-    blog_path.write_text(new_content)
-    print(f"  Updated: {blog_path}")
+    new_blog_path.write_text(new_content)
+
+    # Remove old file if renamed
+    if filename_changed and blog_path.exists():
+        blog_path.unlink()
+        print(f"  Renamed: {blog_path.name} -> {new_blog_path.name}")
+    else:
+        print(f"  Updated: {new_blog_path}")
 
     # Ensure wiki note has correct published URL
     ensure_published_link(wiki_path, published_url)
@@ -278,13 +306,23 @@ def ensure_published_link(wiki_path: Path, published_url: str):
         print(f"  Updated wiki backlink: {wiki_path}")
 
 
+def extract_note_id(filename: str) -> str:
+    """Extract note ID from filename like 'de14645c-slug-here.md'."""
+    stem = filename.removesuffix(".md")
+    # Note ID is the first part before the hyphen (8 hex chars)
+    match = re.match(r"^([a-f0-9]{8})", stem)
+    if match:
+        return match.group(1)
+    return stem  # Fallback to full stem
+
+
 def main():
     # Get list of note IDs to sync
     if len(sys.argv) > 1:
         note_ids = sys.argv[1:]
     else:
         # Sync all notes in _notes/
-        note_ids = [p.stem for p in NOTES_DIR.glob("*.md")]
+        note_ids = [extract_note_id(p.name) for p in NOTES_DIR.glob("*.md")]
 
     if not note_ids:
         print("No notes to sync.")
