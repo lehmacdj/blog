@@ -177,15 +177,10 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     if not title:
         raise ValueError("No title found (expected # heading)")
 
-    # Convert date
-    original_date = metadata.get("date", "")
-    if original_date:
-        jekyll_date, date_for_filename = convert_date(original_date)
-    else:
-        from datetime import datetime
-        today = datetime.now()
-        jekyll_date = today.strftime("%Y-%m-%d %H:%M") + " -0500"
-        date_for_filename = today.strftime("%Y-%m-%d")
+    # Use current date as publication date
+    from datetime import datetime
+    now = datetime.now()
+    jekyll_date = now.strftime("%Y-%m-%d %H:%M") + " -0500"
 
     # Resolve wiki-links
     body = resolve_wikilinks(body)
