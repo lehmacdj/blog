@@ -1,6 +1,6 @@
 ---
 layout: post
-title: vim-magic-link-paste
+title: "vim-magic-link-paste"
 date: 2025-09-08 01:30 -0400
 permalink: /1657d223/vim-magic-link-paste
 redirect_from:
