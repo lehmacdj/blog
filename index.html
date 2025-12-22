@@ -81,7 +81,7 @@ layout: default
       if (activeTags.length === 0) {
         post.classList.remove('hidden');
       } else {
-        const hasMatch = activeTags.some(tag => postTags.includes(tag));
+        const hasMatch = activeTags.every(tag => postTags.includes(tag));
         post.classList.toggle('hidden', !hasMatch);
       }
     });
