@@ -1,0 +1,191 @@
+"""
+Shared utilities for blog publishing scripts.
+"""
+
+import re
+from pathlib import Path
+
+WIKI_DIR = Path.home() / "wiki"
+BLOG_DIR = Path(__file__).parent.resolve()
+NOTES_DIR = BLOG_DIR / "_notes"
+BASE_URL = "https://lehmacdj.github.io"
+
+TZ_OFFSETS = {
+    "EST": "-0500",
+    "EDT": "-0400",
+    "CST": "-0600",
+    "CDT": "-0500",
+    "MST": "-0700",
+    "MDT": "-0600",
+    "PST": "-0800",
+    "PDT": "-0700",
+    "UTC": "+0000",
+    "GMT": "+0000",
+}
+
+
+def parse_frontmatter(content: str) -> tuple[dict, str]:
+    """Parse YAML frontmatter and return (metadata, body)."""
+    if not content.startswith("---"):
+        return {}, content
+
+    parts = content.split("---", 2)
+    if len(parts) < 3:
+        return {}, content
+
+    frontmatter_text = parts[1].strip()
+    body = parts[2].lstrip("\n")
+
+    metadata = {}
+    for line in frontmatter_text.split("\n"):
+        if ":" in line:
+            key, value = line.split(":", 1)
+            metadata[key.strip()] = value.strip()
+
+    return metadata, body
+
+
+def convert_date(date_str: str) -> str:
+    """Convert date from note format to Jekyll format."""
+    match = re.match(
+        r"(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})[-]?([A-Z]{3,4})", date_str
+    )
+    if match:
+        date_part, time_part, tz_abbrev = match.groups()
+        offset = TZ_OFFSETS.get(tz_abbrev, "-0500")
+        return f"{date_part} {time_part} {offset}"
+
+    match = re.match(r"(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})([-+]\d{4})?", date_str)
+    if match:
+        date_part, time_part, offset = match.groups()
+        offset = offset or "-0500"
+        return f"{date_part} {time_part} {offset}"
+
+    return date_str
+
+
+def slugify(title: str) -> str:
+    """Convert title to URL-friendly slug."""
+    slug = title.lower()
+    slug = slug.replace("/", "-")
+    slug = re.sub(r"[^\w\s-]", "", slug)
+    slug = re.sub(r"[\s_]+", "-", slug)
+    slug = slug.strip("-")
+    slug = re.sub(r"-+", "-", slug)
+    return slug
+
+
+def get_published_url(note_id: str) -> str | None:
+    """Check if a note is published and return its URL."""
+    note_path = WIKI_DIR / f"{note_id}.md"
+    if not note_path.exists():
+        return None
+
+    content = note_path.read_text()
+    metadata, _ = parse_frontmatter(content)
+
+    return metadata.get("published")
+
+
+def resolve_wikilinks(body: str) -> str:
+    """
+    Resolve wiki-links in the body.
+    [[id|text]]<!--wls--> -> [text](url) if published, otherwise just text
+    """
+    pattern = r"\[\[([a-f0-9]+)\|([^\]]+)\]\]<!--wls-->"
+
+    def replace_wikilink(match):
+        note_id = match.group(1)
+        text = match.group(2)
+        published_url = get_published_url(note_id)
+        if published_url:
+            return f"[{text}]({published_url})"
+        else:
+            return text
+
+    return re.sub(pattern, replace_wikilink, body)
+
+
+def extract_title(body: str) -> tuple[str, str]:
+    """Extract title from # heading and return (title, body_without_title)."""
+    lines = body.split("\n")
+    for i, line in enumerate(lines):
+        if line.startswith("# "):
+            title = line[2:].strip()
+            # Remove backticks (they don't render correctly in titles)
+            title = title.replace("`", "")
+            # Remove the title line and any following blank lines
+            remaining = lines[i + 1 :]
+            while remaining and not remaining[0].strip():
+                remaining.pop(0)
+            return title, "\n".join(remaining)
+    return "", body
+
+
+def parse_tags(tags_str: str) -> list[str]:
+    """Parse tags from frontmatter value."""
+    if not tags_str:
+        return []
+    if tags_str.startswith("["):
+        return [t.strip() for t in tags_str.strip("[]").split(",")]
+    return [tags_str]
+
+
+def find_blog_note(note_id: str) -> Path | None:
+    """Find the blog note file for a given note ID (handles slug in filename)."""
+    matches = list(NOTES_DIR.glob(f"{note_id}*.md"))
+    if len(matches) == 1:
+        return matches[0]
+    elif len(matches) > 1:
+        for m in matches:
+            if m.stem == note_id:
+                return m
+        return sorted(matches, key=lambda p: len(p.name))[0]
+    return None
+
+
+def extract_note_id(filename: str) -> str:
+    """Extract note ID from filename like 'de14645c-slug-here.md'."""
+    stem = filename.removesuffix(".md")
+    match = re.match(r"^([a-f0-9]{8})", stem)
+    if match:
+        return match.group(1)
+    return stem
+
+
+def get_blog_tags(note_id: str) -> list[str]:
+    """Get current tags from the blog version of the note."""
+    blog_path = find_blog_note(note_id)
+    if not blog_path:
+        return []
+
+    content = blog_path.read_text()
+    metadata, _ = parse_frontmatter(content)
+    return parse_tags(metadata.get("tags", ""))
+
+
+def ensure_published_link(wiki_path: Path, published_url: str):
+    """Ensure the wiki note has the correct published: URL."""
+    content = wiki_path.read_text()
+    metadata, body = parse_frontmatter(content)
+
+    current_url = metadata.get("published", "")
+    if current_url == published_url:
+        return
+
+    if not content.startswith("---"):
+        new_content = f"---\npublished: {published_url}\n---\n\n{content}"
+    elif "published:" in content:
+        new_content = re.sub(
+            r"published:\s*[^\n]*",
+            f"published: {published_url}",
+            content
+        )
+    else:
+        lines = content.split("\n")
+        lines.insert(1, f"published: {published_url}")
+        new_content = "\n".join(lines)
+
+    if new_content != content:
+        wiki_path.write_text(new_content)
+        print(f"  Updated wiki backlink: {wiki_path}")
