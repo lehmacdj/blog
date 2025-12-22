@@ -74,6 +74,17 @@ layout: default
       .map(btn => btn.dataset.tag);
   }
 
+  function updateUrl() {
+    const activeTags = getActiveTags();
+    const url = new URL(window.location);
+    if (activeTags.length > 0) {
+      url.searchParams.set('tags', activeTags.join(','));
+    } else {
+      url.searchParams.delete('tags');
+    }
+    history.replaceState(null, '', url);
+  }
+
   function filterPosts() {
     const activeTags = getActiveTags();
     posts.forEach(post => {
@@ -85,6 +96,19 @@ layout: default
         post.classList.toggle('hidden', !hasMatch);
       }
     });
+    updateUrl();
+  }
+
+  function initFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const tagsParam = params.get('tags');
+    if (tagsParam) {
+      const urlTags = tagsParam.split(',');
+      buttons.forEach(btn => {
+        btn.classList.toggle('active', urlTags.includes(btn.dataset.tag));
+      });
+    }
+    // If no URL params, keep the default (article selected from HTML)
   }
 
   buttons.forEach(btn => {
@@ -99,7 +123,8 @@ layout: default
     filterPosts();
   });
 
-  // Initial filter
+  // Initialize from URL params, then filter
+  initFromUrl();
   filterPosts();
 })();
 </script>

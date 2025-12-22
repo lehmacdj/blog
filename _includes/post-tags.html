@@ -1,6 +1,6 @@
 {% for tag in include.tags %}
 <span class="entry-tag">
-    <a href="{{ site.baseurl }}/{{ tag }}/" rel="tag">
+    <a href="{{ site.baseurl }}/?tags={{ tag }}" rel="tag">
         {{ tag }}
     </a>
 </span>{% unless forloop.last %},{% endunless %}
