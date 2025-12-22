@@ -1,0 +1,307 @@
+#!/usr/bin/env python3
+"""
+Sync published notes from ~/wiki to the blog.
+
+Usage: ./sync-notes [note-id ...]
+       ./sync-notes              # sync all published notes
+       ./sync-notes de14645c     # sync specific note(s)
+
+For each published note:
+  - Pulls latest content from ~/wiki/<id>.md
+  - Preserves blog-specific frontmatter (tags, etc.)
+  - Re-resolves wiki-links (picks up newly published links)
+  - Updates the published: URL in the wiki note if needed
+"""
+
+import re
+import sys
+from pathlib import Path
+
+WIKI_DIR = Path.home() / "wiki"
+BLOG_DIR = Path(__file__).parent.resolve()
+NOTES_DIR = BLOG_DIR / "_notes"
+BASE_URL = "https://lehmacdj.github.io"
+
+TZ_OFFSETS = {
+    "EST": "-0500",
+    "EDT": "-0400",
+    "CST": "-0600",
+    "CDT": "-0500",
+    "MST": "-0700",
+    "MDT": "-0600",
+    "PST": "-0800",
+    "PDT": "-0700",
+    "UTC": "+0000",
+    "GMT": "+0000",
+}
+
+
+def parse_frontmatter(content: str) -> tuple[dict, str]:
+    """Parse YAML frontmatter and return (metadata, body)."""
+    if not content.startswith("---"):
+        return {}, content
+
+    parts = content.split("---", 2)
+    if len(parts) < 3:
+        return {}, content
+
+    frontmatter_text = parts[1].strip()
+    body = parts[2].lstrip("\n")
+
+    metadata = {}
+    for line in frontmatter_text.split("\n"):
+        if ":" in line:
+            key, value = line.split(":", 1)
+            metadata[key.strip()] = value.strip()
+
+    return metadata, body
+
+
+def convert_date(date_str: str) -> str:
+    """Convert date from note format to Jekyll format."""
+    match = re.match(
+        r"(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})[-]?([A-Z]{3,4})", date_str
+    )
+    if match:
+        date_part, time_part, tz_abbrev = match.groups()
+        offset = TZ_OFFSETS.get(tz_abbrev, "-0500")
+        return f"{date_part} {time_part} {offset}"
+
+    match = re.match(r"(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})([-+]\d{4})?", date_str)
+    if match:
+        date_part, time_part, offset = match.groups()
+        offset = offset or "-0500"
+        return f"{date_part} {time_part} {offset}"
+
+    return date_str
+
+
+def slugify(title: str) -> str:
+    """Convert title to URL-friendly slug."""
+    slug = title.lower()
+    slug = slug.replace("/", "-")
+    slug = re.sub(r"[^\w\s-]", "", slug)
+    slug = re.sub(r"[\s_]+", "-", slug)
+    slug = slug.strip("-")
+    slug = re.sub(r"-+", "-", slug)
+    return slug
+
+
+def get_published_url(note_id: str) -> str | None:
+    """Check if a note is published and return its URL."""
+    note_path = WIKI_DIR / f"{note_id}.md"
+    if not note_path.exists():
+        return None
+
+    content = note_path.read_text()
+    metadata, _ = parse_frontmatter(content)
+
+    return metadata.get("published")
+
+
+def resolve_wikilinks(body: str) -> str:
+    """Resolve wiki-links: [[id|text]]<!--wls--> -> [text](url) or text."""
+    pattern = r"\[\[([a-f0-9]+)\|([^\]]+)\]\]<!--wls-->"
+
+    def replace_wikilink(match):
+        note_id = match.group(1)
+        text = match.group(2)
+        published_url = get_published_url(note_id)
+        if published_url:
+            return f"[{text}]({published_url})"
+        else:
+            return text
+
+    return re.sub(pattern, replace_wikilink, body)
+
+
+def extract_title(body: str) -> tuple[str, str]:
+    """Extract title from # heading and return (title, body_without_title)."""
+    lines = body.split("\n")
+    for i, line in enumerate(lines):
+        if line.startswith("# "):
+            title = line[2:].strip()
+            remaining = lines[i + 1 :]
+            while remaining and not remaining[0].strip():
+                remaining.pop(0)
+            return title, "\n".join(remaining)
+    return "", body
+
+
+def parse_tags(tags_str: str) -> list[str]:
+    """Parse tags from frontmatter value."""
+    if not tags_str:
+        return []
+    if tags_str.startswith("["):
+        return [t.strip() for t in tags_str.strip("[]").split(",")]
+    return [tags_str]
+
+
+def get_blog_tags(note_id: str) -> list[str]:
+    """Get current tags from the blog version of the note."""
+    blog_path = NOTES_DIR / f"{note_id}.md"
+    if not blog_path.exists():
+        return []
+
+    content = blog_path.read_text()
+    metadata, _ = parse_frontmatter(content)
+    return parse_tags(metadata.get("tags", ""))
+
+
+def sync_note(note_id: str) -> bool:
+    """
+    Sync a single note from wiki to blog.
+
+    Returns True if changes were made, False otherwise.
+    """
+    wiki_path = WIKI_DIR / f"{note_id}.md"
+    blog_path = NOTES_DIR / f"{note_id}.md"
+
+    if not wiki_path.exists():
+        print(f"  Warning: wiki note not found: {wiki_path}")
+        return False
+
+    if not blog_path.exists():
+        print(f"  Warning: blog note not found (use publish-note first): {blog_path}")
+        return False
+
+    # Read wiki note
+    wiki_content = wiki_path.read_text()
+    wiki_meta, wiki_body = parse_frontmatter(wiki_content)
+
+    # Read current blog note to preserve blog-specific metadata
+    blog_content = blog_path.read_text()
+    blog_meta, _ = parse_frontmatter(blog_content)
+
+    # Extract title from wiki body
+    title, body = extract_title(wiki_body)
+    if not title:
+        print(f"  Warning: no title found in {wiki_path}")
+        return False
+
+    # Keep the original publication date from the blog
+    jekyll_date = blog_meta.get("date", "")
+
+    # Resolve wiki-links (re-resolve in case new notes are now published)
+    body = resolve_wikilinks(body)
+
+    # Build slug and permalink
+    slug = slugify(title)
+    permalink = f"/{note_id}/{slug}"
+    published_url = f"{BASE_URL}{permalink}"
+
+    # Merge tags: keep blog tags (like 'article'), add wiki tags
+    blog_tags = get_blog_tags(note_id)
+    wiki_tags = parse_tags(wiki_meta.get("tags", ""))
+
+    # Preserve blog-only tags, update with wiki tags
+    # Blog-only tags are ones not from wiki (like 'article')
+    merged_tags = list(blog_tags)  # Start with blog tags
+    for tag in wiki_tags:
+        if tag not in merged_tags:
+            merged_tags.append(tag)
+
+    # Build Jekyll frontmatter
+    frontmatter_lines = [
+        "---",
+        "layout: post",
+        f"title: \"{title}\"",
+        f"date: {jekyll_date}",
+        f"permalink: {permalink}",
+        "redirect_from:",
+        f"  - /{note_id}",
+    ]
+
+    # Preserve old URL redirects if they exist
+    if "redirect_from" in blog_meta:
+        # Parse existing redirects from blog content
+        redirect_match = re.search(
+            r"redirect_from:\s*\n((?:\s+-\s+[^\n]+\n?)+)",
+            blog_content
+        )
+        if redirect_match:
+            existing_redirects = re.findall(r"-\s+(/[^\n]+)", redirect_match.group(1))
+            for redirect in existing_redirects:
+                if redirect != f"/{note_id}" and redirect not in frontmatter_lines:
+                    frontmatter_lines.append(f"  - {redirect}")
+
+    if merged_tags:
+        frontmatter_lines.append(f"tags: [{', '.join(merged_tags)}]")
+
+    frontmatter_lines.append("---")
+
+    new_content = "\n".join(frontmatter_lines) + "\n\n" + body
+
+    if not new_content.endswith("\n"):
+        new_content += "\n"
+
+    # Check if content changed
+    if new_content == blog_content:
+        return False
+
+    # Write updated blog note
+    blog_path.write_text(new_content)
+    print(f"  Updated: {blog_path}")
+
+    # Ensure wiki note has correct published URL
+    ensure_published_link(wiki_path, published_url)
+
+    return True
+
+
+def ensure_published_link(wiki_path: Path, published_url: str):
+    """Ensure the wiki note has the correct published: URL."""
+    content = wiki_path.read_text()
+    metadata, body = parse_frontmatter(content)
+
+    current_url = metadata.get("published", "")
+    if current_url == published_url:
+        return  # Already correct
+
+    if not content.startswith("---"):
+        new_content = f"---\npublished: {published_url}\n---\n\n{content}"
+    elif "published:" in content:
+        # Update existing published line
+        new_content = re.sub(
+            r"published:\s*[^\n]*",
+            f"published: {published_url}",
+            content
+        )
+    else:
+        # Insert published line after opening ---
+        lines = content.split("\n")
+        lines.insert(1, f"published: {published_url}")
+        new_content = "\n".join(lines)
+
+    if new_content != content:
+        wiki_path.write_text(new_content)
+        print(f"  Updated wiki backlink: {wiki_path}")
+
+
+def main():
+    # Get list of note IDs to sync
+    if len(sys.argv) > 1:
+        note_ids = sys.argv[1:]
+    else:
+        # Sync all notes in _notes/
+        note_ids = [p.stem for p in NOTES_DIR.glob("*.md")]
+
+    if not note_ids:
+        print("No notes to sync.")
+        return
+
+    print(f"Syncing {len(note_ids)} note(s)...")
+
+    updated = 0
+    for note_id in sorted(note_ids):
+        print(f"\n{note_id}:")
+        if sync_note(note_id):
+            updated += 1
+        else:
+            print("  No changes")
+
+    print(f"\nDone. Updated {updated} note(s).")
+
+
+if __name__ == "__main__":
+    main()
