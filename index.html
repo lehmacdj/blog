@@ -6,9 +6,18 @@ layout: default
 
   <h1 class="page-heading">Posts</h1>
 
+  <div class="tag-filter">
+    <span class="filter-label">Filter:</span>
+    {% assign all_tags = site.posts | map: "tags" | flatten | uniq | sort %}
+    {% for tag in all_tags %}
+      <button class="tag-btn{% if tag == 'article' %} active{% endif %}" data-tag="{{ tag }}">{{ tag }}</button>
+    {% endfor %}
+    <button class="tag-btn show-all">show all</button>
+  </div>
+
   <ul class="post-list">
     {% for post in site.posts %}
-      <li>
+      <li data-tags="{{ post.tags | join: ' ' }}">
         <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
 
         <h2>
@@ -21,3 +30,75 @@ layout: default
   <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
 
 </div>
+
+<style>
+.tag-filter {
+  margin-bottom: 1.5em;
+}
+.filter-label {
+  margin-right: 0.5em;
+  color: #828282;
+}
+.tag-btn {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 0.25em 0.5em;
+  margin-right: 0.25em;
+  cursor: pointer;
+  font-size: 0.875em;
+}
+.tag-btn:hover {
+  background: #e0e0e0;
+}
+.tag-btn.active {
+  background: #2a7ae2;
+  color: white;
+  border-color: #2a7ae2;
+}
+.post-list li.hidden {
+  display: none;
+}
+</style>
+
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.tag-btn[data-tag]');
+  const showAllBtn = document.querySelector('.tag-btn.show-all');
+  const posts = document.querySelectorAll('.post-list li');
+
+  function getActiveTags() {
+    return Array.from(buttons)
+      .filter(btn => btn.classList.contains('active'))
+      .map(btn => btn.dataset.tag);
+  }
+
+  function filterPosts() {
+    const activeTags = getActiveTags();
+    posts.forEach(post => {
+      const postTags = (post.dataset.tags || '').split(' ');
+      if (activeTags.length === 0) {
+        post.classList.remove('hidden');
+      } else {
+        const hasMatch = activeTags.some(tag => postTags.includes(tag));
+        post.classList.toggle('hidden', !hasMatch);
+      }
+    });
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      filterPosts();
+    });
+  });
+
+  showAllBtn.addEventListener('click', () => {
+    buttons.forEach(btn => btn.classList.remove('active'));
+    filterPosts();
+  });
+
+  // Initial filter
+  filterPosts();
+})();
+</script>

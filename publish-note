@@ -1,0 +1,292 @@
+#!/usr/bin/env python3
+"""
+Publish a note from ~/wiki to the blog.
+
+Usage: ./publish-note <note-id> [--tags tag1,tag2]
+Example: ./publish-note de14645c
+         ./publish-note de14645c --tags article,japanese
+
+Transforms:
+  - Extracts title from # heading -> frontmatter title
+  - Converts date format
+  - Resolves wiki-links: [[id|text]]<!--wls--> -> [text](url) if published
+  - Generates ID-based permalink: /note-id/slug-title
+  - Adds redirect from /note-id
+  - Adds published: URL backlink to original note
+"""
+
+import os
+import re
+import sys
+from pathlib import Path
+
+WIKI_DIR = Path.home() / "wiki"
+BLOG_DIR = Path(__file__).parent.resolve()
+POSTS_DIR = BLOG_DIR / "_posts"
+BASE_URL = "https://lehmacdj.github.io"
+
+# Timezone abbreviation to offset mapping
+TZ_OFFSETS = {
+    "EST": "-0500",
+    "EDT": "-0400",
+    "CST": "-0600",
+    "CDT": "-0500",
+    "MST": "-0700",
+    "MDT": "-0600",
+    "PST": "-0800",
+    "PDT": "-0700",
+    "UTC": "+0000",
+    "GMT": "+0000",
+}
+
+
+def parse_frontmatter(content: str) -> tuple[dict, str]:
+    """Parse YAML frontmatter and return (metadata, body)."""
+    if not content.startswith("---"):
+        return {}, content
+
+    parts = content.split("---", 2)
+    if len(parts) < 3:
+        return {}, content
+
+    frontmatter_text = parts[1].strip()
+    body = parts[2].lstrip("\n")
+
+    metadata = {}
+    for line in frontmatter_text.split("\n"):
+        if ":" in line:
+            key, value = line.split(":", 1)
+            metadata[key.strip()] = value.strip()
+
+    return metadata, body
+
+
+def convert_date(date_str: str) -> tuple[str, str]:
+    """
+    Convert date from note format to Jekyll format.
+    Returns (jekyll_date, date_for_filename).
+    '2024-02-17T15:52-EST' -> ('2024-02-17 15:52 -0500', '2024-02-17')
+    """
+    # Handle format like 2024-02-17T15:52-EST or 2024-02-17T15:52-PST
+    match = re.match(
+        r"(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})[-]?([A-Z]{3,4})", date_str
+    )
+    if match:
+        date_part, time_part, tz_abbrev = match.groups()
+        offset = TZ_OFFSETS.get(tz_abbrev, "-0500")
+        return f"{date_part} {time_part} {offset}", date_part
+
+    # Handle format with numeric offset like 2021-11-29T20:59-0500
+    match = re.match(r"(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})([-+]\d{4})?", date_str)
+    if match:
+        date_part, time_part, offset = match.groups()
+        offset = offset or "-0500"
+        return f"{date_part} {time_part} {offset}", date_part
+
+    # Return as-is if we can't parse, extract date portion
+    date_part = date_str.split("T")[0] if "T" in date_str else date_str
+    return date_str, date_part
+
+
+def slugify(title: str) -> str:
+    """Convert title to URL-friendly slug."""
+    slug = title.lower()
+    # Convert slashes to hyphens (before removing special chars)
+    slug = slug.replace("/", "-")
+    # Remove special characters except spaces and hyphens
+    slug = re.sub(r"[^\w\s-]", "", slug)
+    # Replace spaces with hyphens
+    slug = re.sub(r"[\s_]+", "-", slug)
+    # Remove leading/trailing hyphens
+    slug = slug.strip("-")
+    # Collapse multiple hyphens
+    slug = re.sub(r"-+", "-", slug)
+    return slug
+
+
+def get_published_url(note_id: str) -> str | None:
+    """Check if a note is published and return its URL."""
+    note_path = WIKI_DIR / f"{note_id}.md"
+    if not note_path.exists():
+        return None
+
+    content = note_path.read_text()
+    metadata, _ = parse_frontmatter(content)
+
+    return metadata.get("published")
+
+
+def resolve_wikilinks(body: str) -> str:
+    """
+    Resolve wiki-links in the body.
+    [[id|text]]<!--wls--> -> [text](url) if published, otherwise just text
+    """
+    pattern = r"\[\[([a-f0-9]+)\|([^\]]+)\]\]<!--wls-->"
+
+    def replace_wikilink(match):
+        note_id = match.group(1)
+        text = match.group(2)
+        published_url = get_published_url(note_id)
+        if published_url:
+            return f"[{text}]({published_url})"
+        else:
+            return text
+
+    return re.sub(pattern, replace_wikilink, body)
+
+
+def extract_title(body: str) -> tuple[str, str]:
+    """Extract title from # heading and return (title, body_without_title)."""
+    lines = body.split("\n")
+    for i, line in enumerate(lines):
+        if line.startswith("# "):
+            title = line[2:].strip()
+            # Remove the title line and any following blank lines
+            remaining = lines[i + 1 :]
+            while remaining and not remaining[0].strip():
+                remaining.pop(0)
+            return title, "\n".join(remaining)
+    return "", body
+
+
+def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
+    """
+    Publish a note to the blog.
+
+    Args:
+        note_id: The note ID (e.g., 'de14645c')
+        extra_tags: Optional list of additional tags
+
+    Returns:
+        The published URL
+    """
+    note_path = WIKI_DIR / f"{note_id}.md"
+    if not note_path.exists():
+        raise FileNotFoundError(f"Note not found: {note_path}")
+
+    content = note_path.read_text()
+    metadata, body = parse_frontmatter(content)
+
+    # Check if already published
+    if "published" in metadata:
+        print(f"Note already published: {metadata['published']}")
+        return metadata["published"]
+
+    # Extract title from body
+    title, body = extract_title(body)
+    if not title:
+        raise ValueError("No title found (expected # heading)")
+
+    # Convert date
+    original_date = metadata.get("date", "")
+    if original_date:
+        jekyll_date, date_for_filename = convert_date(original_date)
+    else:
+        from datetime import datetime
+        today = datetime.now()
+        jekyll_date = today.strftime("%Y-%m-%d %H:%M") + " -0500"
+        date_for_filename = today.strftime("%Y-%m-%d")
+
+    # Resolve wiki-links
+    body = resolve_wikilinks(body)
+
+    # Build slug and permalink
+    slug = slugify(title)
+    permalink = f"/{note_id}/{slug}"
+
+    # Collect tags
+    tags = []
+    if "tags" in metadata:
+        # Parse tags from frontmatter (could be [a, b] or just "a")
+        tags_str = metadata["tags"]
+        if tags_str.startswith("["):
+            tags = [t.strip() for t in tags_str.strip("[]").split(",")]
+        else:
+            tags = [tags_str]
+    if extra_tags:
+        tags.extend(extra_tags)
+
+    # Build Jekyll frontmatter
+    frontmatter_lines = [
+        "---",
+        "layout: post",
+        f"title: \"{title}\"",
+        f"date: {jekyll_date}",
+        f"permalink: {permalink}",
+        f"redirect_from:",
+        f"  - /{note_id}",
+    ]
+
+    if tags:
+        frontmatter_lines.append(f"tags: [{', '.join(tags)}]")
+
+    frontmatter_lines.append("---")
+
+    jekyll_content = "\n".join(frontmatter_lines) + "\n\n" + body
+
+    # Ensure content ends with newline
+    if not jekyll_content.endswith("\n"):
+        jekyll_content += "\n"
+
+    # Write to _posts (filename uses date for Jekyll ordering)
+    post_filename = f"{date_for_filename}-{note_id}.md"
+    post_path = POSTS_DIR / post_filename
+    post_path.write_text(jekyll_content)
+    print(f"Created: {post_path}")
+
+    # Generate published URL
+    published_url = f"{BASE_URL}{permalink}"
+
+    # Add backlink to original note
+    add_backlink(note_path, published_url)
+
+    return published_url
+
+
+def add_backlink(note_path: Path, published_url: str):
+    """Add published: URL to the note's frontmatter."""
+    content = note_path.read_text()
+
+    if not content.startswith("---"):
+        # No frontmatter, add it
+        new_content = f"---\npublished: {published_url}\n---\n\n{content}"
+    else:
+        # Insert published line after opening ---
+        lines = content.split("\n")
+        insert_idx = 1  # After first ---
+        lines.insert(insert_idx, f"published: {published_url}")
+        new_content = "\n".join(lines)
+
+    note_path.write_text(new_content)
+    print(f"Added backlink to: {note_path}")
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: ./publish-note <note-id> [--tags tag1,tag2]")
+        print("Example: ./publish-note de14645c")
+        print("         ./publish-note de14645c --tags article,japanese")
+        sys.exit(1)
+
+    note_id = sys.argv[1]
+
+    # Parse optional tags
+    extra_tags = None
+    if "--tags" in sys.argv:
+        tags_idx = sys.argv.index("--tags")
+        if tags_idx + 1 < len(sys.argv):
+            extra_tags = [t.strip() for t in sys.argv[tags_idx + 1].split(",")]
+
+    try:
+        url = publish_note(note_id, extra_tags)
+        print(f"\nPublished: {url}")
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

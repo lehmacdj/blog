@@ -20,3 +20,5 @@ permalink: /:year/:month/:day/:title.html
 # Build settings
 markdown: kramdown
 include: ["_tags"]
+plugins:
+  - jekyll-redirect-from
