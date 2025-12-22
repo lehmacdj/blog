@@ -22,3 +22,9 @@ markdown: kramdown
 include: ["_tags"]
 plugins:
   - jekyll-redirect-from
+
+# Collections
+collections:
+  notes:
+    output: true
+    sort_by: date

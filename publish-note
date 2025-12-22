@@ -22,7 +22,7 @@ from pathlib import Path
 
 WIKI_DIR = Path.home() / "wiki"
 BLOG_DIR = Path(__file__).parent.resolve()
-POSTS_DIR = BLOG_DIR / "_posts"
+NOTES_DIR = BLOG_DIR / "_notes"
 BASE_URL = "https://lehmacdj.github.io"
 
 # Timezone abbreviation to offset mapping
@@ -228,11 +228,11 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     if not jekyll_content.endswith("\n"):
         jekyll_content += "\n"
 
-    # Write to _posts (filename uses date for Jekyll ordering)
-    post_filename = f"{date_for_filename}-{note_id}.md"
-    post_path = POSTS_DIR / post_filename
-    post_path.write_text(jekyll_content)
-    print(f"Created: {post_path}")
+    # Write to _notes
+    note_filename = f"{note_id}.md"
+    note_path = NOTES_DIR / note_filename
+    note_path.write_text(jekyll_content)
+    print(f"Created: {note_path}")
 
     # Generate published URL
     published_url = f"{BASE_URL}{permalink}"

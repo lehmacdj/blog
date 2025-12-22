@@ -8,15 +8,16 @@ layout: default
 
   <div class="tag-filter">
     <span class="filter-label">Filter:</span>
-    {% assign all_tags = site.posts | map: "tags" | flatten | uniq | sort %}
+    {% assign all_tags = site.notes | map: "tags" | flatten | uniq | sort %}
     {% for tag in all_tags %}
       <button class="tag-btn{% if tag == 'article' %} active{% endif %}" data-tag="{{ tag }}">{{ tag }}</button>
     {% endfor %}
     <button class="tag-btn show-all">show all</button>
   </div>
 
+  {% assign sorted_notes = site.notes | sort: "date" | reverse %}
   <ul class="post-list">
-    {% for post in site.posts %}
+    {% for post in sorted_notes %}
       <li data-tags="{{ post.tags | join: ' ' }}">
         <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
 
