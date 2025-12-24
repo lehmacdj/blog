@@ -6,7 +6,7 @@ permalink: /74aba351/the-kinetic-basis-of-the-equilibrium-constant
 redirect_from:
   - /74aba351
   - /2017/01/31/the-kinetic-basis-of-the-equilibrium-constant.html
-tags: [article, chemistry]
+tags: [recommended, chemistry]
 ---
 
 [Reaction equilibrium][equilibrium] was one of the most mystifying concepts when

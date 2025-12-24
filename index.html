@@ -10,7 +10,7 @@ layout: default
     <span class="filter-label">Filter:</span>
     {% assign all_tags = site.notes | map: "tags" | flatten | uniq | sort %}
     {% for tag in all_tags %}
-      <button class="tag-btn{% if tag == 'article' %} active{% endif %}" data-tag="{{ tag }}">{{ tag }}</button>
+      <button class="tag-btn{% if tag == 'recommended' %} active{% endif %}" data-tag="{{ tag }}">{{ tag }}</button>
     {% endfor %}
     <button class="tag-btn show-all">show all</button>
   </div>
@@ -108,7 +108,7 @@ layout: default
         btn.classList.toggle('active', urlTags.includes(btn.dataset.tag));
       });
     }
-    // If no URL params, keep the default (article selected from HTML)
+    // If no URL params, keep the default (recommended selected from HTML)
   }
 
   buttons.forEach(btn => {

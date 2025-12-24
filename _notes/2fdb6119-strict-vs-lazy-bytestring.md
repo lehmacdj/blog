@@ -6,7 +6,7 @@ permalink: /2fdb6119/strict-vs-lazy-bytestring
 redirect_from:
   - /2fdb6119
   - /2025/09/01/strict-vs-lazy-bytestring.html
-tags: [article, haskell]
+tags: [recommended, haskell]
 ---
 
 The Haskell ecosystem's preferred way of representing binary data is the `ByteString` type. The [`bytestring`](https://hackage-content.haskell.org/package/bytestring-0.12.2.0) introduces its two variants like so:

@@ -6,7 +6,7 @@ permalink: /1657d223/vim-magic-link-paste
 redirect_from:
   - /1657d223
   - /2025/09/08/vim-magic-link-paste.html
-tags: [article, vim, wiki]
+tags: [recommended, vim, wiki]
 ---
 
 I'm releasing [vim-magic-link-paste](https://github.com/lehmacdj/vim-magic-link-paste) today. When pasting a link over visually selected markdown text it creates markdown syntax for a link. See the video for an example of what the plugin can do:
