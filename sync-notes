@@ -2,17 +2,20 @@
 """
 Sync published notes from ~/wiki to the blog.
 
-Usage: ./sync-notes [note-id ...]
+Usage: ./sync-notes [--backsync-tags] [note-id ...]
        ./sync-notes              # sync all published notes
        ./sync-notes de14645c     # sync specific note(s)
+       ./sync-notes --backsync-tags  # sync and write merged tags back to wiki
 
 For each published note:
   - Pulls latest content from ~/wiki/<id>.md
   - Preserves blog-specific frontmatter (tags, etc.)
   - Re-resolves wiki-links (picks up newly published links)
   - Updates the published: URL in the wiki note if needed
+  - Optionally backsyncs merged tags to wiki notes (--backsync-tags)
 """
 
+import argparse
 import re
 import sys
 
@@ -29,10 +32,11 @@ from blog_utils import (
     extract_note_id,
     get_blog_tags,
     ensure_published_link,
+    update_wiki_tags,
 )
 
 
-def sync_note(note_id: str) -> bool:
+def sync_note(note_id: str, backsync_tags: bool = False) -> bool:
     """
     Sync a single note from wiki to blog.
 
@@ -123,30 +127,50 @@ def sync_note(note_id: str) -> bool:
     # Check if content changed or filename needs updating
     content_changed = new_content != blog_content
     filename_changed = blog_path != new_blog_path
+    changes_made = False
 
-    if not content_changed and not filename_changed:
-        return False
+    if content_changed or filename_changed:
+        # Write updated blog note
+        new_blog_path.write_text(new_content)
 
-    # Write updated blog note
-    new_blog_path.write_text(new_content)
+        # Remove old file if renamed
+        if filename_changed and blog_path.exists():
+            blog_path.unlink()
+            print(f"  Renamed: {blog_path.name} -> {new_blog_path.name}")
+        else:
+            print(f"  Updated: {new_blog_path}")
 
-    # Remove old file if renamed
-    if filename_changed and blog_path.exists():
-        blog_path.unlink()
-        print(f"  Renamed: {blog_path.name} -> {new_blog_path.name}")
-    else:
-        print(f"  Updated: {new_blog_path}")
+        # Ensure wiki note has correct published URL
+        ensure_published_link(wiki_path, published_url)
+        changes_made = True
 
-    # Ensure wiki note has correct published URL
-    ensure_published_link(wiki_path, published_url)
+    # Optionally backsync merged tags to wiki (even if no blog changes)
+    if backsync_tags:
+        if update_wiki_tags(wiki_path, merged_tags):
+            changes_made = True
 
-    return True
+    return changes_made
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Sync published notes from ~/wiki to the blog."
+    )
+    parser.add_argument(
+        "note_ids",
+        nargs="*",
+        help="Note IDs to sync (defaults to all published notes)"
+    )
+    parser.add_argument(
+        "--backsync-tags",
+        action="store_true",
+        help="Write merged tags back to wiki notes"
+    )
+    args = parser.parse_args()
+
     # Get list of note IDs to sync
-    if len(sys.argv) > 1:
-        note_ids = sys.argv[1:]
+    if args.note_ids:
+        note_ids = args.note_ids
     else:
         # Sync all notes in _notes/
         note_ids = [extract_note_id(p.name) for p in NOTES_DIR.glob("*.md")]
@@ -160,7 +184,7 @@ def main():
     updated = 0
     for note_id in sorted(note_ids):
         print(f"\n{note_id}:")
-        if sync_note(note_id):
+        if sync_note(note_id, backsync_tags=args.backsync_tags):
             updated += 1
         else:
             print("  No changes")

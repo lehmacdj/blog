@@ -189,3 +189,51 @@ def ensure_published_link(wiki_path: Path, published_url: str):
     if new_content != content:
         wiki_path.write_text(new_content)
         print(f"  Updated wiki backlink: {wiki_path}")
+
+
+def update_wiki_tags(wiki_path: Path, tags: list[str]):
+    """Update the tags in a wiki note's frontmatter."""
+    content = wiki_path.read_text()
+    metadata, body = parse_frontmatter(content)
+
+    current_tags = parse_tags(metadata.get("tags", ""))
+    if set(current_tags) == set(tags):
+        return False
+
+    tags_str = f"[{', '.join(tags)}]" if tags else ""
+
+    if not content.startswith("---"):
+        if tags:
+            new_content = f"---\ntags: {tags_str}\n---\n\n{content}"
+        else:
+            new_content = content
+    elif re.search(r"^tags:\s*", content, re.MULTILINE):
+        if tags:
+            new_content = re.sub(
+                r"^tags:\s*[^\n]*",
+                f"tags: {tags_str}",
+                content,
+                flags=re.MULTILINE
+            )
+        else:
+            new_content = re.sub(
+                r"^tags:\s*[^\n]*\n?",
+                "",
+                content,
+                flags=re.MULTILINE
+            )
+    else:
+        if tags:
+            lines = content.split("\n")
+            lines.insert(1, f"tags: {tags_str}")
+            new_content = "\n".join(lines)
+        else:
+            new_content = content
+
+    if new_content != content:
+        wiki_path.write_text(new_content)
+        old_str = f"[{', '.join(current_tags)}]" if current_tags else "(none)"
+        new_str = f"[{', '.join(tags)}]" if tags else "(none)"
+        print(f"  Backsynced tags: {old_str} -> {new_str}")
+        return True
+    return False
