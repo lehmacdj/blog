@@ -20,6 +20,7 @@ permalink: /:year/:month/:day/:title.html
 # Build settings
 markdown: kramdown
 include: ["_tags"]
+exclude: ["CLAUDE.md"]
 plugins:
   - jekyll-redirect-from
 
