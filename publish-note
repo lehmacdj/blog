@@ -15,6 +15,7 @@ Transforms:
   - Adds published: URL backlink to original note
 """
 
+import subprocess
 import sys
 from datetime import datetime
 
@@ -108,6 +109,10 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
 
     # Add backlink to original note
     ensure_published_link(wiki_path, published_url)
+
+    # Commit and sync
+    subprocess.run(["jj", "commit", "-m", f"Publish {title}"], check=True)
+    subprocess.run(["jj", "tug"], check=True)
 
     return published_url
 
