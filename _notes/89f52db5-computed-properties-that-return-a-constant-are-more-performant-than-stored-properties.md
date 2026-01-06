@@ -5,7 +5,7 @@ date: 2026-01-05 15:19 -0500
 permalink: /89f52db5/computed-properties-that-return-a-constant-are-more-performant-than-stored-properties
 redirect_from:
   - /89f52db5
-tags: [swift, optimization, recommended]
+tags: [swift, optimization, recommended, swift, optimization, recommended]
 ---
 
 I had a hunch that the compiler should almost certainly optimize away a computed property that returns a constant.
