@@ -33,6 +33,7 @@ from blog_utils import (
     get_blog_tags,
     ensure_published_link,
     update_wiki_tags,
+    copy_images,
 )
 
 
@@ -73,6 +74,9 @@ def sync_note(note_id: str, backsync_tags: bool = False) -> bool:
     # Resolve wiki-links (re-resolve in case new notes are now published)
     body = resolve_wikilinks(body)
 
+    # Copy images from wiki to blog
+    body, copied_images = copy_images(body, note_id)
+
     # Build slug and permalink
     slug = slugify(title)
     permalink = f"/{note_id}/{slug}"
@@ -82,11 +86,9 @@ def sync_note(note_id: str, backsync_tags: bool = False) -> bool:
     blog_tags = get_blog_tags(note_id)
     wiki_tags = parse_tags(wiki_meta.get("tags", ""))
 
-    # Preserve blog-only tags, update with wiki tags
-    merged_tags = list(blog_tags)
-    for tag in wiki_tags:
-        if tag not in merged_tags:
-            merged_tags.append(tag)
+    # Preserve blog-only tags, update with wiki tags, deduplicate
+    merged_tags = list(blog_tags) + wiki_tags
+    merged_tags = list(dict.fromkeys(merged_tags))  # dedupe, preserve order
 
     # Build Jekyll frontmatter
     frontmatter_lines = [

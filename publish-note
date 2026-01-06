@@ -29,6 +29,7 @@ from blog_utils import (
     resolve_wikilinks,
     extract_title,
     ensure_published_link,
+    copy_images,
 )
 
 
@@ -66,6 +67,9 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
 
     # Resolve wiki-links
     body = resolve_wikilinks(body)
+
+    # Copy images from wiki to blog
+    body, _ = copy_images(body, note_id)
 
     # Build slug and permalink
     slug = slugify(title)

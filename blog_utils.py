@@ -3,11 +3,13 @@ Shared utilities for blog publishing scripts.
 """
 
 import re
+import shutil
 from pathlib import Path
 
 WIKI_DIR = Path.home() / "wiki"
 BLOG_DIR = Path(__file__).parent.resolve()
 NOTES_DIR = BLOG_DIR / "_notes"
+IMAGES_DIR = BLOG_DIR / "images"
 BASE_URL = "https://lehmacdj.github.io"
 
 TZ_OFFSETS = {
@@ -126,9 +128,9 @@ def parse_tags(tags_str: str) -> list[str]:
     """Parse tags from frontmatter value."""
     if not tags_str:
         return []
-    if tags_str.startswith("["):
-        return [t.strip() for t in tags_str.strip("[]").split(",")]
-    return [tags_str]
+    # Handle both [tag1, tag2] and tag1, tag2 formats
+    tags_str = tags_str.strip("[]")
+    return [t.strip() for t in tags_str.split(",") if t.strip()]
 
 
 def find_blog_note(note_id: str) -> Path | None:
@@ -237,3 +239,95 @@ def update_wiki_tags(wiki_path: Path, tags: list[str]):
         print(f"  Backsynced tags: {old_str} -> {new_str}")
         return True
     return False
+
+
+def extract_image_paths(body: str) -> list[str]:
+    """
+    Extract image paths from markdown content.
+
+    Handles:
+      - ![alt](path) - standard markdown
+      - ![alt](<path>) - markdown with angle brackets (allows spaces)
+      - ![[path]] - Obsidian-style wikilinks
+    """
+    paths = []
+
+    # Angle-bracket paths: ![alt](<path with spaces>)
+    angle_pattern = r'!\[[^\]]*\]\(<([^>]+)>\)'
+    for match in re.finditer(angle_pattern, body):
+        paths.append(match.group(1))
+
+    # Standard markdown images without angle brackets: ![alt](path)
+    std_pattern = r'!\[[^\]]*\]\(([^)<>\s]+)\)'
+    for match in re.finditer(std_pattern, body):
+        paths.append(match.group(1))
+
+    # Obsidian-style wikilinks: ![[path]]
+    obsidian_pattern = r'!\[\[([^\]]+)\]\]'
+    for match in re.finditer(obsidian_pattern, body):
+        paths.append(match.group(1))
+
+    return paths
+
+
+def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
+    """
+    Copy images referenced in the body from wiki to blog.
+
+    Returns:
+        Tuple of (updated body with fixed paths, list of copied image paths)
+    """
+    image_paths = extract_image_paths(body)
+    copied = []
+
+    for img_path in image_paths:
+        # Resolve the source path relative to wiki directory
+        # Handle various path formats
+        clean_path = img_path.replace("%20", " ")
+
+        if clean_path.startswith("./"):
+            clean_path = clean_path[2:]
+
+        source = WIKI_DIR / clean_path
+        if not source.exists():
+            # Try without URL encoding
+            source = WIKI_DIR / img_path
+        if not source.exists():
+            print(f"  Warning: image not found: {img_path}")
+            continue
+
+        # Determine destination filename (prefix with note_id for uniqueness)
+        dest_name = f"{note_id}-{source.name}"
+        dest = IMAGES_DIR / dest_name
+
+        # Copy if not already there or if source is newer
+        if not dest.exists() or source.stat().st_mtime > dest.stat().st_mtime:
+            shutil.copy2(source, dest)
+            copied.append(dest)
+            print(f"  Copied image: {source.name} -> {dest_name}")
+
+        # Update the path in the body to point to the blog images directory
+        new_path = f"/images/{dest_name}"
+
+        # Replace the original path with the new one
+        # Handle both regular and angle-bracket syntax
+        old_patterns = [
+            re.escape(img_path),
+            re.escape(f"<{img_path}>"),
+            re.escape(img_path.replace(" ", "%20")),
+        ]
+        for pattern in old_patterns:
+            body = re.sub(
+                rf'(!\[[^\]]*\]\()<?{pattern}>?(\))',
+                rf'\1{new_path}\2',
+                body
+            )
+
+        # Handle Obsidian-style wikilinks - convert to standard markdown
+        body = re.sub(
+            rf'!\[\[{re.escape(img_path)}\]\]',
+            f'![]({new_path})',
+            body
+        )
+
+    return body, copied
