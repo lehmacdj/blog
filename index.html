@@ -3,9 +3,6 @@ layout: default
 ---
 
 <div class="home">
-
-  <h1 class="page-heading">Posts</h1>
-
   {% comment %}Build tag data with counts{% endcomment %}
   {% assign all_tags = site.notes | map: "tags" | compact | flatten | sort %}
   {% assign unique_tags = all_tags | uniq %}
