@@ -307,7 +307,8 @@ def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
             print(f"  Copied image: {source.name} -> {dest_name}")
 
         # Update the path in the body to point to the blog images directory
-        new_path = f"/images/{dest_name}"
+        # Wrap in angle brackets to handle spaces in filenames
+        new_path = f"</images/{dest_name}>"
 
         # Replace the original path with the new one
         # Handle both regular and angle-bracket syntax
@@ -319,7 +320,7 @@ def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
         for pattern in old_patterns:
             body = re.sub(
                 rf'(!\[[^\]]*\]\()<?{pattern}>?(\))',
-                rf'\1{new_path}\2',
+                rf'\g<1>{new_path}\2',
                 body
             )
 
