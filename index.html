@@ -77,7 +77,6 @@ layout: default
   gap: 0.375em;
   max-height: 1.875em;
   overflow: hidden;
-  transition: max-height 0.25s ease;
 }
 .tag-filter-container.expanded .tag-filter-tags {
   max-height: 500px;
@@ -139,7 +138,7 @@ layout: default
   flex-shrink: 0;
 }
 .tag-search {
-  width: 100px;
+  width: 120px;
   padding: 0.35em 0.75em;
   padding-right: 1.75em;
   font-size: 0.8125em;
@@ -147,11 +146,10 @@ layout: default
   border: 1px solid #e8e8e8;
   border-radius: 1em;
   outline: none;
-  transition: border-color 0.15s ease, width 0.2s ease;
+  transition: border-color 0.15s ease;
 }
 .tag-search:focus {
   border-color: #2a7ae2;
-  width: 140px;
 }
 .tag-search::placeholder {
   color: #aaa;
@@ -254,29 +252,33 @@ layout: default
       return;
     }
 
+    // First, move expand button to end to measure its natural position
+    tagsContainer.appendChild(expandBtn);
+
     var containerRect = tagsContainer.getBoundingClientRect();
     var firstRowBottom = containerRect.top + ROW_HEIGHT;
+    var expandBtnLeft = expandBtn.getBoundingClientRect().left;
 
     var visibleBtns = Array.from(
       tagsContainer.querySelectorAll('.tag-btn[data-tag]:not(.filtered-out)')
     );
 
-    // Find the last button that fits in the first row
+    // Find the last button that fits in the first row before the expand button
     var lastInRowIdx = -1;
     for (var i = 0; i < visibleBtns.length; i++) {
-      if (visibleBtns[i].getBoundingClientRect().top < firstRowBottom) {
+      var btnRect = visibleBtns[i].getBoundingClientRect();
+      if (btnRect.top < firstRowBottom && btnRect.right <= expandBtnLeft) {
         lastInRowIdx = i;
-      } else {
+      } else if (btnRect.top >= firstRowBottom) {
         break;
       }
     }
 
-    // Position expand button after last visible tag in first row, or at end
+    // Position expand button after last visible tag in first row
     if (lastInRowIdx >= 0 && lastInRowIdx < visibleBtns.length - 1) {
       visibleBtns[lastInRowIdx].after(expandBtn);
-    } else {
-      tagsContainer.appendChild(expandBtn);
     }
+    // Otherwise it stays at the end where we already moved it
   }
 
   function reorderTags() {
