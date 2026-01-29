@@ -1,7 +1,9 @@
 {% for tag in include.tags %}
-<span class="entry-tag">
-    <a href="{{ site.baseurl }}/?tags={{ tag }}" rel="tag">
-        {{ tag }}
-    </a>
-</span>{% unless forloop.last %},{% endunless %}
+{% assign count = 0 %}
+{% for note in site.notes %}
+  {% if note.tags contains tag %}
+    {% assign count = count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+<a class="tag-btn" href="{{ site.baseurl }}/?tags={{ tag }}" rel="tag">{{ tag }}<span class="tag-count">{{ count }}</span></a>
 {% endfor %}
