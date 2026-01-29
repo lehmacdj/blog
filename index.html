@@ -6,13 +6,42 @@ layout: default
 
   <h1 class="page-heading">Posts</h1>
 
-  <div class="tag-filter">
-    <span class="filter-label">Filter:</span>
-    {% assign all_tags = site.notes | map: "tags" | flatten | uniq | sort %}
-    {% for tag in all_tags %}
-      <button class="tag-btn{% if tag == 'recommended' %} active{% endif %}" data-tag="{{ tag }}">{{ tag }}</button>
-    {% endfor %}
-    <button class="tag-btn show-all">show all</button>
+  {% comment %}Build tag data with counts{% endcomment %}
+  {% assign all_tags = site.notes | map: "tags" | compact | flatten | sort %}
+  {% assign unique_tags = all_tags | uniq %}
+
+  <div class="tag-filter-container">
+    <div class="tag-filter-row">
+      <div class="tag-filter-tags">
+        {% for tag in unique_tags %}
+          {% assign count = 0 %}
+          {% for note in site.notes %}
+            {% if note.tags contains tag %}
+              {% assign count = count | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+          <button class="tag-btn{% if tag == 'recommended' %} active{% endif %}" data-tag="{{ tag }}" data-count="{{ count }}">{{ tag }}<span class="tag-count">{{ count }}</span></button>
+        {% endfor %}
+        <button class="tag-btn tag-clear-btn" aria-label="Clear filters" style="display: none;">
+          <svg width="10" height="10" viewBox="0 0 12 12">
+            <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="tag-btn tag-expand-btn" aria-label="Expand tags">
+          <svg width="10" height="10" viewBox="0 0 12 12">
+            <path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="tag-search-wrapper">
+        <input type="text" class="tag-search" placeholder="Filter..." />
+        <button class="tag-search-clear" aria-label="Clear search" style="display: none;">
+          <svg width="10" height="10" viewBox="0 0 12 12">
+            <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
   {% assign sorted_notes = site.notes | sort: "date" | reverse %}
@@ -33,50 +62,176 @@ layout: default
 </div>
 
 <style>
-.tag-filter {
+.tag-filter-container {
   margin-bottom: 1.5em;
 }
-.filter-label {
-  margin-right: 0.5em;
-  color: #828282;
+.tag-filter-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75em;
+}
+.tag-filter-tags {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375em;
+  max-height: 1.875em;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+.tag-filter-container.expanded .tag-filter-tags {
+  max-height: 500px;
 }
 .tag-btn {
-  background: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  padding: 0.25em 0.5em;
-  margin-right: 0.25em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375em;
+  background: transparent;
+  border: 1px solid #e8e8e8;
+  border-radius: 1em;
+  padding: 0.25em 0.75em;
   cursor: pointer;
-  font-size: 0.875em;
+  font-size: 0.8125em;
+  font-family: inherit;
+  color: #828282;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 .tag-btn:hover {
-  background: #e0e0e0;
+  border-color: #2a7ae2;
+  color: #2a7ae2;
 }
 .tag-btn.active {
   background: #2a7ae2;
   color: white;
   border-color: #2a7ae2;
 }
+.tag-btn.active .tag-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+.tag-btn.filtered-out {
+  display: none;
+}
+.tag-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25em;
+  height: 1.25em;
+  padding: 0 0.25em;
+  font-size: 0.75em;
+  background: #e8e8e8;
+  border-radius: 0.625em;
+  color: #828282;
+}
+.tag-clear-btn {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  color: #828282;
+}
+.tag-clear-btn:hover {
+  color: #d14;
+  border-color: #d14;
+}
+.tag-search-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+.tag-search {
+  width: 100px;
+  padding: 0.35em 0.75em;
+  padding-right: 1.75em;
+  font-size: 0.8125em;
+  font-family: inherit;
+  border: 1px solid #e8e8e8;
+  border-radius: 1em;
+  outline: none;
+  transition: border-color 0.15s ease, width 0.2s ease;
+}
+.tag-search:focus {
+  border-color: #2a7ae2;
+  width: 140px;
+}
+.tag-search::placeholder {
+  color: #aaa;
+}
+.tag-search-clear {
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125em;
+  height: 1.125em;
+  padding: 0;
+  background: #e8e8e8;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #828282;
+  transition: all 0.15s ease;
+}
+.tag-search-clear:hover {
+  background: #d14;
+  color: white;
+}
+.tag-expand-btn {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+.tag-expand-btn svg {
+  transition: transform 0.2s ease;
+}
+.tag-filter-container.expanded .tag-expand-btn svg {
+  transform: rotate(180deg);
+}
 .post-list li.hidden {
   display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .tag-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5em;
+  }
+  .tag-search-wrapper {
+    width: 100%;
+  }
+  .tag-search,
+  .tag-search:focus {
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 </style>
 
 <script>
 (function() {
-  const buttons = document.querySelectorAll('.tag-btn[data-tag]');
-  const showAllBtn = document.querySelector('.tag-btn.show-all');
-  const posts = document.querySelectorAll('.post-list li');
+  // DOM elements
+  var container = document.querySelector('.tag-filter-container');
+  var tagsContainer = document.querySelector('.tag-filter-tags');
+  var tagButtons = document.querySelectorAll('.tag-filter-tags .tag-btn[data-tag]');
+  var clearBtn = document.querySelector('.tag-clear-btn');
+  var posts = document.querySelectorAll('.post-list li');
+  var searchInput = document.querySelector('.tag-search');
+  var searchClearBtn = document.querySelector('.tag-search-clear');
+  var expandBtn = document.querySelector('.tag-expand-btn');
+
+  var ROW_HEIGHT = 30;
 
   function getActiveTags() {
-    return Array.from(buttons)
-      .filter(btn => btn.classList.contains('active'))
-      .map(btn => btn.dataset.tag);
+    return Array.from(tagButtons)
+      .filter(function(btn) { return btn.classList.contains('active'); })
+      .map(function(btn) { return btn.dataset.tag; });
   }
 
   function updateUrl() {
-    const activeTags = getActiveTags();
-    const url = new URL(window.location);
+    var activeTags = getActiveTags();
+    var url = new URL(window.location);
     if (activeTags.length > 0) {
       url.searchParams.set('tags', activeTags.join(','));
     } else {
@@ -85,45 +240,154 @@ layout: default
     history.replaceState(null, '', url);
   }
 
-  function filterPosts() {
-    const activeTags = getActiveTags();
-    posts.forEach(post => {
-      const postTags = (post.dataset.tags || '').split(' ');
-      if (activeTags.length === 0) {
-        post.classList.remove('hidden');
+  // Sort comparator: by count descending, then alphabetically
+  function compareByCountThenName(a, b) {
+    var countDiff = parseInt(b.dataset.count) - parseInt(a.dataset.count);
+    if (countDiff !== 0) return countDiff;
+    return a.dataset.tag.localeCompare(b.dataset.tag);
+  }
+
+  function positionExpandButton() {
+    // When expanded, expand button goes at the end
+    if (container.classList.contains('expanded')) {
+      tagsContainer.appendChild(expandBtn);
+      return;
+    }
+
+    var containerRect = tagsContainer.getBoundingClientRect();
+    var firstRowBottom = containerRect.top + ROW_HEIGHT;
+
+    var visibleBtns = Array.from(
+      tagsContainer.querySelectorAll('.tag-btn[data-tag]:not(.filtered-out)')
+    );
+
+    // Find the last button that fits in the first row
+    var lastInRowIdx = -1;
+    for (var i = 0; i < visibleBtns.length; i++) {
+      if (visibleBtns[i].getBoundingClientRect().top < firstRowBottom) {
+        lastInRowIdx = i;
       } else {
-        const hasMatch = activeTags.every(tag => postTags.includes(tag));
-        post.classList.toggle('hidden', !hasMatch);
+        break;
       }
+    }
+
+    // Position expand button after last visible tag in first row, or at end
+    if (lastInRowIdx >= 0 && lastInRowIdx < visibleBtns.length - 1) {
+      visibleBtns[lastInRowIdx].after(expandBtn);
+    } else {
+      tagsContainer.appendChild(expandBtn);
+    }
+  }
+
+  function reorderTags() {
+    var allBtns = Array.from(
+      tagsContainer.querySelectorAll('.tag-btn[data-tag]')
+    );
+    var activeBtns = allBtns.filter(function(btn) {
+      return btn.classList.contains('active');
+    });
+    var inactiveBtns = allBtns.filter(function(btn) {
+      return !btn.classList.contains('active');
+    });
+
+    activeBtns.sort(compareByCountThenName);
+    inactiveBtns.sort(compareByCountThenName);
+
+    // Reorder DOM: active tags first, then clear button, then inactive tags
+    var insertionPoint = inactiveBtns[0] || expandBtn;
+    activeBtns.forEach(function(btn) {
+      tagsContainer.insertBefore(btn, insertionPoint);
+    });
+
+    // Show/hide and position clear button after active tags
+    var hasActiveTags = activeBtns.length > 0;
+    clearBtn.style.display = hasActiveTags ? '' : 'none';
+    if (hasActiveTags) {
+      activeBtns[activeBtns.length - 1].after(clearBtn);
+    }
+
+    inactiveBtns.forEach(function(btn) {
+      tagsContainer.insertBefore(btn, expandBtn);
+    });
+
+    requestAnimationFrame(positionExpandButton);
+  }
+
+  function filterPosts() {
+    var activeTags = getActiveTags();
+    posts.forEach(function(post) {
+      var postTags = (post.dataset.tags || '').split(' ');
+      var isVisible = activeTags.length === 0 ||
+        activeTags.every(function(tag) { return postTags.includes(tag); });
+      post.classList.toggle('hidden', !isVisible);
     });
     updateUrl();
+    reorderTags();
+  }
+
+  function filterTags(query) {
+    var q = query.toLowerCase().trim();
+    var hasQuery = q.length > 0;
+
+    tagButtons.forEach(function(btn) {
+      var matchesQuery = btn.dataset.tag.toLowerCase().includes(q);
+      btn.classList.toggle('filtered-out', hasQuery && !matchesQuery);
+    });
+
+    // Hide tag clear button during search to avoid confusion
+    clearBtn.classList.toggle('filtered-out', hasQuery);
+    searchClearBtn.style.display = hasQuery ? '' : 'none';
+
+    requestAnimationFrame(positionExpandButton);
   }
 
   function initFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    const tagsParam = params.get('tags');
+    var params = new URLSearchParams(window.location.search);
+    var tagsParam = params.get('tags');
     if (tagsParam) {
-      const urlTags = tagsParam.split(',');
-      buttons.forEach(btn => {
+      var urlTags = tagsParam.split(',');
+      tagButtons.forEach(function(btn) {
         btn.classList.toggle('active', urlTags.includes(btn.dataset.tag));
       });
     }
-    // If no URL params, keep the default (recommended selected from HTML)
   }
 
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
+  // Event listeners
+  tagButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
       btn.classList.toggle('active');
       filterPosts();
     });
   });
 
-  showAllBtn.addEventListener('click', () => {
-    buttons.forEach(btn => btn.classList.remove('active'));
+  clearBtn.addEventListener('click', function() {
+    tagButtons.forEach(function(btn) { btn.classList.remove('active'); });
     filterPosts();
   });
 
-  // Initialize from URL params, then filter
+  searchInput.addEventListener('input', function(e) {
+    filterTags(e.target.value);
+    if (e.target.value.trim()) {
+      container.classList.add('expanded');
+    }
+  });
+
+  searchClearBtn.addEventListener('click', function() {
+    searchInput.value = '';
+    filterTags('');
+    searchInput.focus();
+  });
+
+  expandBtn.addEventListener('click', function() {
+    container.classList.toggle('expanded');
+    requestAnimationFrame(positionExpandButton);
+  });
+
+  window.addEventListener('resize', function() {
+    requestAnimationFrame(positionExpandButton);
+  });
+
+  // Initialize
   initFromUrl();
   filterPosts();
 })();
