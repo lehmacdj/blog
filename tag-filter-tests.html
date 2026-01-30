@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tag Filter Layout Tests</title>
+  <link rel="stylesheet" href="tag-filter.css">
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 { margin-bottom: 0.5em; }
+    .description { color: #666; margin-bottom: 2em; }
+
+    .scenario {
+      margin: 1.5em 0;
+      padding: 1em;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    .scenario h3 {
+      margin: 0 0 0.5em 0;
+      font-size: 0.95em;
+    }
+    .scenario .width-indicator {
+      font-size: 0.75em;
+      color: #999;
+      margin-bottom: 0.75em;
+    }
+    .scenario .expected {
+      font-size: 0.75em;
+      color: #888;
+      font-family: monospace;
+      margin-bottom: 0.5em;
+    }
+
+    /* Test page overrides */
+    .tag-filter-container { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <h1>Tag Filter Layout Tests</h1>
+  <p class="description">
+    Visual verification of tag filter layout. Click tags to select/deselect.
+    Click > to expand, < to collapse. X clears selection.
+    <br>
+    Expected: [selected tags] [X] [unselected tags] [>/<]
+  </p>
+
+  <div id="scenarios"></div>
+
+  <script src="tag-filter.js"></script>
+  <script>
+    var scenarios = [
+      {
+        name: 'No selection, all fit',
+        width: null,
+        tags: [
+          { name: 'vim', count: 5 },
+          { name: 'wiki', count: 3 },
+          { name: 'jq', count: 2 }
+        ],
+        expected: 'All tags visible, > at end'
+      },
+      {
+        name: 'One selected, all fit',
+        width: null,
+        tags: [
+          { name: 'recommended', count: 10, active: true },
+          { name: 'vim', count: 5 },
+          { name: 'wiki', count: 3 }
+        ],
+        expected: '[recommended] X [vim] [wiki] >'
+      },
+      {
+        name: 'Multiple selected, all fit',
+        width: null,
+        tags: [
+          { name: 'recommended', count: 10, active: true },
+          { name: 'haskell', count: 8, active: true },
+          { name: 'vim', count: 5 }
+        ],
+        expected: '[recommended] [haskell] X [vim] >'
+      },
+      {
+        name: 'No selection, overflow',
+        width: 350,
+        tags: [
+          { name: 'recommended', count: 10 },
+          { name: 'optimization', count: 8 },
+          { name: 'programming', count: 7 },
+          { name: 'productivity', count: 6 },
+          { name: 'mathematics', count: 5 },
+          { name: 'chemistry', count: 4 },
+          { name: 'debugging', count: 3 }
+        ],
+        expected: 'First few tags, > at end (click > to see all)'
+      },
+      {
+        name: 'One selected, overflow',
+        width: 350,
+        tags: [
+          { name: 'recommended', count: 10, active: true },
+          { name: 'optimization', count: 8 },
+          { name: 'programming', count: 7 },
+          { name: 'productivity', count: 6 },
+          { name: 'mathematics', count: 5 },
+          { name: 'chemistry', count: 4 }
+        ],
+        expected: '[recommended] X [some unselected] >'
+      },
+      {
+        name: 'Many selected, overflow',
+        width: 350,
+        tags: [
+          { name: 'recommended', count: 10, active: true },
+          { name: 'optimization', count: 8, active: true },
+          { name: 'programming', count: 7, active: true },
+          { name: 'productivity', count: 6, active: true },
+          { name: 'mathematics', count: 5, active: true },
+          { name: 'chemistry', count: 4 }
+        ],
+        expected: '[some selected] X >'
+      },
+      {
+        name: 'Only selected tags',
+        width: null,
+        tags: [
+          { name: 'recommended', count: 10, active: true },
+          { name: 'haskell', count: 8, active: true }
+        ],
+        expected: '[recommended] [haskell] X >'
+      },
+      {
+        name: 'Narrow container, one selected',
+        width: 250,
+        tags: [
+          { name: 'recommended', count: 10, active: true },
+          { name: 'optimization', count: 8 },
+          { name: 'programming', count: 7 }
+        ],
+        expected: '[recommended] X > (may hide unselected)'
+      }
+    ];
+
+    function createTagFilter(scenarioTags, width) {
+      var container = document.createElement('div');
+      container.className = 'tag-filter-container';
+      if (width) container.style.width = width + 'px';
+
+      var row = document.createElement('div');
+      row.className = 'tag-filter-row';
+
+      var tagsContainer = document.createElement('div');
+      tagsContainer.className = 'tag-filter-tags';
+
+      // Create tag buttons
+      scenarioTags.forEach(function(tag) {
+        var btn = document.createElement('button');
+        btn.className = 'tag-btn' + (tag.active ? ' active' : '');
+        btn.dataset.tag = tag.name;
+        btn.dataset.count = tag.count || 1;
+        btn.textContent = tag.name;
+
+        var count = document.createElement('span');
+        count.className = 'tag-count';
+        count.textContent = tag.count || 1;
+        btn.appendChild(count);
+
+        tagsContainer.appendChild(btn);
+      });
+
+      // Create clear button (X)
+      var clearBtn = document.createElement('button');
+      clearBtn.className = 'tag-btn tag-clear-btn';
+      clearBtn.setAttribute('aria-label', 'Clear filters');
+      clearBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';
+      clearBtn.style.display = scenarioTags.some(function(t) { return t.active; }) ? '' : 'none';
+      tagsContainer.appendChild(clearBtn);
+
+      // Create expand button (>)
+      var expandBtn = document.createElement('button');
+      expandBtn.className = 'tag-btn tag-expand-btn';
+      expandBtn.setAttribute('aria-label', 'Expand tags');
+      expandBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      tagsContainer.appendChild(expandBtn);
+
+      row.appendChild(tagsContainer);
+      container.appendChild(row);
+
+      // Layout options
+      var layoutOpts = {
+        container: container,
+        tagsContainer: tagsContainer,
+        clearBtn: clearBtn,
+        expandBtn: expandBtn
+      };
+
+      // Add click handlers (same as main page)
+      var tagButtons = tagsContainer.querySelectorAll('.tag-btn[data-tag]');
+      tagButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          btn.classList.toggle('active');
+          TagFilterLayout.reorderTags(layoutOpts);
+        });
+      });
+
+      clearBtn.addEventListener('click', function() {
+        tagButtons.forEach(function(btn) {
+          btn.classList.remove('active');
+        });
+        TagFilterLayout.reorderTags(layoutOpts);
+      });
+
+      expandBtn.addEventListener('click', function() {
+        container.classList.toggle('expanded');
+        requestAnimationFrame(function() {
+          TagFilterLayout.positionControls(layoutOpts);
+        });
+      });
+
+      return {
+        container: container,
+        layoutOpts: layoutOpts
+      };
+    }
+
+    function renderScenarios() {
+      var scenariosDiv = document.getElementById('scenarios');
+
+      scenarios.forEach(function(scenario) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'scenario';
+
+        var title = document.createElement('h3');
+        title.textContent = scenario.name;
+        wrapper.appendChild(title);
+
+        if (scenario.width) {
+          var widthIndicator = document.createElement('div');
+          widthIndicator.className = 'width-indicator';
+          widthIndicator.textContent = 'Container width: ' + scenario.width + 'px';
+          wrapper.appendChild(widthIndicator);
+        }
+
+        var expected = document.createElement('div');
+        expected.className = 'expected';
+        expected.textContent = 'Expected: ' + scenario.expected;
+        wrapper.appendChild(expected);
+
+        var filter = createTagFilter(scenario.tags, scenario.width);
+        wrapper.appendChild(filter.container);
+
+        scenariosDiv.appendChild(wrapper);
+
+        // Force layout then reorder
+        void filter.container.offsetWidth;
+        TagFilterLayout.reorderTags(filter.layoutOpts);
+      });
+    }
+
+    window.onload = renderScenarios;
+  </script>
+</body>
+</html>

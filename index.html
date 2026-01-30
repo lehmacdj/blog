@@ -58,114 +58,9 @@ layout: default
 
 </div>
 
-<style>
-.tag-filter-container {
-  margin-bottom: 1.5em;
-}
-.tag-filter-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75em;
-}
-.tag-filter-tags {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375em;
-  max-height: 1.875em;
-  overflow: hidden;
-}
-.tag-filter-container.expanded .tag-filter-tags {
-  max-height: 500px;
-}
-.tag-filter-tags .tag-btn {
-  flex-shrink: 0;
-}
-.tag-btn.filtered-out {
-  display: none;
-}
-.tag-clear-btn {
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-}
-.tag-clear-btn:hover {
-  color: #d14;
-  border-color: #d14;
-}
-.tag-search-wrapper {
-  position: relative;
-  flex-shrink: 0;
-}
-.tag-search {
-  width: 120px;
-  padding: 0.35em 0.75em;
-  padding-right: 1.75em;
-  font-size: 0.8125em;
-  font-family: inherit;
-  border: 1px solid #e8e8e8;
-  border-radius: 1em;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-.tag-search:focus {
-  border-color: #2a7ae2;
-}
-.tag-search::placeholder {
-  color: #aaa;
-}
-.tag-search-clear {
-  position: absolute;
-  right: 0.5em;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.125em;
-  height: 1.125em;
-  padding: 0;
-  background: #e8e8e8;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  color: #828282;
-  transition: all 0.15s ease;
-}
-.tag-search-clear:hover {
-  background: #d14;
-  color: white;
-}
-.tag-expand-btn {
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-}
-.tag-expand-btn svg {
-  transition: transform 0.2s ease;
-}
-.tag-filter-container.expanded .tag-expand-btn svg {
-  transform: rotate(180deg);
-}
-.post-list li.hidden {
-  display: none;
-}
+<link rel="stylesheet" href="tag-filter.css">
 
-@media screen and (max-width: 600px) {
-  .tag-filter-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5em;
-  }
-  .tag-search-wrapper {
-    width: 100%;
-  }
-  .tag-search,
-  .tag-search:focus {
-    width: 100%;
-    box-sizing: border-box;
-  }
-}
-</style>
-
+<script src="tag-filter.js"></script>
 <script>
 (function() {
   // DOM elements
@@ -178,7 +73,13 @@ layout: default
   var searchClearBtn = document.querySelector('.tag-search-clear');
   var expandBtn = document.querySelector('.tag-expand-btn');
 
-  var ROW_HEIGHT = 30;
+  // Layout options for TagFilterLayout
+  var layoutOpts = {
+    container: container,
+    tagsContainer: tagsContainer,
+    clearBtn: clearBtn,
+    expandBtn: expandBtn
+  };
 
   function getActiveTags() {
     return Array.from(tagButtons)
@@ -197,83 +98,6 @@ layout: default
     history.replaceState(null, '', url);
   }
 
-  // Sort comparator: by count descending, then alphabetically
-  function compareByCountThenName(a, b) {
-    var countDiff = parseInt(b.dataset.count) - parseInt(a.dataset.count);
-    if (countDiff !== 0) return countDiff;
-    return a.dataset.tag.localeCompare(b.dataset.tag);
-  }
-
-  function positionExpandButton() {
-    // When expanded, expand button goes at the end
-    if (container.classList.contains('expanded')) {
-      tagsContainer.appendChild(expandBtn);
-      return;
-    }
-
-    // First, move expand button to end to measure its natural position
-    tagsContainer.appendChild(expandBtn);
-
-    var containerRect = tagsContainer.getBoundingClientRect();
-    var firstRowBottom = containerRect.top + ROW_HEIGHT;
-    var expandBtnLeft = expandBtn.getBoundingClientRect().left;
-
-    var visibleBtns = Array.from(
-      tagsContainer.querySelectorAll('.tag-btn[data-tag]:not(.filtered-out)')
-    );
-
-    // Find the last button that fits in the first row before the expand button
-    var lastInRowIdx = -1;
-    for (var i = 0; i < visibleBtns.length; i++) {
-      var btnRect = visibleBtns[i].getBoundingClientRect();
-      if (btnRect.top < firstRowBottom && btnRect.right <= expandBtnLeft) {
-        lastInRowIdx = i;
-      } else if (btnRect.top >= firstRowBottom) {
-        break;
-      }
-    }
-
-    // Position expand button after last visible tag in first row
-    if (lastInRowIdx >= 0 && lastInRowIdx < visibleBtns.length - 1) {
-      visibleBtns[lastInRowIdx].after(expandBtn);
-    }
-    // Otherwise it stays at the end where we already moved it
-  }
-
-  function reorderTags() {
-    var allBtns = Array.from(
-      tagsContainer.querySelectorAll('.tag-btn[data-tag]')
-    );
-    var activeBtns = allBtns.filter(function(btn) {
-      return btn.classList.contains('active');
-    });
-    var inactiveBtns = allBtns.filter(function(btn) {
-      return !btn.classList.contains('active');
-    });
-
-    activeBtns.sort(compareByCountThenName);
-    inactiveBtns.sort(compareByCountThenName);
-
-    // Reorder DOM: active tags first, then clear button, then inactive tags
-    var insertionPoint = inactiveBtns[0] || expandBtn;
-    activeBtns.forEach(function(btn) {
-      tagsContainer.insertBefore(btn, insertionPoint);
-    });
-
-    // Show/hide and position clear button after active tags
-    var hasActiveTags = activeBtns.length > 0;
-    clearBtn.style.display = hasActiveTags ? '' : 'none';
-    if (hasActiveTags) {
-      activeBtns[activeBtns.length - 1].after(clearBtn);
-    }
-
-    inactiveBtns.forEach(function(btn) {
-      tagsContainer.insertBefore(btn, expandBtn);
-    });
-
-    requestAnimationFrame(positionExpandButton);
-  }
-
   function filterPosts() {
     var activeTags = getActiveTags();
     posts.forEach(function(post) {
@@ -283,7 +107,7 @@ layout: default
       post.classList.toggle('hidden', !isVisible);
     });
     updateUrl();
-    reorderTags();
+    TagFilterLayout.reorderTags(layoutOpts);
   }
 
   function filterTags(query) {
@@ -299,7 +123,9 @@ layout: default
     clearBtn.classList.toggle('filtered-out', hasQuery);
     searchClearBtn.style.display = hasQuery ? '' : 'none';
 
-    requestAnimationFrame(positionExpandButton);
+    requestAnimationFrame(function() {
+      TagFilterLayout.positionControls(layoutOpts);
+    });
   }
 
   function initFromUrl() {
@@ -341,11 +167,15 @@ layout: default
 
   expandBtn.addEventListener('click', function() {
     container.classList.toggle('expanded');
-    requestAnimationFrame(positionExpandButton);
+    requestAnimationFrame(function() {
+      TagFilterLayout.positionControls(layoutOpts);
+    });
   });
 
   window.addEventListener('resize', function() {
-    requestAnimationFrame(positionExpandButton);
+    requestAnimationFrame(function() {
+      TagFilterLayout.positionControls(layoutOpts);
+    });
   });
 
   // Initialize
