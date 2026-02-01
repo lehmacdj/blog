@@ -7,13 +7,13 @@ redirect_from:
   - /9b80aaf5
 ---
 
-I recently started using a Glowforge Aura to laser cut stuff. So far I made a copy of [[3b759b09|the game Hex]], designed an organizer for Kingdom Builder's tiny hexagons that are a pain to sort, and plan to also try my hand at creating custom [[5fb087fb|Jig-Saw Puzzles]].
+I recently started using a Glowforge Aura to laser cut stuff. So far I made a copy of the game Hex, designed an organizer for Kingdom Builder's tiny hexagons that are a pain to sort, and plan to also try my hand at creating custom Jig-Saw Puzzles.
 
 While designing the Kingdom Builder organizer, I needed to measure game pieces using callipers and then cut out pieces of EVA foam with the correct size. Through a little bit of trial and error I determined that a 1151px square SVG exported from Figma (vector editing) was the largest size that didn't get resized when importing it into the Glowforge software and corresponded to the complete size of the Glowforge Aura's available cutting bed which is a 1ft / 304.8mm square.
 
 Performing these conversions using a calculator was annoying.
 
-I just discovered the [[df5a7476|units CLI]], and it makes it makes it pretty easy to define custom units. I defined a `gf` / `glowforge` unit which represents 1 pixel in Figma's coordinate space:
+I just discovered the [units CLI](https://lehmacdj.github.io/df5a7476/performing-unit-conversions-on-the-cli), and it makes it makes it pretty easy to define custom units. I defined a `gf` / `glowforge` unit which represents 1 pixel in Figma's coordinate space:
 ```
 # Figma pixels to millimeters conversion for Glowforge Aura
 glowforge			304.8|1151 millimeter

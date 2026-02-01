@@ -92,9 +92,10 @@ def get_published_url(note_id: str) -> str | None:
 def resolve_wikilinks(body: str) -> str:
     """
     Resolve wiki-links in the body.
-    [[id|text]]<!--wls--> -> [text](url) if published, otherwise just text
+    [[id|text]] or [[id|text]]<!--wls--> -> [text](url) if published,
+    otherwise just text
     """
-    pattern = r"\[\[([a-f0-9]+)\|([^\]]+)\]\]<!--wls-->"
+    pattern = r"\[\[([a-f0-9]+)\|([^\]]+)\]\](?:<!--wls-->)?"
 
     def replace_wikilink(match):
         note_id = match.group(1)
