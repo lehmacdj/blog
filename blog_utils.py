@@ -78,7 +78,7 @@ def slugify(title: str) -> str:
 
 
 def get_published_url(note_id: str) -> str | None:
-    """Check if a note is published and return its URL."""
+    """Check if a note is published and return its relative path."""
     note_path = WIKI_DIR / f"{note_id}.md"
     if not note_path.exists():
         return None
@@ -86,7 +86,14 @@ def get_published_url(note_id: str) -> str | None:
     content = note_path.read_text()
     metadata, _ = parse_frontmatter(content)
 
-    return metadata.get("published")
+    published = metadata.get("published")
+    if not published:
+        return None
+
+    # Convert absolute URL to relative path
+    if published.startswith(BASE_URL):
+        return published[len(BASE_URL):]
+    return published
 
 
 def resolve_wikilinks(body: str) -> str:

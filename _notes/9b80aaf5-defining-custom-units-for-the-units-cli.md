@@ -13,7 +13,7 @@ While designing the Kingdom Builder organizer, I needed to measure game pieces u
 
 Performing these conversions using a calculator was annoying.
 
-I just discovered the [units CLI](https://lehmacdj.github.io/df5a7476/performing-unit-conversions-on-the-cli), and it makes it makes it pretty easy to define custom units. I defined a `gf` / `glowforge` unit which represents 1 pixel in Figma's coordinate space:
+I just discovered the [units CLI](/df5a7476/performing-unit-conversions-on-the-cli), and it makes it makes it pretty easy to define custom units. I defined a `gf` / `glowforge` unit which represents 1 pixel in Figma's coordinate space:
 ```
 # Figma pixels to millimeters conversion for Glowforge Aura
 glowforge			304.8|1151 millimeter
