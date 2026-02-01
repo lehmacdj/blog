@@ -40,7 +40,6 @@ conformability error
 	10
 	0.01 m
 ❯ units '10 mm' cm
-conformability error
 	* 1
 	/ 1
 ```
