@@ -5,6 +5,7 @@ date: 2026-02-01 01:37 -0500
 permalink: /9b80aaf5/defining-custom-units-for-the-units-cli
 redirect_from:
   - /9b80aaf5
+tags: [cli, lasercutting]
 ---
 
 I recently started using a Glowforge Aura to laser cut stuff. So far I made a copy of the game Hex, designed an organizer for Kingdom Builder's tiny hexagons that are a pain to sort, and plan to also try my hand at creating custom Jig-Saw Puzzles.
