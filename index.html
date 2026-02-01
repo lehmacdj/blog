@@ -87,15 +87,22 @@ layout: default
       .map(function(btn) { return btn.dataset.tag; });
   }
 
+  function isDefaultState(tags) {
+    return tags.length === 1 && tags[0] === 'recommended';
+  }
+
   function updateUrl() {
     var activeTags = getActiveTags();
-    var url = new URL(window.location);
-    if (activeTags.length > 0) {
-      url.searchParams.set('tags', activeTags.join(','));
-    } else {
-      url.searchParams.delete('tags');
+    var path = window.location.pathname;
+
+    if (isDefaultState(activeTags)) {
+      history.replaceState(null, '', path);
+      return;
     }
-    history.replaceState(null, '', url);
+
+    // Use + as separator (decoded as space by URLSearchParams)
+    var search = '?tags=' + activeTags.join('+');
+    history.replaceState(null, '', path + search);
   }
 
   function filterPosts() {
@@ -130,13 +137,18 @@ layout: default
 
   function initFromUrl() {
     var params = new URLSearchParams(window.location.search);
-    var tagsParam = params.get('tags');
-    if (tagsParam) {
-      var urlTags = tagsParam.split(',');
-      tagButtons.forEach(function(btn) {
-        btn.classList.toggle('active', urlTags.includes(btn.dataset.tag));
-      });
+
+    if (!params.has('tags')) {
+      return;  // No param: keep template default (recommended active)
     }
+
+    // URLSearchParams decodes + as space, split gives [] for empty string
+    var tagsParam = params.get('tags');
+    var urlTags = tagsParam ? tagsParam.split(' ') : [];
+
+    tagButtons.forEach(function(btn) {
+      btn.classList.toggle('active', urlTags.includes(btn.dataset.tag));
+    });
   }
 
   // Event listeners
