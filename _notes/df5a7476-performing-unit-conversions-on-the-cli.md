@@ -5,7 +5,7 @@ date: 2026-02-01 01:37 -0500
 permalink: /df5a7476/performing-unit-conversions-on-the-cli
 redirect_from:
   - /df5a7476
-tags: [cli]
+tags: [cli, recommended]
 ---
 
 I recently discovered[^how-I-discovered-it] the `units` CLI tool which installed by default on macOS/Linux and comes with a ton of builtin conversions. For example you can do:
