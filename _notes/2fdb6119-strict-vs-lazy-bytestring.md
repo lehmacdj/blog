@@ -13,7 +13,7 @@ The Haskell ecosystem's preferred way of representing binary data is the `ByteSt
 > - Strict `ByteString`s keep the string as a single large array. This makes them convenient for passing data between C and Haskell.
 > - Lazy `ByteString`s use a lazy list of strict chunks which makes it suitable for I/O streaming tasks.
 
-Otherwise it has little to preference to express between strict `ByteString`s and lazy `ByteString`s.
+Otherwise, the documentation expresses little preference between strict and lazy `ByteString`s.
 
 The broader library ecosystem often offers functions for working with both lazy and strict `ByteString`s. For example, in `aeson` exposes [`decode`](https://hackage.haskell.org/package/aeson-2.2.3.0/docs/Data-Aeson.html#v:decode) which decodes a json value from a lazy `ByteString` in addition to a strict variant [`decodeStrict`](https://hackage.haskell.org/package/aeson-2.2.3.0/docs/Data-Aeson.html#v:decodeStrict). From this, it's reasonable to assume that lazy `ByteString` is the default, because `aeson` exposes it unqualified, while relegating strict to a section with "Variants for strict bytestrings".
 
