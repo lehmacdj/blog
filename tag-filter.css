@@ -117,6 +117,23 @@
   color: white;
 }
 
+/* RSS feed links */
+.rss-tag-link {
+  display: none;
+}
+.rss-tag-link.visible {
+  display: inline;
+}
+.rss-tag-link.visible ~ .rss-tag-link.visible::before,
+.rss-tag-link.visible ~ .rss-everything-link::before {
+  content: "\00b7";
+  color: #828282;
+  text-decoration: none;
+  display: inline-block;
+  padding: 0 0.4em;
+  pointer-events: none;
+}
+
 /* Post list filtering */
 .post-list li.hidden {
   display: none;

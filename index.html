@@ -54,7 +54,10 @@ layout: default
     {% endfor %}
   </ul>
 
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+  <p class="rss-subscribe">
+    subscribe via RSS:
+    <span class="rss-links">{% for tag in unique_tags %}<a class="rss-tag-link{% if tag == "recommended" %} visible{% endif %}" href="{{ "/feed/" | append: tag | append: ".xml" | prepend: site.baseurl }}" data-tag="{{ tag }}">{{ tag }}</a>{% endfor %}<a class="rss-everything-link" href="{{ "/feed/everything.xml" | prepend: site.baseurl }}">everything</a></span>
+  </p>
 
 </div>
 
@@ -105,6 +108,16 @@ layout: default
     history.replaceState(null, '', path + search);
   }
 
+  var rssTagLinks = document.querySelectorAll('.rss-tag-link');
+
+  function updateRssLinks(activeTags) {
+    rssTagLinks.forEach(function(link) {
+      link.classList.toggle(
+        'visible', activeTags.includes(link.dataset.tag)
+      );
+    });
+  }
+
   function filterPosts() {
     var activeTags = getActiveTags();
     posts.forEach(function(post) {
@@ -113,6 +126,7 @@ layout: default
         activeTags.every(function(tag) { return postTags.includes(tag); });
       post.classList.toggle('hidden', !isVisible);
     });
+    updateRssLinks(activeTags);
     updateUrl();
     TagFilterLayout.reorderTags(layoutOpts);
   }
