@@ -9,6 +9,7 @@ from pathlib import Path
 WIKI_DIR = Path.home() / "wiki"
 BLOG_DIR = Path(__file__).parent.resolve()
 NOTES_DIR = BLOG_DIR / "_notes"
+FEED_DIR = BLOG_DIR / "feed"
 IMAGES_DIR = BLOG_DIR / "images"
 BASE_URL = "https://lehmacdj.github.io"
 
@@ -247,6 +248,29 @@ def update_wiki_tags(wiki_path: Path, tags: list[str]):
         print(f"  Backsynced tags: {old_str} -> {new_str}")
         return True
     return False
+
+
+def sync_tag_feeds():
+    """Ensure a feed file exists for every tag used in notes."""
+    FEED_DIR.mkdir(exist_ok=True)
+    tags = set()
+    for note_path in NOTES_DIR.glob("*.md"):
+        content = note_path.read_text()
+        metadata, _ = parse_frontmatter(content)
+        tags.update(parse_tags(metadata.get("tags", "")))
+
+    created = []
+    for tag in sorted(tags):
+        feed_path = FEED_DIR / f"{tag}.xml"
+        if not feed_path.exists():
+            feed_path.write_text(
+                f"---\nlayout: feed\n"
+                f"feed_suffix: \"{tag}\"\n"
+                f"feed_tag: \"{tag}\"\n---\n"
+            )
+            created.append(tag)
+    if created:
+        print(f"Created feed(s): {', '.join(created)}")
 
 
 def extract_image_paths(body: str) -> list[str]:

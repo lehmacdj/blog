@@ -34,6 +34,7 @@ from blog_utils import (
     ensure_published_link,
     update_wiki_tags,
     copy_images,
+    sync_tag_feeds,
 )
 
 
@@ -191,6 +192,7 @@ def main():
         else:
             print("  No changes")
 
+    sync_tag_feeds()
     print(f"\nDone. Updated {updated} note(s).")
 
 

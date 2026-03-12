@@ -30,6 +30,7 @@ from blog_utils import (
     extract_title,
     ensure_published_link,
     copy_images,
+    sync_tag_feeds,
 )
 
 
@@ -113,6 +114,9 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
 
     # Add backlink to original note
     ensure_published_link(wiki_path, published_url)
+
+    # Ensure feed files exist for any new tags
+    sync_tag_feeds()
 
     # Commit and sync
     subprocess.run(["jj", "commit", "-m", f"Publish {title}"], check=True)
