@@ -2,9 +2,9 @@
 layout: post
 title: "Defining custom units for the units CLI"
 date: 2026-02-01 01:37 -0500
-permalink: /9b80aaf5/defining-custom-units-for-the-units-cli
+permalink: /EaF5QphkhxlD/defining-custom-units-for-the-units-cli
 redirect_from:
-  - /9b80aaf5
+  - /EaF5QphkhxlD
 tags: [cli, lasercutting]
 ---
 
@@ -14,7 +14,7 @@ While designing the Kingdom Builder organizer, I needed to measure game pieces u
 
 Performing these conversions using a calculator was annoying.
 
-I just discovered the [units CLI](/df5a7476/performing-unit-conversions-on-the-cli), and it makes it pretty easy to define custom units. I defined a `gf` / `glowforge` unit which represents 1 pixel in Figma's coordinate space:
+I just discovered the [units CLI](/80ez771I2kAJ/performing-unit-conversions-on-the-cli), and it makes it pretty easy to define custom units. I defined a `gf` / `glowforge` unit which represents 1 pixel in Figma's coordinate space:
 ```
 # Figma pixels to millimeters conversion for Glowforge Aura
 glowforge			304.8|1151 millimeter

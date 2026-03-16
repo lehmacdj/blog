@@ -2,9 +2,9 @@
 layout: post
 title: "Swift computed properties returning a constant aren't slower than stored constants"
 date: 2026-01-05 15:19 -0500
-permalink: /89f52db5/swift-computed-properties-returning-a-constant-arent-slower-than-stored-constants
+permalink: /m1hm9H9NxeLD/swift-computed-properties-returning-a-constant-arent-slower-than-stored-constants
 redirect_from:
-  - /89f52db5
+  - /m1hm9H9NxeLD
 tags: [swift, optimization, recommended]
 ---
 

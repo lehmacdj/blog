@@ -2,14 +2,14 @@
 layout: post
 title: "You can use regexes to filter out noisy console logs"
 date: 2025-12-31 15:03 -0500
-permalink: /b1ff90c4/you-can-use-regexes-to-filter-out-noisy-console-logs
+permalink: /rGhYCT5cjMgg/you-can-use-regexes-to-filter-out-noisy-console-logs
 redirect_from:
-  - /b1ff90c4
+  - /rGhYCT5cjMgg
 tags: [browser, debugging, recommended]
 ---
 
 When building browser extensions/ad-hoc scripts that run in the browser I often run into a lot of noisy warnings/logs emitted by the website my script runs on. Here's just a sampling of what I encountered while writing a Tampermonkey script to bulk download statements from Fidelity:
-![Screenshot of some noisy debug logs](</images/b1ff90c4-Screenshot 2025-12-29 at 16.17.15.png>)
+![Screenshot of some noisy debug logs](</images/rGhYCT5cjMgg-Screenshot 2025-12-29 at 16.17.15.png>)
 
 An easy solution is to filter for a string that you include in your own log messages. This works pretty well, but sometimes your JavaScript emits an error, which is typically not prefixed. Here's an example from the same bulk Fidelity statement downloader. The last line's error message isn't prefixed with FidelityDL, but was produced by my script:
 ```

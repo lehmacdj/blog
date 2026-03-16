@@ -2,9 +2,9 @@
 layout: post
 title: "Performing unit conversions on the CLI"
 date: 2026-02-01 01:37 -0500
-permalink: /df5a7476/performing-unit-conversions-on-the-cli
+permalink: /80ez771I2kAJ/performing-unit-conversions-on-the-cli
 redirect_from:
-  - /df5a7476
+  - /80ez771I2kAJ
 tags: [cli, recommended]
 ---
 
@@ -72,7 +72,7 @@ But it also contains a lot of (at least to me) extremely obscure units. For exam
 frenchfoot		16|15 ft
 ```
 
-You also can [define your own custom conversions](/9b80aaf5/defining-custom-units-for-the-units-cli) for your own unique use cases.
+You also can [define your own custom conversions](/EaF5QphkhxlD/defining-custom-units-for-the-units-cli) for your own unique use cases.
 
 I frequently find it convenient to use `bc` as a calculator on the command line in my dropdown terminal instead of using a browser/search engine, so I imagine I'll use `units` in the future when remembering or typing the conversion into `bc` is too inconvenient.
 

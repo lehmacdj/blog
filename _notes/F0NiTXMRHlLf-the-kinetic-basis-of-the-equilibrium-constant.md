@@ -2,9 +2,9 @@
 layout: post
 title: "The Kinetic Basis of the Equilibrium Constant"
 date: 2017-01-31 19:09 -0400
-permalink: /74aba351/the-kinetic-basis-of-the-equilibrium-constant
+permalink: /F0NiTXMRHlLf/the-kinetic-basis-of-the-equilibrium-constant
 redirect_from:
-  - /74aba351
+  - /F0NiTXMRHlLf
   - /2017/01/31/the-kinetic-basis-of-the-equilibrium-constant.html
 tags: [recommended, chemistry]
 ---

@@ -2,9 +2,9 @@
 layout: post
 title: "vim-magic-link-paste"
 date: 2025-09-08 01:30 -0400
-permalink: /1657d223/vim-magic-link-paste
+permalink: /Rna31XL7OHqU/vim-magic-link-paste
 redirect_from:
-  - /1657d223
+  - /Rna31XL7OHqU
   - /2025/09/08/vim-magic-link-paste.html
 tags: [recommended, vim, wiki]
 ---

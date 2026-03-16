@@ -2,9 +2,9 @@
 layout: post
 title: "There's ~150 vocab/radicals/kanji per WaniKani level"
 date: 2025-12-22 14:32 -0500
-permalink: /de14645c/theres-150-vocab-radicals-kanji-per-wanikani-level
+permalink: /1zuNpog5p4DD/theres-150-vocab-radicals-kanji-per-wanikani-level
 redirect_from:
-  - /de14645c
+  - /1zuNpog5p4DD
 tags: [japanese, jq]
 ---
 
