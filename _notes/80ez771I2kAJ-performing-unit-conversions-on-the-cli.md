@@ -5,6 +5,8 @@ date: 2026-02-01 01:37 -0500
 permalink: /80ez771I2kAJ/performing-unit-conversions-on-the-cli
 redirect_from:
   - /80ez771I2kAJ
+  - /df5a7476
+  - /df5a7476/performing-unit-conversions-on-the-cli
 tags: [cli, recommended]
 ---
 

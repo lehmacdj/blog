@@ -5,6 +5,8 @@ date: 2025-12-22 14:32 -0500
 permalink: /1zuNpog5p4DD/theres-150-vocab-radicals-kanji-per-wanikani-level
 redirect_from:
   - /1zuNpog5p4DD
+  - /de14645c
+  - /de14645c/theres-150-vocab-radicals-kanji-per-wanikani-level
 tags: [japanese, jq]
 ---
 

@@ -5,6 +5,8 @@ date: 2025-12-31 15:03 -0500
 permalink: /rGhYCT5cjMgg/you-can-use-regexes-to-filter-out-noisy-console-logs
 redirect_from:
   - /rGhYCT5cjMgg
+  - /b1ff90c4
+  - /b1ff90c4/you-can-use-regexes-to-filter-out-noisy-console-logs
 tags: [browser, debugging, recommended]
 ---
 

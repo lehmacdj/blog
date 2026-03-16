@@ -5,6 +5,8 @@ date: 2026-01-05 15:19 -0500
 permalink: /m1hm9H9NxeLD/swift-computed-properties-returning-a-constant-arent-slower-than-stored-constants
 redirect_from:
   - /m1hm9H9NxeLD
+  - /89f52db5
+  - /89f52db5/swift-computed-properties-returning-a-constant-arent-slower-than-stored-constants
 tags: [swift, optimization, recommended]
 ---
 

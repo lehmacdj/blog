@@ -5,6 +5,8 @@ date: 2026-03-16 21:47 +0900
 permalink: /pI5A62E7dfuR/streuselkuchen-german-crumb-cake
 redirect_from:
   - /pI5A62E7dfuR
+  - /fb05acf7
+  - /fb05acf7/streuselkuchen-german-crumb-cake
 tags: [recipe, dessert]
 ---
 

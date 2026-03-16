@@ -6,6 +6,8 @@ permalink: /Rna31XL7OHqU/vim-magic-link-paste
 redirect_from:
   - /Rna31XL7OHqU
   - /2025/09/08/vim-magic-link-paste.html
+  - /1657d223
+  - /1657d223/vim-magic-link-paste
 tags: [recommended, vim, wiki]
 ---
 

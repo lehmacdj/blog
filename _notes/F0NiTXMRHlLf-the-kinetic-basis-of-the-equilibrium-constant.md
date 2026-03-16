@@ -6,6 +6,8 @@ permalink: /F0NiTXMRHlLf/the-kinetic-basis-of-the-equilibrium-constant
 redirect_from:
   - /F0NiTXMRHlLf
   - /2017/01/31/the-kinetic-basis-of-the-equilibrium-constant.html
+  - /74aba351
+  - /74aba351/the-kinetic-basis-of-the-equilibrium-constant
 tags: [recommended, chemistry]
 ---
 

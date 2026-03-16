@@ -5,6 +5,8 @@ date: 2026-02-01 01:37 -0500
 permalink: /EaF5QphkhxlD/defining-custom-units-for-the-units-cli
 redirect_from:
   - /EaF5QphkhxlD
+  - /9b80aaf5
+  - /9b80aaf5/defining-custom-units-for-the-units-cli
 tags: [cli, lasercutting]
 ---
 
