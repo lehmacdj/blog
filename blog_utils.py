@@ -4,6 +4,8 @@ Shared utilities for blog publishing scripts.
 
 import re
 import shutil
+import subprocess
+from datetime import datetime
 from pathlib import Path
 
 WIKI_DIR = Path.home() / "wiki"
@@ -48,20 +50,27 @@ def parse_frontmatter(content: str) -> tuple[dict, str]:
     return metadata, body
 
 
+def local_tz_offset() -> str:
+    """Get the local timezone offset as a string like '+0900' or '-0500'."""
+    return datetime.now().astimezone().strftime("%z")
+
+
 def convert_date(date_str: str) -> str:
     """Convert date from note format to Jekyll format."""
+    fallback = local_tz_offset()
+
     match = re.match(
         r"(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})[-]?([A-Z]{3,4})", date_str
     )
     if match:
         date_part, time_part, tz_abbrev = match.groups()
-        offset = TZ_OFFSETS.get(tz_abbrev, "-0500")
+        offset = TZ_OFFSETS.get(tz_abbrev, fallback)
         return f"{date_part} {time_part} {offset}"
 
     match = re.match(r"(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})([-+]\d{4})?", date_str)
     if match:
         date_part, time_part, offset = match.groups()
-        offset = offset or "-0500"
+        offset = offset or fallback
         return f"{date_part} {time_part} {offset}"
 
     return date_str
@@ -329,14 +338,27 @@ def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
             continue
 
         # Determine destination filename (prefix with note_id for uniqueness)
-        dest_name = f"{note_id}-{source.name}"
+        # Convert HEIC to JPEG for wider browser compatibility
+        if source.suffix.lower() == ".heic":
+            dest_name = f"{note_id}-{source.stem}.jpeg"
+        else:
+            dest_name = f"{note_id}-{source.name}"
         dest = IMAGES_DIR / dest_name
 
-        # Copy if not already there or if source is newer
+        # Copy (or convert) if not already there or if source is newer
         if not dest.exists() or source.stat().st_mtime > dest.stat().st_mtime:
-            shutil.copy2(source, dest)
+            if source.suffix.lower() == ".heic":
+                subprocess.run(
+                    ["sips", "-s", "format", "jpeg",
+                     str(source), "--out", str(dest)],
+                    check=True,
+                    capture_output=True,
+                )
+                print(f"  Converted image: {source.name} -> {dest_name}")
+            else:
+                shutil.copy2(source, dest)
+                print(f"  Copied image: {source.name} -> {dest_name}")
             copied.append(dest)
-            print(f"  Copied image: {source.name} -> {dest_name}")
 
         # Update the path in the body to point to the blog images directory
         # Wrap in angle brackets to handle spaces in filenames

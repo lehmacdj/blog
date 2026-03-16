@@ -17,7 +17,7 @@ Transforms:
 
 import subprocess
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 from blog_utils import (
     WIKI_DIR,
@@ -62,9 +62,9 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     if not title:
         raise ValueError("No title found (expected # heading)")
 
-    # Use current date as publication date
-    now = datetime.now()
-    jekyll_date = now.strftime("%Y-%m-%d %H:%M") + " -0500"
+    # Use current date as publication date with local timezone
+    now = datetime.now().astimezone()
+    jekyll_date = now.strftime("%Y-%m-%d %H:%M %z")
 
     # Resolve wiki-links
     body = resolve_wikilinks(body)
