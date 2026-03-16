@@ -112,7 +112,7 @@ def resolve_wikilinks(body: str) -> str:
     [[id|text]] or [[id|text]]<!--wls--> -> [text](url) if published,
     otherwise just text
     """
-    pattern = r"\[\[([a-f0-9]+)\|([^\]]+)\]\](?:<!--wls-->)?"
+    pattern = r"\[\[([A-Za-z0-9]+)\|([^\]]+)\]\](?:<!--wls-->)?"
 
     def replace_wikilink(match):
         note_id = match.group(1)
@@ -167,7 +167,7 @@ def find_blog_note(note_id: str) -> Path | None:
 def extract_note_id(filename: str) -> str:
     """Extract note ID from filename like 'de14645c-slug-here.md'."""
     stem = filename.removesuffix(".md")
-    match = re.match(r"^([a-f0-9]{8})", stem)
+    match = re.match(r"^([A-Za-z0-9]{8,12})(?:-|$)", stem)
     if match:
         return match.group(1)
     return stem
