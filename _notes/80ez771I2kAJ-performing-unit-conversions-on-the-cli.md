@@ -7,6 +7,8 @@ redirect_from:
   - /80ez771I2kAJ
   - /df5a7476
   - /df5a7476/performing-unit-conversions-on-the-cli
+  - /itf3RpYjS0af
+  - /itf3RpYjS0af/performing-unit-conversions-on-the-cli
 tags: [cli, recommended]
 ---
 

@@ -13,7 +13,7 @@ BLOG_DIR = Path(__file__).parent.resolve()
 NOTES_DIR = BLOG_DIR / "_notes"
 FEED_DIR = BLOG_DIR / "feed"
 IMAGES_DIR = BLOG_DIR / "images"
-BASE_URL = "https://lehmacdj.github.io"
+BASE_URL = "https://unformeddelta.wiki"
 
 TZ_OFFSETS = {
     "EST": "-0500",

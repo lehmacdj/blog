@@ -7,6 +7,8 @@ redirect_from:
   - /rGhYCT5cjMgg
   - /b1ff90c4
   - /b1ff90c4/you-can-use-regexes-to-filter-out-noisy-console-logs
+  - /eFK64NFAYvnf
+  - /eFK64NFAYvnf/you-can-use-regexes-to-filter-out-noisy-console-logs
 tags: [browser, debugging, recommended]
 ---
 
