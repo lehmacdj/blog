@@ -30,19 +30,19 @@
   font-size: 0.8125em;
   font-family: inherit;
   background: white;
-  border: 1px solid #e8e8e8;
+  border: 1px solid $grey-color-light;
   border-radius: 1em;
   cursor: pointer;
-  color: #828282;
+  color: $grey-color;
   transition: all 0.15s ease;
 }
 .tag-btn:hover {
-  border-color: #2a7ae2;
-  color: #2a7ae2;
+  border-color: $brand-color;
+  color: $brand-color;
 }
 .tag-btn.active {
-  background: #2a7ae2;
-  border-color: #2a7ae2;
+  background: $brand-color;
+  border-color: $brand-color;
   color: white;
 }
 .tag-btn.filtered-out,
@@ -83,13 +83,13 @@
   padding-right: 1.75em;
   font-size: 0.8125em;
   font-family: inherit;
-  border: 1px solid #e8e8e8;
+  border: 1px solid $grey-color-light;
   border-radius: 1em;
   outline: none;
   transition: border-color 0.15s ease;
 }
 .tag-search:focus {
-  border-color: #2a7ae2;
+  border-color: $brand-color;
 }
 .tag-search::placeholder {
   color: #aaa;
@@ -105,11 +105,11 @@
   width: 1.125em;
   height: 1.125em;
   padding: 0;
-  background: #e8e8e8;
+  background: $grey-color-light;
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  color: #828282;
+  color: $grey-color;
   transition: all 0.15s ease;
 }
 .tag-search-clear:hover {
@@ -127,7 +127,7 @@
 .rss-tag-link.visible ~ .rss-tag-link.visible::before,
 .rss-tag-link.visible ~ .rss-everything-link::before {
   content: "\00b7";
-  color: #828282;
+  color: $grey-color;
   text-decoration: none;
   display: inline-block;
   padding: 0 0.4em;
