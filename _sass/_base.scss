@@ -197,10 +197,22 @@ pre {
         display: inline-block;
         width: 16px;
         height: 16px;
-        vertical-align: middle;
+        vertical-align: -0.15em;
 
         path {
             fill: $grey-color;
+        }
+    }
+}
+
+.contact-list a {
+    text-decoration-color: transparent;
+
+    &:hover {
+        text-decoration: none;
+
+        .username {
+            text-decoration: underline;
         }
     }
 }
