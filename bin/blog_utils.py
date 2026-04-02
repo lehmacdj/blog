@@ -311,6 +311,16 @@ def extract_image_paths(body: str) -> list[str]:
     return paths
 
 
+def scrub_metadata(image_path: Path) -> None:
+    """Strip all metadata (GPS, device info, etc.) from an image."""
+    subprocess.run(
+        ["exiftool", "-all=", "-overwrite_original", str(image_path)],
+        check=True,
+        capture_output=True,
+    )
+    print(f"  Scrubbed metadata: {image_path.name}")
+
+
 def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
     """
     Copy images referenced in the body from wiki to blog.
@@ -358,6 +368,7 @@ def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
             else:
                 shutil.copy2(source, dest)
                 print(f"  Copied image: {source.name} -> {dest_name}")
+            scrub_metadata(dest)
             copied.append(dest)
 
         # Update the path in the body to point to the blog images directory

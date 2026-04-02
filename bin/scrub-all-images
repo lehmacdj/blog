@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""
+One-time script to scrub metadata from all existing blog images.
+
+Usage: ./scrub-all-images
+"""
+
+from blog_utils import IMAGES_DIR, scrub_metadata
+
+IMAGE_EXTENSIONS = {".jpeg", ".jpg", ".png", ".tiff", ".webp"}
+
+
+def main():
+    images = [
+        p for p in IMAGES_DIR.iterdir()
+        if p.suffix.lower() in IMAGE_EXTENSIONS
+    ]
+    print(f"Found {len(images)} images to scrub")
+    for img in sorted(images):
+        scrub_metadata(img)
+    print("Done")
+
+
+if __name__ == "__main__":
+    main()
