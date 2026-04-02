@@ -20,6 +20,8 @@ markdown: kramdown
 exclude: ["CLAUDE.md"]
 plugins:
   - jekyll-redirect-from
+  - jekyll-sitemap
+  - jekyll-seo-tag
 
 # Collections
 collections:
