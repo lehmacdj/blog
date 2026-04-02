@@ -8,7 +8,7 @@ redirect_from:
 tags: [inkhaven, travel, personal, recommended, japan]
 ---
 
-Yesterday I arrived at Inkhaven from my most thoroughly planned trip ever: a 3 week trip to Japan. My highlights from the trip were: attending Idolm@ster Million Live! 11th Live 百合咲く誇るレムリア, a couple of action-packed days hiking the Nakasendo + seeing Matsumoto castle/Lake Suwa, an overnight bikepacking trip from Fujiyoshida to Minobu with an stunning view of Mount Fuji from my campsite, and a memorable dinner at a tiny home restaurant in Shuzenji after seeing at least 8 waterfalls on the Izu peninsula.
+Yesterday I arrived at Inkhaven from my most thoroughly planned trip ever: a 3 week trip to Japan. My highlights from the trip were: attending Idolm@ster Million Live! 11th Live 百合咲く誇るレムリア, a couple of action-packed days hiking the Nakasendo + seeing Matsumoto castle/Lake Suwa, an overnight bikepacking trip from Fujiyoshida to Minobu with a stunning view of Mount Fuji from my campsite, and a memorable dinner at a tiny home restaurant in Shuzenji after seeing at least 8 waterfalls on the Izu peninsula.
 ![Mount Fuji reflected in Lake Motosu from Kouan campground](</images/br2DXvbqAAkw-IMG_4300.jpeg>)
 
 A few years ago, I wouldn't have been able to plan such a trip. On my first trip to Japan, I hadn't even booked a hotel for my first night in Tokyo before my plane landed. I enjoy the spontaneity afforded by last minute planning, but mostly that trip was a product of my laziness/procrastination. The last minute planning led to days with more time spent researching than actually doing things plus significant stress from making same-day hotel bookings while on the train in the afternoon.
