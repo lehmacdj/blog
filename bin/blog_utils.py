@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 WIKI_DIR = Path.home() / "wiki"
-BLOG_DIR = Path(__file__).parent.resolve()
+BLOG_DIR = Path(__file__).parent.parent.resolve()
 NOTES_DIR = BLOG_DIR / "_notes"
 FEED_DIR = BLOG_DIR / "feed"
 IMAGES_DIR = BLOG_DIR / "images"
