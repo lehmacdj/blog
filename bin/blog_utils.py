@@ -314,7 +314,8 @@ def extract_image_paths(body: str) -> list[str]:
 def scrub_metadata(image_path: Path) -> None:
     """Strip all metadata (GPS, device info, etc.) from an image."""
     subprocess.run(
-        ["exiftool", "-all=", "-overwrite_original", str(image_path)],
+        ["exiftool", "-all=", "--icc_profile:all",
+         "-overwrite_original", str(image_path)],
         check=True,
         capture_output=True,
     )
