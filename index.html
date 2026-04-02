@@ -45,7 +45,7 @@ layout: default
   <ul class="post-list">
     {% for post in sorted_notes %}
       <li data-tags="{{ post.tags | join: ' ' }}">
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+        <time class="post-meta" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
 
         <h2>
           <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>

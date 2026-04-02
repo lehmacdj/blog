@@ -15,6 +15,18 @@
 
     {% include footer.html %}
 
+    <script>
+    // Reformat dates to the reader's local timezone
+    document.querySelectorAll('time[datetime]').forEach(function(el) {
+      var d = new Date(el.getAttribute('datetime'));
+      if (isNaN(d)) return;
+      var months = ['Jan','Feb','Mar','Apr','May','Jun',
+                    'Jul','Aug','Sep','Oct','Nov','Dec'];
+      el.textContent = months[d.getMonth()] + ' '
+        + d.getDate() + ', ' + d.getFullYear();
+    });
+    </script>
+
   </body>
 
 </html>
