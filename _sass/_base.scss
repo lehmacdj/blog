@@ -111,11 +111,8 @@ a {
  */
 blockquote {
     color: $grey-color;
-    border-left: 4px solid $grey-color-light;
+    border-left: 3px solid $grey-color-light;
     padding-left: $spacing-unit * 0.5;
-    font-size: 18px;
-    letter-spacing: -1px;
-    font-style: italic;
 
     > :last-child {
         margin-bottom: 0;
@@ -203,6 +200,36 @@ pre {
             fill: $grey-color;
         }
     }
+}
+
+/**
+ * Furigana: hover/tap to reveal
+ *
+ * Ruby text (rt) is hidden by default and positioned as an
+ * overlay so it doesn't affect line spacing. Hovering a ruby
+ * element reveals its reading; for multi-ruby words, wrap the
+ * phrase in <span class="ruby-reveal"> so hovering any part of
+ * the phrase reveals all readings within it.
+ */
+ruby {
+    position: relative;
+}
+
+rt {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: $background-color;
+    padding: 0 0.15em;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+}
+
+ruby:hover rt,
+.ruby-reveal:hover rt {
+    opacity: 1;
 }
 
 .contact-list a {
