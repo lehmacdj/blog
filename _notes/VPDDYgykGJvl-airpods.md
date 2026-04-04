@@ -5,6 +5,7 @@ date: 2026-04-03 22:35 -0700
 permalink: /VPDDYgykGJvl/airpods
 redirect_from:
   - /VPDDYgykGJvl
+tags: [recommended, personal, tech, mindfulness]
 ---
 
 AirPods are my most and least favorite piece of tech.

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "how to speak more Japanese in Japan"
+title: "How to speak more Japanese in Japan"
 date: 2026-04-02 21:43 -0700
 permalink: /r23hJLyugc7T/how-to-speak-more-japanese-in-japan
 redirect_from:

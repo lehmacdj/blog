@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "vibe-planning a trip to Japan"
+title: "Vibe-planning a trip to Japan"
 date: 2026-04-01 23:19 -0700
 permalink: /br2DXvbqAAkw/vibe-planning-a-trip-to-japan
 redirect_from:
