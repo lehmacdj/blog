@@ -128,15 +128,28 @@
     margin-bottom: $spacing-unit * 0.25;
     font-size: 15px;
     color: $grey-color;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    row-gap: 0.2em;
+    container-type: inline-size;
 
     li {
-        display: inline-block;
+        display: flex;
+        align-items: center;
 
         & + li::before {
             content: "\00b7";
             margin: 0 0.4em;
             color: $grey-color;
         }
+    }
+}
+
+@container (max-width: 260px) {
+    .contact-list li + li::before {
+        display: none;
     }
 }
 
