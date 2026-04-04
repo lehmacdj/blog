@@ -28,4 +28,4 @@ Sometimes I would unintentionally still be listening to something, but slowly my
 
 My backlog of unlistened podcasts grew. I'd stopped attending book clubs a few years ago, only reading the books I was most interested in.
 
-To this day, wearing AirPods puts me in a different state of mind. I get bored and it's easier to slip into distraction. I can only bear the silence when I'm not wearing them.
+To this day, wearing AirPods puts me in a different state of mind. I get bored and it's easier to slip into distraction. I can only bear silence when I'm not wearing them.
