@@ -85,4 +85,4 @@ import Baz as X hiding (bar2)
 
 Note that you can have multiple imports of the same module, here `Bar`. This can be useful when you're providing some functions that work with the types in an existing module, but don't want to re-export the whole original module.
 
-Finally, note that using `hiding` lets you re-export a whole module less some identifiers, here `Qux`. This can be useful when you want to re-export everything but one of your identifiers conflicts.
+Finally, note that using `hiding` lets you re-export a whole module less some identifiers, here `Baz`. This can be useful when you want to re-export everything but one of your identifiers conflicts.
