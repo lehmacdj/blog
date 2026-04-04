@@ -150,8 +150,9 @@ def sync_note(
         else:
             details.append("content updated")
 
-        # Ensure wiki note has correct published URL
-        ensure_published_link(wiki_path, published_url)
+    # Always ensure wiki note has correct published URL
+    if ensure_published_link(wiki_path, published_url):
+        details.append("fixed wiki backlink")
 
     if copied_images:
         details.append(

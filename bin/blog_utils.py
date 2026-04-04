@@ -184,14 +184,14 @@ def get_blog_tags(note_id: str) -> list[str]:
     return parse_tags(metadata.get("tags", ""))
 
 
-def ensure_published_link(wiki_path: Path, published_url: str):
+def ensure_published_link(wiki_path: Path, published_url: str) -> bool:
     """Ensure the wiki note has the correct published: URL."""
     content = wiki_path.read_text()
     metadata, body = parse_frontmatter(content)
 
     current_url = metadata.get("published", "")
     if current_url == published_url:
-        return
+        return False
 
     if not content.startswith("---"):
         new_content = f"---\npublished: {published_url}\n---\n\n{content}"
@@ -208,6 +208,8 @@ def ensure_published_link(wiki_path: Path, published_url: str):
 
     if new_content != content:
         wiki_path.write_text(new_content)
+        return True
+    return False
 
 
 def update_wiki_tags(wiki_path: Path, tags: list[str]):
