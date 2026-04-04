@@ -38,22 +38,22 @@ from blog_utils import (
 )
 
 
-def sync_note(note_id: str, backsync_tags: bool = False) -> bool:
+def sync_note(
+    note_id: str, backsync_tags: bool = False
+) -> list[str] | None:
     """
     Sync a single note from wiki to blog.
 
-    Returns True if changes were made, False otherwise.
+    Returns a list of change descriptions, or None if unchanged.
     """
     wiki_path = WIKI_DIR / f"{note_id}.md"
     blog_path = find_blog_note(note_id)
 
     if not wiki_path.exists():
-        print(f"  Warning: wiki note not found: {wiki_path}")
-        return False
+        return [f"warning: wiki note not found: {wiki_path}"]
 
     if not blog_path:
-        print(f"  Warning: blog note not found (use publish-note first)")
-        return False
+        return ["warning: blog note not found (publish first)"]
 
     # Read wiki note
     wiki_content = wiki_path.read_text()
@@ -66,8 +66,7 @@ def sync_note(note_id: str, backsync_tags: bool = False) -> bool:
     # Extract title from wiki body
     title, body = extract_title(wiki_body)
     if not title:
-        print(f"  Warning: no title found in {wiki_path}")
-        return False
+        return [f"warning: no title found in {wiki_path}"]
 
     # Keep the original publication date from the blog
     jekyll_date = blog_meta.get("date", "")
@@ -108,9 +107,12 @@ def sync_note(note_id: str, backsync_tags: bool = False) -> bool:
         blog_content
     )
     if redirect_match:
-        existing_redirects = re.findall(r"-\s+(/[^\n]+)", redirect_match.group(1))
+        existing_redirects = re.findall(
+            r"-\s+(/[^\n]+)", redirect_match.group(1)
+        )
         for redirect in existing_redirects:
-            if redirect != f"/{note_id}" and redirect not in frontmatter_lines:
+            if (redirect != f"/{note_id}"
+                    and redirect not in frontmatter_lines):
                 frontmatter_lines.append(f"  - {redirect}")
 
     if merged_tags:
@@ -130,29 +132,36 @@ def sync_note(note_id: str, backsync_tags: bool = False) -> bool:
     # Check if content changed or filename needs updating
     content_changed = new_content != blog_content
     filename_changed = blog_path != new_blog_path
-    changes_made = False
+    details = []
 
     if content_changed or filename_changed:
         # Write updated blog note
         new_blog_path.write_text(new_content)
 
-        # Remove old file if renamed
         if filename_changed and blog_path.exists():
             blog_path.unlink()
-            print(f"  Renamed: {blog_path.name} -> {new_blog_path.name}")
+            details.append(
+                f"renamed {blog_path.name} -> {new_blog_path.name}"
+            )
         else:
-            print(f"  Updated: {new_blog_path}")
+            details.append("content updated")
 
         # Ensure wiki note has correct published URL
         ensure_published_link(wiki_path, published_url)
-        changes_made = True
+
+    if copied_images:
+        details.append(
+            f"{len(copied_images)} image(s) copied"
+        )
 
     # Optionally backsync merged tags to wiki (even if no blog changes)
     if backsync_tags:
         if update_wiki_tags(wiki_path, merged_tags):
-            changes_made = True
+            details.append("tags backsynced")
 
-    return changes_made
+    if details:
+        return details
+    return None
 
 
 def main():
@@ -186,14 +195,22 @@ def main():
 
     updated = 0
     for note_id in sorted(note_ids):
-        print(f"\n{note_id}:")
-        if sync_note(note_id, backsync_tags=args.backsync_tags):
+        details = sync_note(note_id, backsync_tags=args.backsync_tags)
+        if details:
+            if len(details) == 1:
+                print(f"  {note_id}: {details[0]}")
+            else:
+                print(f"  {note_id}:")
+                for detail in details:
+                    print(f"    {detail}")
             updated += 1
-        else:
-            print("  No changes")
 
     sync_tag_feeds()
-    print(f"\nDone. Updated {updated} note(s).")
+    unchanged = len(note_ids) - updated
+    print(
+        f"Done. Updated {updated} note(s), "
+        f"{unchanged} note(s) unchanged."
+    )
 
 
 if __name__ == "__main__":

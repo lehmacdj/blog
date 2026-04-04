@@ -208,7 +208,6 @@ def ensure_published_link(wiki_path: Path, published_url: str):
 
     if new_content != content:
         wiki_path.write_text(new_content)
-        print(f"  Updated wiki backlink: {wiki_path}")
 
 
 def update_wiki_tags(wiki_path: Path, tags: list[str]):
@@ -252,9 +251,6 @@ def update_wiki_tags(wiki_path: Path, tags: list[str]):
 
     if new_content != content:
         wiki_path.write_text(new_content)
-        old_str = f"[{', '.join(current_tags)}]" if current_tags else "(none)"
-        new_str = f"[{', '.join(tags)}]" if tags else "(none)"
-        print(f"  Backsynced tags: {old_str} -> {new_str}")
         return True
     return False
 
@@ -319,7 +315,6 @@ def scrub_metadata(image_path: Path) -> None:
         check=True,
         capture_output=True,
     )
-    print(f"  Scrubbed metadata: {image_path.name}")
 
 
 def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
@@ -365,10 +360,8 @@ def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
                     check=True,
                     capture_output=True,
                 )
-                print(f"  Converted image: {source.name} -> {dest_name}")
             else:
                 shutil.copy2(source, dest)
-                print(f"  Copied image: {source.name} -> {dest_name}")
             scrub_metadata(dest)
             copied.append(dest)
 
