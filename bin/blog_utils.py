@@ -96,22 +96,8 @@ def get_published_url(note_id: str) -> str | None:
     blog_path = find_blog_note(note_id)
     if not blog_path:
         return None
-
-    content = blog_path.read_text()
-    metadata, _ = parse_frontmatter(content)
-    permalink = metadata.get("permalink")
-    if permalink:
-        return permalink
-
-    # Fallback: derive from filename
-    wiki_path = WIKI_DIR / f"{note_id}.md"
-    if not wiki_path.exists():
-        return None
-    _, wiki_body = parse_frontmatter(wiki_path.read_text())
-    title, _ = extract_title(wiki_body)
-    if not title:
-        return None
-    return f"/{note_id}/{slugify(title)}"
+    slug = blog_path.stem.removeprefix(f"{note_id}-")
+    return f"/{note_id}/{slug}"
 
 
 def resolve_wikilinks(body: str) -> str:
