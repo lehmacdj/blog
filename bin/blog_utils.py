@@ -88,22 +88,30 @@ def slugify(title: str) -> str:
 
 
 def get_published_url(note_id: str) -> str | None:
-    """Check if a note is published and return its relative path."""
-    note_path = WIKI_DIR / f"{note_id}.md"
-    if not note_path.exists():
+    """Check if a note is published and return its permalink.
+
+    Determines publication status by checking if a blog note exists
+    in _notes/, rather than relying on wiki frontmatter.
+    """
+    blog_path = find_blog_note(note_id)
+    if not blog_path:
         return None
 
-    content = note_path.read_text()
+    content = blog_path.read_text()
     metadata, _ = parse_frontmatter(content)
+    permalink = metadata.get("permalink")
+    if permalink:
+        return permalink
 
-    published = metadata.get("published")
-    if not published:
+    # Fallback: derive from filename
+    wiki_path = WIKI_DIR / f"{note_id}.md"
+    if not wiki_path.exists():
         return None
-
-    # Convert absolute URL to relative path
-    if published.startswith(BASE_URL):
-        return published[len(BASE_URL):]
-    return published
+    _, wiki_body = parse_frontmatter(wiki_path.read_text())
+    title, _ = extract_title(wiki_body)
+    if not title:
+        return None
+    return f"/{note_id}/{slugify(title)}"
 
 
 def resolve_wikilinks(body: str) -> str:
