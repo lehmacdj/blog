@@ -101,19 +101,23 @@ def sync_note(
         f"  - /{note_id}",
     ]
 
-    # Preserve old URL redirects if they exist
+    # Collect old redirects and the old permalink (if slug changed)
+    old_redirects = set()
     redirect_match = re.search(
         r"redirect_from:\s*\n((?:\s+-\s+[^\n]+\n?)+)",
         blog_content
     )
     if redirect_match:
-        existing_redirects = re.findall(
-            r"-\s+(/[^\n]+)", redirect_match.group(1)
+        old_redirects.update(
+            re.findall(r"-\s+(/[^\n]+)", redirect_match.group(1))
         )
-        for redirect in existing_redirects:
-            if (redirect != f"/{note_id}"
-                    and redirect not in frontmatter_lines):
-                frontmatter_lines.append(f"  - {redirect}")
+    old_permalink = blog_meta.get("permalink", "")
+    if old_permalink and old_permalink != permalink:
+        old_redirects.add(old_permalink)
+    for redirect in sorted(old_redirects):
+        entry = f"  - {redirect}"
+        if redirect != f"/{note_id}" and entry not in frontmatter_lines:
+            frontmatter_lines.append(entry)
 
     if merged_tags:
         frontmatter_lines.append(f"tags: [{', '.join(merged_tags)}]")

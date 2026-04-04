@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Strict vs Lazy ByteString"
+title: "Haskell: Strict vs Lazy ByteString"
 date: 2025-09-01 00:35 -0400
-permalink: /qeIskL2GME7w/strict-vs-lazy-bytestring
+permalink: /qeIskL2GME7w/haskell-strict-vs-lazy-bytestring
 redirect_from:
   - /qeIskL2GME7w
   - /2025/09/01/strict-vs-lazy-bytestring.html
@@ -11,6 +11,7 @@ redirect_from:
   - /2fdb6119/strict-vs-lazy-bytestring
   - /bsigVWvPASpk
   - /bsigVWvPASpk/strict-vs-lazy-bytestring
+  - /qeIskL2GME7w/strict-vs-lazy-bytestring
 tags: [recommended, haskell]
 ---
 
