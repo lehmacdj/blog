@@ -10,7 +10,7 @@ tags: [recommended, personal, tech, mindfulness]
 
 AirPods are my most and least favorite piece of tech.
 
-Not too long after the release of the first version of AirPods I was just starting to listen to podcasts. I'd always preferred listening to audiobooks. Podcasts gave me access to the news without needing to read letters with my eyes. I could listen to things much more engaging than what I was learning class. To top it off, it easily slotted into activities I was already doing: walking to my classes, cleaning, or exercising. In fact, I had so much time for listening to podcasts, that even 2-3 hour podcasts rounding up the latest Apple rumors fit into my schedule.
+Not too long after the release of the first version of AirPods, I was just starting to listen to podcasts. I'd always preferred listening to audiobooks. Podcasts gave me access to the news without needing to read letters with my eyes. I could listen to things much more engaging than what I was learning in class. To top it off, it easily slotted into activities I was already doing: walking to my classes, cleaning, or exercising. In fact, I had so much time for listening to podcasts, that even 2-3 hour podcasts rounding up the latest Apple rumors fit into my schedule.
 
 By the time AirPods Pro were released, there was hardly a menial task where I was not listening to podcasts. Noise cancellation enabled me to listen while walking down a busy street, and obsolesced the need for a separate pair of noise cancelling headphones on a plane. In a noisy corner of campus, I could create a distraction free environment by listening to white noise at a moment's notice.
 
