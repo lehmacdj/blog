@@ -274,6 +274,52 @@ def sync_tag_feeds():
         print(f"Created feed(s): {', '.join(created)}")
 
 
+def build_frontmatter(
+    note_id: str,
+    title: str,
+    date: str,
+    tags: list[str],
+    wiki_meta: dict,
+    extra_redirects: set[str] | None = None,
+) -> str:
+    """Build Jekyll frontmatter string."""
+    slug = slugify(title)
+    permalink = f"/{note_id}/{slug}"
+
+    lines = [
+        "---",
+        "layout: post",
+        f"title: \"{title}\"",
+        f"date: {date}",
+        f"permalink: {permalink}",
+        "redirect_from:",
+        f"  - /{note_id}",
+    ]
+
+    for redirect in sorted(extra_redirects or []):
+        entry = f"  - {redirect}"
+        if redirect != f"/{note_id}" and entry not in lines:
+            lines.append(entry)
+
+    if tags:
+        lines.append(f"tags: [{', '.join(tags)}]")
+
+    wiki_image = wiki_meta.get("image", "").strip()
+    if wiki_image:
+        dest = blog_image_name(note_id, Path(wiki_image))
+        lines.append(f"image: /images/{dest}")
+
+    lines.append("---")
+    return "\n".join(lines)
+
+
+def blog_image_name(note_id: str, source: Path) -> str:
+    """Compute the blog-side filename for a wiki image."""
+    if source.suffix.lower() == ".heic":
+        return f"{note_id}-{source.stem}.jpeg"
+    return f"{note_id}-{source.name}"
+
+
 def extract_image_paths(body: str) -> list[str]:
     """
     Extract image paths from markdown content.
@@ -340,11 +386,7 @@ def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
             continue
 
         # Determine destination filename (prefix with note_id for uniqueness)
-        # Convert HEIC to JPEG for wider browser compatibility
-        if source.suffix.lower() == ".heic":
-            dest_name = f"{note_id}-{source.stem}.jpeg"
-        else:
-            dest_name = f"{note_id}-{source.name}"
+        dest_name = blog_image_name(note_id, source)
         dest = IMAGES_DIR / dest_name
 
         # Copy (or convert) if not already there or if source is newer

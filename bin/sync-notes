@@ -33,6 +33,7 @@ from blog_utils import (
     get_blog_tags,
     ensure_published_link,
     update_wiki_tags,
+    build_frontmatter,
     copy_images,
     sync_tag_feeds,
 )
@@ -90,17 +91,6 @@ def sync_note(
     merged_tags = list(blog_tags) + wiki_tags
     merged_tags = list(dict.fromkeys(merged_tags))  # dedupe, preserve order
 
-    # Build Jekyll frontmatter
-    frontmatter_lines = [
-        "---",
-        "layout: post",
-        f"title: \"{title}\"",
-        f"date: {jekyll_date}",
-        f"permalink: {permalink}",
-        "redirect_from:",
-        f"  - /{note_id}",
-    ]
-
     # Collect old redirects and the old permalink (if slug changed)
     old_redirects = set()
     redirect_match = re.search(
@@ -114,17 +104,14 @@ def sync_note(
     old_permalink = blog_meta.get("permalink", "")
     if old_permalink and old_permalink != permalink:
         old_redirects.add(old_permalink)
-    for redirect in sorted(old_redirects):
-        entry = f"  - {redirect}"
-        if redirect != f"/{note_id}" and entry not in frontmatter_lines:
-            frontmatter_lines.append(entry)
 
-    if merged_tags:
-        frontmatter_lines.append(f"tags: [{', '.join(merged_tags)}]")
+    # Build Jekyll frontmatter
+    frontmatter = build_frontmatter(
+        note_id, title, jekyll_date, merged_tags,
+        wiki_meta, extra_redirects=old_redirects,
+    )
 
-    frontmatter_lines.append("---")
-
-    new_content = "\n".join(frontmatter_lines) + "\n\n" + body
+    new_content = frontmatter + "\n\n" + body
 
     if not new_content.endswith("\n"):
         new_content += "\n"

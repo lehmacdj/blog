@@ -6,6 +6,7 @@ permalink: /br2DXvbqAAkw/vibe-planning-a-trip-to-japan
 redirect_from:
   - /br2DXvbqAAkw
 tags: [inkhaven, travel, personal, recommended, japan]
+image: /images/br2DXvbqAAkw-IMG_4300.jpeg
 ---
 
 Yesterday I arrived at Inkhaven from my most thoroughly planned trip ever: a 3 week trip to Japan. My highlights from the trip were: attending Idolm@ster Million Live! 11th Live 百合咲く誇るレムリア, a couple of action-packed days hiking the Nakasendo + seeing Matsumoto castle/Lake Suwa, an overnight bikepacking trip from Fujiyoshida to Minobu with a stunning view of Mount Fuji from my campsite, and a memorable dinner at a tiny home restaurant in Shuzenji after seeing at least 8 waterfalls on the Izu peninsula.

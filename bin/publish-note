@@ -29,6 +29,7 @@ from blog_utils import (
     resolve_wikilinks,
     extract_title,
     ensure_published_link,
+    build_frontmatter,
     copy_images,
     sync_tag_feeds,
 )
@@ -74,7 +75,6 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
 
     # Build slug and permalink
     slug = slugify(title)
-    permalink = f"/{note_id}/{slug}"
 
     # Collect tags
     tags = parse_tags(metadata.get("tags", ""))
@@ -82,22 +82,11 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
         tags.extend(extra_tags)
 
     # Build Jekyll frontmatter
-    frontmatter_lines = [
-        "---",
-        "layout: post",
-        f"title: \"{title}\"",
-        f"date: {jekyll_date}",
-        f"permalink: {permalink}",
-        "redirect_from:",
-        f"  - /{note_id}",
-    ]
+    frontmatter = build_frontmatter(
+        note_id, title, jekyll_date, tags, metadata,
+    )
 
-    if tags:
-        frontmatter_lines.append(f"tags: [{', '.join(tags)}]")
-
-    frontmatter_lines.append("---")
-
-    jekyll_content = "\n".join(frontmatter_lines) + "\n\n" + body
+    jekyll_content = frontmatter + "\n\n" + body
 
     # Ensure content ends with newline
     if not jekyll_content.endswith("\n"):
@@ -110,6 +99,7 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     print(f"Created: {note_path}")
 
     # Generate published URL
+    permalink = f"/{note_id}/{slug}"
     published_url = f"{BASE_URL}{permalink}"
 
     # Add backlink to original note
