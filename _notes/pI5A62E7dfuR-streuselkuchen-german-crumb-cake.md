@@ -8,6 +8,7 @@ redirect_from:
   - /fb05acf7
   - /fb05acf7/streuselkuchen-german-crumb-cake
 tags: [recipe, dessert]
+image: /images/pI5A62E7dfuR-72A2F484-9449-4CB5-A2F6-8C5F31796443_1_201_a.jpeg
 ---
 
 A traditional German crumb cake. I've adapted this recipe over time from [Hefe-Streuselkuchen (vom Blech)](https://www.essen-und-trinken.de/rezepte/44383-rzpt-hefe-streuselkuchen-vom-blech) with tips from my Papa.
