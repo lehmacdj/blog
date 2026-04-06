@@ -12,7 +12,7 @@ WIKI_DIR = Path.home() / "wiki"
 BLOG_DIR = Path(__file__).parent.parent.resolve()
 NOTES_DIR = BLOG_DIR / "_notes"
 FEED_DIR = BLOG_DIR / "feed"
-TAGS_DIR = BLOG_DIR / "tags"
+TAGS_DIR = BLOG_DIR / "tagged"
 IMAGES_DIR = BLOG_DIR / "images"
 BASE_URL = "https://unformeddelta.wiki"
 

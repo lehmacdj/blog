@@ -31,7 +31,7 @@
   }
 
   function tagPageUrl(tag) {
-    return '/tags/' + encodeURIComponent(tag) + '/';
+    return '/tagged/' + encodeURIComponent(tag) + '/';
   }
 
   function updateUrl(activeTags) {
@@ -106,7 +106,7 @@
       return;
     }
 
-    var tagMatch = path.match(/^\/tags\/([^/]+)$/);
+    var tagMatch = path.match(/^\/tagged\/([^/]+)$/);
     if (tagMatch) {
       var urlTag = decodeURIComponent(tagMatch[1]);
       tagButtons.forEach(function(btn) {
