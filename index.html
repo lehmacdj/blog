@@ -45,11 +45,17 @@ layout: default
   <ul class="post-list">
     {% for post in sorted_notes %}
       <li data-tags="{{ post.tags | join: ' ' }}">
-        <time class="post-meta" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
-
         <h2>
           <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
         </h2>
+        <div class="post-subtitle">
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
+          {% assign display_tags = post.tags | where_exp: "t", "t != 'recommended'" | sort %}
+          {% if display_tags.size > 0 %}
+            <span class="post-meta-sep">&middot;</span>
+            <span>{{ display_tags | join: ", " }}</span>
+          {% endif %}
+        </div>
       </li>
     {% endfor %}
   </ul>

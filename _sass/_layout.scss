@@ -192,6 +192,7 @@
 .post-link {
     display: block;
     font-size: 24px;
+    line-height: 1.2;
 }
 
 
@@ -300,6 +301,16 @@
     flex-wrap: wrap;
     gap: 0.375em;
     margin-top: $spacing-unit;
+}
+
+.post-subtitle {
+    margin-top: -0.5em;
+    font-size: $small-font-size;
+    color: $grey-color;
+}
+
+.post-meta-sep {
+    margin: 0 0.25em;
 }
 
 
