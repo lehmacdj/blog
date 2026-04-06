@@ -31,9 +31,7 @@ from blog_utils import (
     ensure_published_link,
     build_frontmatter,
     copy_images,
-    collect_all_tags,
-    sync_tag_feeds,
-    sync_tag_pages,
+    sync_all_tag_artifacts,
 )
 
 
@@ -108,9 +106,7 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     ensure_published_link(wiki_path, published_url)
 
     # Ensure feed and tag pages exist for any new tags
-    tags = collect_all_tags()
-    sync_tag_feeds(tags)
-    sync_tag_pages(tags)
+    sync_all_tag_artifacts()
 
     # Commit and sync
     subprocess.run(["jj", "commit", "-m", f"Publish {title}"], check=True)

@@ -312,6 +312,13 @@ def sync_tag_pages(tags: set[str] | None = None):
         print(f"Created tag page(s): {', '.join(created)}")
 
 
+def sync_all_tag_artifacts():
+    """Sync feeds and tag pages for all tags used in notes."""
+    tags = collect_all_tags()
+    sync_tag_feeds(tags)
+    sync_tag_pages(tags)
+
+
 def build_frontmatter(
     note_id: str,
     title: str,

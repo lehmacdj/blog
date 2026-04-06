@@ -35,9 +35,7 @@ from blog_utils import (
     update_wiki_tags,
     build_frontmatter,
     copy_images,
-    collect_all_tags,
-    sync_tag_feeds,
-    sync_tag_pages,
+    sync_all_tag_artifacts,
 )
 
 
@@ -199,9 +197,7 @@ def main():
                     print(f"    {detail}")
             updated += 1
 
-    tags = collect_all_tags()
-    sync_tag_feeds(tags)
-    sync_tag_pages(tags)
+    sync_all_tag_artifacts()
     unchanged = len(note_ids) - updated
     print(
         f"Done. Updated {updated} note(s), "
