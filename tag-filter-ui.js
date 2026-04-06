@@ -1,5 +1,4 @@
 (function() {
-  // DOM elements
   var container = document.querySelector('.tag-filter-container');
   var tagsContainer = document.querySelector('.tag-filter-tags');
   var tagButtons = document.querySelectorAll(
@@ -10,8 +9,8 @@
   var searchInput = document.querySelector('.tag-search');
   var searchClearBtn = document.querySelector('.tag-search-clear');
   var expandBtn = document.querySelector('.tag-expand-btn');
+  var rssTagLinks = document.querySelectorAll('.rss-tag-link');
 
-  // Layout options for TagFilterLayout
   var layoutOpts = {
     container: container,
     tagsContainer: tagsContainer,
@@ -35,17 +34,13 @@
     return '/tags/' + encodeURIComponent(tag) + '/';
   }
 
-  function updateUrl() {
-    var activeTags = getActiveTags();
-
+  function updateUrl(activeTags) {
     if (isDefaultState(activeTags)) {
-      // Default state: bare index path
       history.replaceState(null, '', '/');
       return;
     }
 
     if (activeTags.length === 1) {
-      // Single tag: use /tags/X/ for rich link previews
       history.replaceState(null, '', tagPageUrl(activeTags[0]));
       return;
     }
@@ -55,12 +50,11 @@
     if (activeTags.length === 0) {
       history.replaceState(null, '', '/everything');
     } else {
-      var search = '?tags=' + activeTags.join('+');
-      history.replaceState(null, '', '/' + search);
+      history.replaceState(
+        null, '', '/?tags=' + activeTags.join('+')
+      );
     }
   }
-
-  var rssTagLinks = document.querySelectorAll('.rss-tag-link');
 
   function updateRssLinks(activeTags) {
     rssTagLinks.forEach(function(link) {
@@ -81,7 +75,7 @@
       post.classList.toggle('hidden', !isVisible);
     });
     updateRssLinks(activeTags);
-    updateUrl();
+    updateUrl(activeTags);
     TagFilterLayout.reorderTags(layoutOpts);
   }
 
@@ -94,7 +88,6 @@
       btn.classList.toggle('filtered-out', hasQuery && !matchesQuery);
     });
 
-    // Hide tag clear button during search to avoid confusion
     clearBtn.classList.toggle('filtered-out', hasQuery);
     searchClearBtn.style.display = hasQuery ? '' : 'none';
 
@@ -106,7 +99,6 @@
   function initFromUrl() {
     var path = window.location.pathname.replace(/\/$/, '');
 
-    // /everything — show all posts, no tags active
     if (path === '/everything') {
       tagButtons.forEach(function(btn) {
         btn.classList.remove('active');
@@ -114,7 +106,6 @@
       return;
     }
 
-    // /tags/{tag} — single tag active
     var tagMatch = path.match(/^\/tags\/([^/]+)$/);
     if (tagMatch) {
       var urlTag = decodeURIComponent(tagMatch[1]);
@@ -124,10 +115,9 @@
       return;
     }
 
-    // ?tags= query param (legacy / multi-tag)
     var params = new URLSearchParams(window.location.search);
     if (!params.has('tags')) {
-      return;  // No param: keep template default (recommended)
+      return;
     }
 
     var tagsParam = params.get('tags');
@@ -140,7 +130,6 @@
     });
   }
 
-  // Event listeners
   tagButtons.forEach(function(btn) {
     btn.addEventListener('click', function() {
       btn.classList.toggle('active');
@@ -181,7 +170,6 @@
     });
   });
 
-  // Initialize
   initFromUrl();
   filterPosts();
 })();

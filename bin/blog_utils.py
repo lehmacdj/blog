@@ -284,18 +284,12 @@ def sync_tag_feeds(tags: set[str] | None = None):
 
 TAG_PAGE_TEMPLATE = """\
 ---
-layout: default
+layout: note-index
 title: "Unformed Delta — {tag}"
 description: "Posts tagged {tag}"
 active_tag: "{tag}"
+nav_exclude: true
 ---
-
-<div class="home">
-  {{% include note-list.html %}}
-</div>
-
-<script src="/tag-filter.js"></script>
-<script src="/tag-filter-ui.js"></script>
 """
 
 

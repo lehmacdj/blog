@@ -12,7 +12,7 @@
             {% assign count = count | plus: 1 %}
           {% endif %}
         {% endfor %}
-        <button class="tag-btn{% if tag == 'recommended' %} active{% endif %}" data-tag="{{ tag }}" data-count="{{ count }}">{{ tag }}<span class="tag-count">{{ count }}</span></button>
+        <button class="tag-btn{% if tag == page.active_tag %} active{% endif %}" data-tag="{{ tag }}" data-count="{{ count }}">{{ tag }}<span class="tag-count">{{ count }}</span></button>
       {% endfor %}
       <button class="tag-btn tag-clear-btn" aria-label="Clear filters" style="display: none;">
         <svg width="10" height="10" viewBox="0 0 12 12">
