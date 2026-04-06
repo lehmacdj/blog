@@ -1,4 +1,5 @@
-{% for tag in include.tags %}
+{% assign sorted_tags = include.tags | sort %}
+{% for tag in sorted_tags %}
 {% assign count = 0 %}
 {% for note in site.notes %}
   {% if note.tags contains tag %}
