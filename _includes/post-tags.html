@@ -6,5 +6,5 @@
     {% assign count = count | plus: 1 %}
   {% endif %}
 {% endfor %}
-<a class="tag-btn" href="{{ site.baseurl }}/?tags={{ tag }}" rel="tag">{{ tag }}<span class="tag-count">{{ count }}</span></a>
+<a class="tag-btn" href="{{ site.baseurl }}/tags/{{ tag }}/" rel="tag">{{ tag }}<span class="tag-count">{{ count }}</span></a>
 {% endfor %}

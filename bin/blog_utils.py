@@ -12,6 +12,7 @@ WIKI_DIR = Path.home() / "wiki"
 BLOG_DIR = Path(__file__).parent.parent.resolve()
 NOTES_DIR = BLOG_DIR / "_notes"
 FEED_DIR = BLOG_DIR / "feed"
+TAGS_DIR = BLOG_DIR / "tags"
 IMAGES_DIR = BLOG_DIR / "images"
 BASE_URL = "https://unformeddelta.wiki"
 
@@ -251,14 +252,21 @@ def update_wiki_tags(wiki_path: Path, tags: list[str]):
     return False
 
 
-def sync_tag_feeds():
-    """Ensure a feed file exists for every tag used in notes."""
-    FEED_DIR.mkdir(exist_ok=True)
+def collect_all_tags() -> set[str]:
+    """Collect all tags used across published notes."""
     tags = set()
     for note_path in NOTES_DIR.glob("*.md"):
         content = note_path.read_text()
         metadata, _ = parse_frontmatter(content)
         tags.update(parse_tags(metadata.get("tags", "")))
+    return tags
+
+
+def sync_tag_feeds(tags: set[str] | None = None):
+    """Ensure a feed file exists for every tag used in notes."""
+    FEED_DIR.mkdir(exist_ok=True)
+    if tags is None:
+        tags = collect_all_tags()
 
     created = []
     for tag in sorted(tags):
@@ -272,6 +280,42 @@ def sync_tag_feeds():
             created.append(tag)
     if created:
         print(f"Created feed(s): {', '.join(created)}")
+
+
+TAG_PAGE_TEMPLATE = """\
+---
+layout: default
+title: "Unformed Delta — {tag}"
+description: "Posts tagged {tag}"
+active_tag: "{tag}"
+---
+
+<div class="home">
+  {{% include note-list.html %}}
+</div>
+
+<script src="/tag-filter.js"></script>
+<script src="/tag-filter-ui.js"></script>
+"""
+
+
+def sync_tag_pages(tags: set[str] | None = None):
+    """Ensure a tag index page exists for every tag used in notes."""
+    TAGS_DIR.mkdir(exist_ok=True)
+    if tags is None:
+        tags = collect_all_tags()
+
+    created = []
+    for tag in sorted(tags):
+        tag_dir = TAGS_DIR / tag
+        tag_page = tag_dir / "index.html"
+        if tag_page.exists():
+            continue
+        tag_dir.mkdir(exist_ok=True)
+        tag_page.write_text(TAG_PAGE_TEMPLATE.format(tag=tag))
+        created.append(tag)
+    if created:
+        print(f"Created tag page(s): {', '.join(created)}")
 
 
 def build_frontmatter(

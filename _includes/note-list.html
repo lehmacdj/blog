@@ -1,0 +1,61 @@
+{% comment %}Build tag data with counts{% endcomment %}
+{% assign all_tags = site.notes | map: "tags" | compact | flatten | sort %}
+{% assign unique_tags = all_tags | uniq %}
+
+<div class="tag-filter-container">
+  <div class="tag-filter-row">
+    <div class="tag-filter-tags">
+      {% for tag in unique_tags %}
+        {% assign count = 0 %}
+        {% for note in site.notes %}
+          {% if note.tags contains tag %}
+            {% assign count = count | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+        <button class="tag-btn{% if tag == 'recommended' %} active{% endif %}" data-tag="{{ tag }}" data-count="{{ count }}">{{ tag }}<span class="tag-count">{{ count }}</span></button>
+      {% endfor %}
+      <button class="tag-btn tag-clear-btn" aria-label="Clear filters" style="display: none;">
+        <svg width="10" height="10" viewBox="0 0 12 12">
+          <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tag-btn tag-expand-btn" aria-label="Expand tags">
+        <svg width="10" height="10" viewBox="0 0 12 12">
+          <path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="tag-search-wrapper">
+      <input type="text" class="tag-search" placeholder="Filter..." />
+      <button class="tag-search-clear" aria-label="Clear search" style="display: none;">
+        <svg width="10" height="10" viewBox="0 0 12 12">
+          <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+{% assign sorted_notes = site.notes | sort: "date" | reverse %}
+<ul class="post-list">
+  {% for post in sorted_notes %}
+    <li data-tags="{{ post.tags | join: ' ' }}">
+      <h2>
+        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+      </h2>
+      <div class="post-subtitle">
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
+        {% assign display_tags = post.tags | where_exp: "t", "t != 'recommended'" | sort %}
+        {% if display_tags.size > 0 %}
+          <span class="post-meta-sep">&middot;</span>
+          <span>{{ display_tags | join: ", " }}</span>
+        {% endif %}
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
+<p class="rss-subscribe">
+  subscribe via RSS:
+  <span class="rss-links">{% for tag in unique_tags %}<a class="rss-tag-link{% if tag == "recommended" %} visible{% endif %}" href="{{ "/feed/" | append: tag | append: ".xml" | prepend: site.baseurl }}" data-tag="{{ tag }}">{{ tag }}</a>{% endfor %}<a class="rss-everything-link" href="{{ "/feed/everything.xml" | prepend: site.baseurl }}">everything</a></span>
+</p>
