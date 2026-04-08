@@ -131,8 +131,20 @@
   }
 
   tagButtons.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      btn.classList.toggle('active');
+    btn.addEventListener('click', function(e) {
+      var multi = e.shiftKey || e.metaKey || e.ctrlKey;
+      if (multi) {
+        btn.classList.toggle('active');
+      } else {
+        var wasActive = btn.classList.contains('active');
+        var activeCount = getActiveTags().length;
+        tagButtons.forEach(function(other) {
+          other.classList.remove('active');
+        });
+        if (!(wasActive && activeCount === 1)) {
+          btn.classList.add('active');
+        }
+      }
       filterPosts();
     });
   });
