@@ -1,6 +1,7 @@
-{% comment %}Build tag data with counts{% endcomment %}
-{% assign all_tags = site.notes | map: "tags" | compact | flatten | sort %}
-{% assign unique_tags = all_tags | uniq %}
+{% comment %}Build tag list from published notes only (excluding notes tagged 'unlisted'){% endcomment %}
+{% assign all_tag_lists = "" | split: "" %}
+{% for n in site.notes %}{% unless n.tags contains 'unlisted' %}{% assign all_tag_lists = all_tag_lists | concat: n.tags %}{% endunless %}{% endfor %}
+{% assign unique_tags = all_tag_lists | uniq | sort %}
 
 <div class="tag-filter-container">
   <div class="tag-filter-row">
@@ -8,9 +9,11 @@
       {% for tag in unique_tags %}
         {% assign count = 0 %}
         {% for note in site.notes %}
-          {% if note.tags contains tag %}
-            {% assign count = count | plus: 1 %}
-          {% endif %}
+          {% unless note.tags contains 'unlisted' %}
+            {% if note.tags contains tag %}
+              {% assign count = count | plus: 1 %}
+            {% endif %}
+          {% endunless %}
         {% endfor %}
         <button class="tag-btn{% if tag == page.active_tag %} active{% endif %}" data-tag="{{ tag }}" data-count="{{ count }}">{{ tag }}<span class="tag-count">{{ count }}</span></button>
       {% endfor %}
@@ -38,7 +41,7 @@
 
 {% assign sorted_notes = site.notes | sort: "date" | reverse %}
 <ul class="post-list">
-  {% for post in sorted_notes %}
+  {% for post in sorted_notes %}{% if post.tags contains 'unlisted' %}{% continue %}{% endif %}
     <li data-tags="{{ post.tags | join: ' ' }}">
       <h2>
         <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>

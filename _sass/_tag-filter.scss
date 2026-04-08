@@ -49,6 +49,13 @@
 .tag-btn.collapsed-hidden {
   display: none;
 }
+.tag-btn.tag-unlisted {
+  cursor: default;
+}
+.tag-btn.tag-unlisted:hover {
+  border-color: $grey-color-light;
+  color: $grey-color;
+}
 .tag-clear-btn {
   padding-left: 0.5em;
   padding-right: 0.5em;

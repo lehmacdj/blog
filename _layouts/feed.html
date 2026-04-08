@@ -8,7 +8,7 @@
     <pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
     <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
     <generator>Jekyll v{{ jekyll.version }}</generator>
-    {% if page.feed_tag %}{% assign feed_notes = sorted_notes | where_exp: "post", "post.tags contains page.feed_tag" %}{% else %}{% assign feed_notes = sorted_notes %}{% endif %}{% for post in feed_notes limit:10 %}
+    {% if page.feed_tag %}{% assign feed_notes = sorted_notes | where_exp: "post", "post.tags contains page.feed_tag" %}{% else %}{% assign feed_notes = sorted_notes %}{% endif %}{% assign count = 0 %}{% for post in feed_notes %}{% if count >= 10 %}{% break %}{% endif %}{% if post.tags contains 'unlisted' %}{% continue %}{% endif %}{% assign count = count | plus: 1 %}
     <item>
       <title>{{ post.title | xml_escape }}</title>
       <description>{{ post.content | xml_escape }}</description>

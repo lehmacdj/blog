@@ -1,10 +1,18 @@
 {% assign sorted_tags = include.tags | sort %}
+{% if include.tags contains 'unlisted' %}
+<span class="tag-btn tag-unlisted">unlisted</span>
+{% endif %}
 {% for tag in sorted_tags %}
+{% if tag == 'unlisted' %}
+{% else %}
 {% assign count = 0 %}
 {% for note in site.notes %}
-  {% if note.tags contains tag %}
-    {% assign count = count | plus: 1 %}
-  {% endif %}
+  {% unless note.tags contains 'unlisted' %}
+    {% if note.tags contains tag %}
+      {% assign count = count | plus: 1 %}
+    {% endif %}
+  {% endunless %}
 {% endfor %}
 <a class="tag-btn" href="{{ site.baseurl }}/tagged/{{ tag }}/" rel="tag">{{ tag }}<span class="tag-count">{{ count }}</span></a>
+{% endif %}
 {% endfor %}
