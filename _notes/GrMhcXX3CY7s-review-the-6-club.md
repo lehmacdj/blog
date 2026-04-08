@@ -28,7 +28,7 @@ The time to start publishing came. While I was on vacation, everyone made a comm
 
 I returned from vacation and made my commitment to publish a short piece once a week. We "graduated" before I'd published my first piece, which left me feeling even more like an imposter.
 
-The next two weeks, I published a piece each week. The high I felt after publishing stuck with me throughout the entire week, even making work feel like it had color again. The third week, I spent longer writing than I had either previous week, having lapsed on my Kanji flashcards, I no longer felt authoritative enough to publish my article comparing the tools I'd used[^which-tools].
+The next two weeks, I published a piece each week. The high I felt after publishing stuck with me throughout the entire week, even making work feel like it had color again. The third week, I spent longer writing than I had either previous week, but having lapsed on my Kanji flashcards, I no longer felt authoritative enough to publish my article comparing the tools I'd used[^which-tools].
 
 [^which-tools]: WaniKani and jpdb.io. jpdb.io is better. Probably I'll manage to publish this article during Inkhaven.
 
