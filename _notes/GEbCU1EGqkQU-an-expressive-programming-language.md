@@ -8,6 +8,8 @@ redirect_from:
 tags: [inkhaven, haskell, recommended, programming-languages]
 ---
 
+*Thanks to Alok Singh for the rough format and inspiration to write this post.*
+
 I tried naming as may programming languages as I could and came up with these before I got bored: C Rust Perl Bash Zsh Fish Zig C++ D Visual Basic Prolog Racket Elisp VimScript Lua Ruby Idris Agda Rocq C# F# F\* Clojure Kotlin Scala Java ECMAScript TypeScript Raku Python OCaml Standard ML Jai Pony koka Cyclone Unison Swift Objective C Piet J APL Brainfuck Purescript Elm JIF (Java Information Flow) moss LLVM CUDA MLIR x86 ARM MIPS
 
 But Haskell is my favorite.
