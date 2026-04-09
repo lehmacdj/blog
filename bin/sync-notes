@@ -176,8 +176,12 @@ def main():
     if args.note_ids:
         note_ids = args.note_ids
     else:
-        # Sync all notes in _notes/
-        note_ids = [extract_note_id(p.name) for p in NOTES_DIR.glob("*.md")]
+        # Sync all notes in _notes/, skipping test- prefixed notes
+        note_ids = [
+            extract_note_id(p.name)
+            for p in NOTES_DIR.glob("*.md")
+            if not p.name.startswith("test-")
+        ]
 
     if not note_ids:
         print("No notes to sync.")
