@@ -5,7 +5,7 @@ date: 2026-04-08 19:00 -0700
 permalink: /mZ5sitead5kB/空色-birthday-card
 redirect_from:
   - /mZ5sitead5kB
-tags: [personal, idol, idolm@ster, song, review, birthdays, recommended]
+tags: [personal, idol, idolm@ster, song, review, birthdays, recommended, inkhaven]
 ---
 
 I'm a bit of a data hoarder. Among other things, I never remove birthdays from my calendar once I've added them. Sometimes this leads to a pang of heartbreak when I look at my calendar to see it's the birthday of a past crush. 空色♡ Birthday Card (literally: Sky-blue Birthday Card) captures my experience of this.
