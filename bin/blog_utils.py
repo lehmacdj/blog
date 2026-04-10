@@ -450,8 +450,11 @@ def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
             copied.append(dest)
 
         # Update the path in the body to point to the blog images directory
-        # Wrap in angle brackets to handle spaces in filenames
-        new_path = f"</images/{dest_name}>"
+        # Only use angle brackets when filename contains spaces
+        if " " in dest_name:
+            new_path = f"</images/{dest_name}>"
+        else:
+            new_path = f"/images/{dest_name}"
 
         # Replace the original path with the new one
         # Handle both regular and angle-bracket syntax
