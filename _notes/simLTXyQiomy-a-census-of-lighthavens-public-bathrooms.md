@@ -78,4 +78,4 @@ I had no difficulty finding the sink in this one.
 The final bidet is in Bayes' basement. It automatically dispenses blue cleaning liquid too.
 ![Bayes' basement](</images/simLTXyQiomy-AC987B22-5DD3-4D9B-87BA-CCCF55C22E4C_1_105_c.jpeg>)
 
-This completes our census of Lighthaven's public bathrooms. Let know if I missed one! Due to completionist tendencies, I likely won't pass up even a private/en-suite bathroom.
+This completes our census of Lighthaven's public bathrooms. Let know if I missed one! Due to my completionist tendencies, I likely won't pass up even a private/en-suite bathroom.
