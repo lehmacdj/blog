@@ -8,7 +8,7 @@ redirect_from:
 tags: [lighthaven, toilet, inkhaven, recommended]
 ---
 
-There are 13 public bathrooms on Lighthaven campus. 5 have showers, 3 have bidets, and only 9 of them are pictured on the map.
+There are ~~13~~ 17 public bathrooms on Lighthaven campus. ~~5~~ 7 have showers, ~~3~~ 5 have bidets, and only 9 of them are pictured on the map.
 ![Map of Lighthaven, with water droplets representing bathrooms](</images/simLTXyQiomy-Generated Image April 09, 2026 - 4_50PM.jpg>)
 
 Let's start with the bathrooms in Darwin, where I'm staying. There are none. I think some of the rooms have en-suite bathrooms, but mine is not one of them.
@@ -75,7 +75,22 @@ I wonder what all this shelving is for.
 ![normal toilet](</images/simLTXyQiomy-67465CE8-6BB1-4821-861B-9B9A538CE31E_1_105_c.jpeg>)
 I had no difficulty finding the sink in this one.
 ![hard to find sink above toilet](</images/simLTXyQiomy-C4060174-DF56-41A8-919E-8AB2C298C5CC_1_105_c.jpeg>)
-The final bidet is in Bayes' basement. It automatically dispenses blue cleaning liquid too.
+~~The final~~ There is also another bidet is in Bayes' basement. It automatically dispenses blue cleaning liquid too.
 ![Bayes' basement](</images/simLTXyQiomy-AC987B22-5DD3-4D9B-87BA-CCCF55C22E4C_1_105_c.jpeg>)
+It turns out that the Bayesment hides a huge amount of toilets/showers/bidets that I initially missed not wanting to intrude too deep into the depths.
+![hallway into the depths of the Bayesment](</images/simLTXyQiomy-02E14C66-A989-4E9B-8203-4FEEC329532A.jpeg>)
+There's a total of 4 more bathrooms: 3 showers and 2 toilets with bidets.
+![shower](</images/simLTXyQiomy-43357544-35BD-4C7B-955E-BEED78B2E80D.jpeg>)
+![shower](</images/simLTXyQiomy-A39E9FEA-3703-4C15-98C6-FAF7C37FAD1A.jpeg>)
+![bidet](</images/simLTXyQiomy-0E97852C-C52C-4E12-BB42-37C58FAD98C0.jpeg>)
+Yes that does add up.
+![shower + bidet](</images/simLTXyQiomy-3F802946-8889-4E5E-AECD-25BCFC45DB2E.jpeg>)
+I appreciate the signs explaining the available amenities. I'm a little concerned I missed a bath though!
+| ![bathroom sign](</images/simLTXyQiomy-18876FA1-97D5-4BFB-8EC9-5AC4786F5CA9.jpeg>)
+| ![bathroom sign](</images/simLTXyQiomy-0722CAF0-F4B8-41E2-A63D-61E2E9FEB326.jpeg>) |
+|-|-|
+| ![bathroom sign](</images/simLTXyQiomy-E7AAAAD8-9486-49E6-90CC-442731779CD6.jpeg>)
+| ![bathroom sign](</images/simLTXyQiomy-677BA5C8-2851-4210-A3C0-B9A11BC32A0C.jpeg>) |
+Bayes has 4/7 showers, 3/6 bidets, and 7/17 bathrooms. Wow!
 
 This completes our census of Lighthaven's public bathrooms. Let know if I missed one! Due to my completionist tendencies, I likely won't pass up even a private/en-suite bathroom.
