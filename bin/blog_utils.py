@@ -398,11 +398,29 @@ def scrub_metadata(image_path: Path) -> None:
     """Strip all metadata (GPS, device info, etc.) from an image."""
     subprocess.run(
         ["exiftool", "-all=", "--icc_profile:all",
-         "--exif:orientation",
          "-overwrite_original", str(image_path)],
         check=True,
         capture_output=True,
     )
+
+
+# Maps EXIF orientation tag to clockwise sips -r rotation degrees.
+_ORIENTATION_TO_ROTATION = {
+    "Rotate 90 CW": 90,
+    "Rotate 180": 180,
+    "Rotate 270 CW": 270,
+}
+
+
+def _heic_rotation(source: Path) -> int | None:
+    """Return sips -r degrees needed to bake EXIF orientation,
+    or None if no rotation is needed."""
+    result = subprocess.run(
+        ["exiftool", "-s3", "-orientation", str(source)],
+        capture_output=True, text=True,
+    )
+    tag = result.stdout.strip()
+    return _ORIENTATION_TO_ROTATION.get(tag)
 
 
 def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
@@ -438,11 +456,14 @@ def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
         # Copy (or convert) if not already there or if source is newer
         if not dest.exists() or source.stat().st_mtime > dest.stat().st_mtime:
             if source.suffix.lower() == ".heic":
+                # Read EXIF orientation before converting
+                rot = _heic_rotation(source)
+                cmd = ["sips", "-s", "format", "jpeg"]
+                if rot:
+                    cmd += ["-r", str(rot)]
+                cmd += [str(source), "--out", str(dest)]
                 subprocess.run(
-                    ["sips", "-s", "format", "jpeg",
-                     str(source), "--out", str(dest)],
-                    check=True,
-                    capture_output=True,
+                    cmd, check=True, capture_output=True,
                 )
             else:
                 shutil.copy2(source, dest)

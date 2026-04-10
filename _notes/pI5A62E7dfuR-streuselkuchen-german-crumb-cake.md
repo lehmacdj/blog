@@ -66,13 +66,13 @@ Cut into squares to serve.
 
 ## Photos
 Here's some pictures to show you what it looks like once it leaves the oven + layering fruit.
-![Completed cake](</images/pI5A62E7dfuR-17F21FA5-6466-4A34-8DF9-7FB47D45F4D3_1_105_c.jpeg>)
+![Completed cake](/images/pI5A62E7dfuR-17F21FA5-6466-4A34-8DF9-7FB47D45F4D3_1_105_c.jpeg)
 
 When bringing somewhere I cut off the edges which are slightly drier.
-![Cake into squares](</images/pI5A62E7dfuR-E1FB5519-EC6D-4E6F-B9C6-E8E6142CB7D3_1_201_a.jpeg>)
+![Cake into squares](/images/pI5A62E7dfuR-E1FB5519-EC6D-4E6F-B9C6-E8E6142CB7D3_1_201_a.jpeg)
 
 The plums ended up being a little bit too dry layered like this, aim for a little more overlap.
 ![Fruit layout with plumbs and blueberries](</images/pI5A62E7dfuR-9C4BF226-5C7D-4F8F-BDCF-5C5E762F4E00_1_201_a 2.jpeg>)
 
 This is probably as dense as you'd want to go with berries.
-![Fruit layout with raspberries, blackberries and blueberries](</images/pI5A62E7dfuR-72A2F484-9449-4CB5-A2F6-8C5F31796443_1_201_a.jpeg>)
+![Fruit layout with raspberries, blackberries and blueberries](/images/pI5A62E7dfuR-72A2F484-9449-4CB5-A2F6-8C5F31796443_1_201_a.jpeg)
