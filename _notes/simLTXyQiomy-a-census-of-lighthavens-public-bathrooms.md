@@ -5,7 +5,7 @@ date: 2026-04-09 21:57 -0700
 permalink: /simLTXyQiomy/a-census-of-lighthavens-public-bathrooms
 redirect_from:
   - /simLTXyQiomy
-tags: [lighthaven, toilet, inkhaven]
+tags: [lighthaven, toilet, inkhaven, recommended]
 ---
 
 There are 13 public bathrooms on Lighthaven campus. 5 have showers, 3 have bidets, and only 9 of them are pictured on the map.
