@@ -86,11 +86,9 @@ There's a total of 4 more bathrooms: 3 showers and 2 toilets with bidets.
 Yes that does add up.
 ![shower + bidet](</images/simLTXyQiomy-3F802946-8889-4E5E-AECD-25BCFC45DB2E.jpeg>)
 I appreciate the signs explaining the available amenities. I'm a little concerned I missed a bath though!
-| ![bathroom sign](</images/simLTXyQiomy-18876FA1-97D5-4BFB-8EC9-5AC4786F5CA9.jpeg>)
-| ![bathroom sign](</images/simLTXyQiomy-0722CAF0-F4B8-41E2-A63D-61E2E9FEB326.jpeg>) |
+| ![bathroom sign](</images/simLTXyQiomy-18876FA1-97D5-4BFB-8EC9-5AC4786F5CA9.jpeg>) | ![bathroom sign](</images/simLTXyQiomy-0722CAF0-F4B8-41E2-A63D-61E2E9FEB326.jpeg>) |
 |-|-|
-| ![bathroom sign](</images/simLTXyQiomy-E7AAAAD8-9486-49E6-90CC-442731779CD6.jpeg>)
-| ![bathroom sign](</images/simLTXyQiomy-677BA5C8-2851-4210-A3C0-B9A11BC32A0C.jpeg>) |
+| ![bathroom sign](</images/simLTXyQiomy-E7AAAAD8-9486-49E6-90CC-442731779CD6.jpeg>) | ![bathroom sign](</images/simLTXyQiomy-677BA5C8-2851-4210-A3C0-B9A11BC32A0C.jpeg>) |
 Bayes has 4/7 showers, 3/6 bidets, and 7/17 bathrooms. Wow!
 
 This completes our census of Lighthaven's public bathrooms. Let know if I missed one! Due to my completionist tendencies, I likely won't pass up even a private/en-suite bathroom.
