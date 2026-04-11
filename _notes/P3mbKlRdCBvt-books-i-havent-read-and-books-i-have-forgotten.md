@@ -6,7 +6,7 @@ permalink: /P3mbKlRdCBvt/books-i-havent-read-and-books-i-have-forgotten
 redirect_from:
   - /P3mbKlRdCBvt
   - /P3mbKlRdCBvt/books-i-havent-read-and-books-i-dont-remember-reading
-tags: [inkhaven]
+tags: [inkhaven, memory]
 ---
 
 **Road to Reality** by Rodger Penrose
