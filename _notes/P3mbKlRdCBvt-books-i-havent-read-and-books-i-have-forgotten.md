@@ -39,6 +39,8 @@ I remember next to nothing not inferable from the title for any of these books, 
 
 Other books, I didn't even consider important enough to write anything down for.
 
+It's sad to contemplate the time and attention I lost by reading without purpose.
+
 **How to write good prompts** by Andy Matuschak
 
 Perhaps someday I'll use Anki or flashcards to remember the things that I find the most important. This seems like a useful guide for doing so well. [Mnomonic medium](https://notes.andymatuschak.org/Mnemonic_medium) not book.
