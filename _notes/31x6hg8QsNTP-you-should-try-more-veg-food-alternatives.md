@@ -38,7 +38,7 @@ Beyond Beef. A ground beef substitute that is overshadowed by—
 
 Impossible/Beyond. The closest / best ground beef substitute. Easily substitutes 1:1 into any recipe that calls for ground beef, mostly maintaining texture and taste.
 
-Grains: Bulgar, Grünkern, Spelt, Buckwheat. My dad makes a delicious burger patty out of these. The grains on the outside become very crispy, and in the center
+Grains: Bulgar, Grünkern, Spelt, Buckwheat. My papa makes a delicious burger patty out of these. The grains on the outside become very crispy, and in the center
 
 Quorn. Made from fungus cells cultured hydroponically, usually stuck together using egg. Kind of expensive, and not actually that novel.
 
@@ -50,7 +50,7 @@ I should try more vegan alternatives too. I'm starting to foray into milk substi
 
 If I were a better person, I'd have a section on the wonderful advances in vegan cheeses. I hear it's now possible to get mozzarella substitutes that turn perfectly golden brown atop a pizza. But, as much I sometimes try to justify my vegetarianism for environmental reasons, for now, you can pry milk and cheese out of my cold dead hands.
 
-I still sometimes eat meat. In Japan, I'd rather eat at a tofu/yuba restaurant that uses bonito in their stock, than have a vegetarian burger. When I visit home, I'll often try a little bit of the meat dish that my dad cooked, because I know how much he loved cooking it and how delicious it will be.
+I still sometimes eat meat. In Japan, I'd rather eat at a tofu/yuba restaurant that uses bonito in their stock, than have a vegetarian burger. When I visit home, I'll often try a little bit of the meat dish that my papa cooked, because I know how much he loved cooking it and how delicious it will be.
 
 But I'll also book a Buddhist temple stay specifically because they have a completely vegetarian menu for their breakfast and dinner. I check the menu before visiting a restaurant with friends to make sure they'll have at least some vegetarian options. I let friends know I'm vegetarian before visiting for dinner.
 
