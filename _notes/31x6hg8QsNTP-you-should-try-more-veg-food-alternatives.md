@@ -8,9 +8,9 @@ redirect_from:
 tags: [vegetarian, vegan, recommended, inkhaven, unlisted]
 ---
 
-*[Drew](https://dschorno.wordpress.com/2026/04/09/against-veganism/), [Itsi](https://news.vilf.org/p/dumb-arguments-against-veganism), [Alec](https://alec.freumh.org/Itsi.html), [Slimes all the way down](https://substack.com/home/post/p-193756302), and [Sean](https://www.lesswrong.com/posts/yHx2Tm8nxuoMwBWSZ/eating-meat-is-fine-if-you-live-in-a-simulation) all have opinions on Veganism. Layla argues that both sides of the debate are missing important questions. I'm just here to argue that you should try more vegan/vegetarian food alternatives.*
+*[Drew](https://dschorno.wordpress.com/2026/04/09/against-veganism/), [Itsi](https://news.vilf.org/p/dumb-arguments-against-veganism), [Alec](https://alec.freumh.org/Itsi.html), [Slimes all the way down](https://substack.com/home/post/p-193756302), and [Sean](https://www.lesswrong.com/posts/yHx2Tm8nxuoMwBWSZ/eating-meat-is-fine-if-you-live-in-a-simulation) all have opinions on Veganism. [Layla](https://www.lesswrong.com/posts/uBWwjbpPP5cNkqxse/some-questions-nobody-in-the-inkhaven-discourse-is-actually) argues that both sides of the debate are missing important questions. I'm just here to argue that you should try more vegan/vegetarian food alternatives.*
 
-I'm 99% vegetarian. At home, I only cook/buy vegetarian food. My mom was vegetarian growing up, so I was already used to meals without a meat entrée. When my brother's environmentalism and morally righteous streak led to him becoming vegetarian, abundant vegetarian options in college cafeterias made the opportunity costs of becoming vegetarian low enough, that I figured, why not try it.
+I'm 99% vegetarian. At home, I only buy/cook vegetarian food. My mom was vegetarian growing up, so I was already used to meals without a meat entrée. While I was in college, my brother's environmentalism and morally righteous streak led to him becoming vegetarian. The abundant vegetarian options in the cafeterias made the opportunity costs of becoming vegetarian low enough, that I figured, why not try it.
 
 Over the following years, the wonderful variety of veg food alternatives slowly made me miss meat less and less.
 
