@@ -15,7 +15,7 @@ I'm 99% vegetarian. At home, I only cook/buy vegetarian food. My mom was vegetar
 Over the following years, the wonderful variety of veg food alternatives slowly made me miss meat less and less.
 
 ## The veg-alternative-dex
-I love trying new veg food alternatives. This list is certainly not complete, but, these are certainly worth trying. I'll rank each in terms of availability (how common is it), flavor (how well it accepts different seasonings), and texture (how good it is and how many options there are).
+I love trying new veg food alternatives. This list is certainly not complete, but these are certainly worth trying. I'll subjectively rank each in terms of availability (how common is it), flavor (how well it accepts different seasonings), and texture (how good it is and how many options there are).
 
 **Tofu**. Extremely widely available, versatile and well known. Different firmnesses of tofu can be used as anything from a meat substitute in a stir fry, to a sweet pudding. I doc a few points from flavor because it can be bland if not marinated carefully. 9 + 6 + 9 = 24.
 
@@ -25,11 +25,11 @@ I love trying new veg food alternatives. This list is certainly not complete, bu
 
 **Yuba.** A close relative of tofu, produced by pulling thin layers of skin off of boiling high-protein soy milk. Stacked in layers it has a wonderfully complex texture. When fried it becomes delightfully crispy. 2 + 8 + 10 = 21.
 
+**Seitan.** Wheat gluten, mixed with spices and boiled. Good at replicating the chewier textures of meat, such as in stews, but also crisps up nicely when pan fried. 7 + 8 + 6 = 21.
+
 **Beyond Beef.** A ground beef substitute that is overshadowed by—
 
 **Impossible Meat.** The closest / best ground beef substitute. Easily substitutes 1:1 into any recipe that calls for ground beef, mostly maintaining texture and taste. 5 + 8 + 6 = 19.
-
-**Seitan.** Wheat gluten, mixed with spices and boiled. Good at replicating the chewier textures of meat, such as in stews, but also crisps up nicely when pan fried. 7 + 8 + 6 = 21.
 
 **Grains**: Bulgar, Grünkern, Spelt, Buckwheat. My papa makes a delicious burger patty out of these. The grains on the outside become very crispy, while the center stays toothsome. 4 + 7 + 8 = 19.
 
@@ -41,13 +41,13 @@ I love trying new veg food alternatives. This list is certainly not complete, bu
 
 **Quorn.** Made from fungus cells cultured hydroponically, usually stuck together using egg. Kind of expensive, and not actually that novel. 6 + 6 + 4 = 14.
 
-**Textured vegetable protein (TVP)**. A waste product from the production of soy bean oil, this is naturally rich in protein, this fries up nicely into a ground beef alternative. I like using this in burritos or fajitas. 5 + 5 + 3 = 13.
+**Textured vegetable protein (TVP)**. A waste product from the production of soy bean oil, naturally rich in protein. It fries up nicely into a ground beef alternative. I like using this in burritos or fajitas. 5 + 5 + 3 = 13.
 
 **Tempeh.** Fermented soybeans bound together by a fungus. It has a very interesting heterogeneous texture while being pan friable not unlike meats. Not my favorite, but enjoyable on occasion. 3 + 2 + 8 = 13.
 
-**Halumi.** A firm cheese that can be fried like a steak. Usually a bit too salty for my taste, but has a very fun texture. 3 + 4 + 5 = 12.
+**Halumi.** A firm cheese that can be fried like a steak. Usually a bit too salty for my taste, but has a fun texture. 3 + 3 + 6 = 12.
 
-**Cell cultured meats.** I've been following two companies in this space: Wildtype Salmon, and Blue Nalu Tofu. SF is one of the few cities where you can get some, and I plan to do so. 1 + ? + ? = ?
+**Cell cultured meats.** I've been following two companies in this space: Wildtype Salmon, and Blue Nalu Tofu. SF is one of the few cities where you can try it, and I plan to do so. 1 + ? + ? = ?
 
 ## My moral failings
 I should try more vegan alternatives too. I'm starting to foray into milk substitutes, after discovering that fresh soy milk is really quite tasty. Nowadays, there's vegan butter substitutes that just work for making cookies. Allegro is one of the best bakeries near where I live, even though they're vegan don't get to use butter to make their croissants.
@@ -58,6 +58,6 @@ I still sometimes eat meat. In Japan, I'd rather eat at a tofu/yuba restaurant t
 
 But I'll also book a Buddhist temple stay specifically because they have a completely vegetarian menu for their breakfast and dinner. I check the menu before visiting a restaurant with friends to make sure they'll have at least some vegetarian options. I let friends know I'm vegetarian before visiting for dinner.
 
-Having a strong preference for not eating meat, often ends up influencing those around me to eat less meat too. Sometimes, I bring a friend to a vegan restaurant with me.
+Having a strong preference for not eating meat, often ends up influencing those around me to eat less meat too. Surprisingly often, I bring a friend to a vegan restaurant with me, and they enjoy it.
 
 Instead of trying to eat less meat, why not try eating more of the wonderful variety of veg alternatives.
