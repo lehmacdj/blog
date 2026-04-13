@@ -14,41 +14,45 @@ I'm 99% vegetarian. At home, I only cook/buy vegetarian food. My mom was vegetar
 
 Over the following years, the wonderful variety of veg food alternatives slowly made me miss meat less and less.
 
-Tofu. Extremely widely available, versatile and well known. Different firmnesses of tofu can be used as anything from a meat substitute in a stir fry, to a sweet pudding.
+## The veg-alternative-dex
+I love trying new veg food alternatives. This list is certainly not complete, but, these are certainly worth trying. I'll rank each in terms of availability (how common is it), flavor (how well it accepts different seasonings), and texture (how good it is and how many options there are).
 
-Yuba is a close relative of tofu, produced by pulling thin layers of skin off of boiling high-protein soy milk. Stacked in layers it has a wonderfully complex texture. When fried it becomes delightfully crispy.
+**Tofu**. Extremely widely available, versatile and well known. Different firmnesses of tofu can be used as anything from a meat substitute in a stir fry, to a sweet pudding. I doc a few points from flavor because it can be bland if not marinated carefully. 9 + 6 + 9 = 24.
 
-Seitan. Wheat gluten, mixed with spices and boiled. Good at replicating the chewier textures of meat, such as in stews, but also crisps up nicely when pan fried.
+**Paneer.** Delicious melt in your mouth protein for Indian food. 6 + 8 + 8 = 22.
 
-Konjac. A jelly made from the moyu plant. It has a remarkable texture, almost like a grape: firm when biting, but soft on the inside. Traditionally it is mostly used for making noodles and jelly. It's unique texture and transparent color also make it a nice vegan fish alternative for sushi.
+**Beans.** There's too many kinds of beans to count up, great in a burrito, chilli, or stew. 10 + 8 + 4 + 22.
 
-Jackfruit. The unripe fruit fragments into little pieces, with a texture similar to that of pulled pork.
+**Yuba.** A close relative of tofu, produced by pulling thin layers of skin off of boiling high-protein soy milk. Stacked in layers it has a wonderfully complex texture. When fried it becomes delightfully crispy. 2 + 8 + 10 = 21.
 
-Beans. There's too many kinds of beans to count up, great in a burrito, chilli, or stew.
+**Beyond Beef.** A ground beef substitute that is overshadowed by—
 
-Textured vegetable protein (TVP). A waste product from the production of soy bean oil, this is naturally rich in protein, this fries up nicely into a ground beef alternative. I like using this in burritos or fajitas.
+**Impossible Meat.** The closest / best ground beef substitute. Easily substitutes 1:1 into any recipe that calls for ground beef, mostly maintaining texture and taste. 5 + 8 + 6 = 19.
 
-Tempeh. Fermented soybeans bound together by a fungus. It has a very interesting heterogeneous texture while being pan friable not unlike meats. Not my favorite, but enjoyable on occasion.
+**Seitan.** Wheat gluten, mixed with spices and boiled. Good at replicating the chewier textures of meat, such as in stews, but also crisps up nicely when pan fried. 7 + 8 + 6 = 21.
 
-Halumi. A firm cheese that can be fried like a steak. Usually a bit too salty for my taste, but has a very fun texture.
+**Grains**: Bulgar, Grünkern, Spelt, Buckwheat. My papa makes a delicious burger patty out of these. The grains on the outside become very crispy, while the center stays toothsome. 4 + 7 + 8 = 19.
 
-Paneer. Delicious melt in your mouth protein for Indian food.
+**Mycelium.** There's a fairly new range of products made from pretty much just compressed mushroom mycelium. MyBacon is the only one I've tried so far, but it has a better texture than bacon. I haven't yet tried a steak-like product, but I bet it would fry up nicely. 2 + 6 + 10 = 18.
 
-Beyond Beef. A ground beef substitute that is overshadowed by—
+**Jackfruit.** The unripe fruit fragments into little pieces, with a texture similar to that of pulled pork. It's a bit sour, but nothing a little BBQ sauce can't cover up. 7 + 3 + 7 = 17.
 
-Impossible/Beyond. The closest / best ground beef substitute. Easily substitutes 1:1 into any recipe that calls for ground beef, mostly maintaining texture and taste.
+**Konjac.** A jelly made from the moyu plant. It has a remarkable texture, almost like a grape: firm when biting, but soft on the inside. Traditionally it is mostly used for making noodles and jelly. Its unique texture and transparent color also make it a nice vegan fish alternative for sushi. 3 + 7 + 7 = 16.
 
-Grains: Bulgar, Grünkern, Spelt, Buckwheat. My papa makes a delicious burger patty out of these. The grains on the outside become very crispy, and in the center
+**Quorn.** Made from fungus cells cultured hydroponically, usually stuck together using egg. Kind of expensive, and not actually that novel. 6 + 6 + 4 = 14.
 
-Quorn. Made from fungus cells cultured hydroponically, usually stuck together using egg. Kind of expensive, and not actually that novel.
+**Textured vegetable protein (TVP)**. A waste product from the production of soy bean oil, this is naturally rich in protein, this fries up nicely into a ground beef alternative. I like using this in burritos or fajitas. 5 + 5 + 3 = 13.
 
-Mycelium. There's a fairly new range of products made from pretty much just compressed mushroom mycelium. MyBacon is the only one I've tried so far, but it's by far the best bacon substitute I've ever tried. I haven't yet tried a steak-like product, but I bet it would fry up nicely.
+**Tempeh.** Fermented soybeans bound together by a fungus. It has a very interesting heterogeneous texture while being pan friable not unlike meats. Not my favorite, but enjoyable on occasion. 3 + 2 + 8 = 13.
 
-Cell cultured meats. I've been following two companies in this space: Wildtype Salmon, and Blue Nalu Tofu. I just realized that SF is one of the few cities where it is theoretically possible to try Wildtype Salmon, so hopefully I'll be able to try it while I'm here.
+**Halumi.** A firm cheese that can be fried like a steak. Usually a bit too salty for my taste, but has a very fun texture. 3 + 4 + 5 = 12.
 
+**Cell cultured meats.** I've been following two companies in this space: Wildtype Salmon, and Blue Nalu Tofu. SF is one of the few cities where you can get some, and I plan to do so. 1 + ? + ? = ?
+
+## My moral failings
 I should try more vegan alternatives too. I'm starting to foray into milk substitutes, after discovering that fresh soy milk is really quite tasty. Nowadays, there's vegan butter substitutes that just work for making cookies. Allegro is one of the best bakeries near where I live, even though they're vegan don't get to use butter to make their croissants.
 
-If I were a better person, I'd have a section on the wonderful advances in vegan cheeses. I hear it's now possible to get mozzarella substitutes that turn perfectly golden brown atop a pizza. But, as much I sometimes try to justify my vegetarianism for environmental reasons, for now, you can pry milk and cheese out of my cold dead hands.
+If I were a better person, I'd have ranked wonderful advances in vegan cheeses too. I hear it's now possible to get mozzarella substitutes that turn perfectly golden brown atop a pizza. But, as much I sometimes try to justify my vegetarianism for environmental reasons, for now, you can pry milk and cheese out of my cold dead hands.
 
 I still sometimes eat meat. In Japan, I'd rather eat at a tofu/yuba restaurant that uses bonito in their stock, than have a vegetarian burger. When I visit home, I'll often try a little bit of the meat dish that my papa cooked, because I know how much he loved cooking it and how delicious it will be.
 
