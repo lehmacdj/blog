@@ -5,7 +5,7 @@ date: 2026-04-05 20:16 -0700
 permalink: /GrMhcXX3CY7s/review-the-6-club
 redirect_from:
   - /GrMhcXX3CY7s
-tags: [review, personal, recommended, inkhaven]
+tags: [recommended, inkhaven, review, personal]
 ---
 
 The 6% Club offers a 100% money-back guarantee if you complete the program, publish 2 pieces, and feel that the program didn't help. I joined the program wanting to start publishing on my personal website again, published 2 weeks in a row in September, then not again until months later. I'm not looking for a refund.

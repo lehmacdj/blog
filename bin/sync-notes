@@ -2,17 +2,15 @@
 """
 Sync published notes from ~/wiki to the blog.
 
-Usage: ./sync-notes [--backsync-tags] [note-id ...]
+Usage: ./sync-notes [note-id ...]
        ./sync-notes              # sync all published notes
        ./sync-notes de14645c     # sync specific note(s)
-       ./sync-notes --backsync-tags  # sync and write merged tags back to wiki
 
 For each published note:
   - Pulls latest content from ~/wiki/<id>.md
-  - Preserves blog-specific frontmatter (tags, etc.)
+  - Uses wiki tags as the source of truth
   - Re-resolves wiki-links (picks up newly published links)
   - Updates the published: URL in the wiki note if needed
-  - Optionally backsyncs merged tags to wiki notes (--backsync-tags)
 """
 
 import argparse
@@ -30,18 +28,14 @@ from blog_utils import (
     extract_title,
     find_blog_note,
     extract_note_id,
-    get_blog_tags,
     ensure_published_link,
-    update_wiki_tags,
     build_frontmatter,
     copy_images,
     sync_all_tag_artifacts,
 )
 
 
-def sync_note(
-    note_id: str, backsync_tags: bool = False
-) -> list[str] | None:
+def sync_note(note_id: str) -> list[str] | None:
     """
     Sync a single note from wiki to blog.
 
@@ -83,13 +77,8 @@ def sync_note(
     permalink = f"/{note_id}/{slug}"
     published_url = f"{BASE_URL}{permalink}"
 
-    # Merge tags: keep blog tags (like 'article'), add wiki tags
-    blog_tags = get_blog_tags(note_id)
-    wiki_tags = parse_tags(wiki_meta.get("tags", ""))
-
-    # Preserve blog-only tags, update with wiki tags, deduplicate
-    merged_tags = list(blog_tags) + wiki_tags
-    merged_tags = list(dict.fromkeys(merged_tags))  # dedupe, preserve order
+    # Wiki is the source of truth for tags
+    merged_tags = parse_tags(wiki_meta.get("tags", ""))
 
     # Collect old redirects and the old permalink (if slug changed)
     old_redirects = set()
@@ -146,11 +135,6 @@ def sync_note(
             f"{len(copied_images)} image(s) copied"
         )
 
-    # Optionally backsync merged tags to wiki (even if no blog changes)
-    if backsync_tags:
-        if update_wiki_tags(wiki_path, merged_tags):
-            details.append("tags backsynced")
-
     if details:
         return details
     return None
@@ -164,11 +148,6 @@ def main():
         "note_ids",
         nargs="*",
         help="Note IDs to sync (defaults to all published notes)"
-    )
-    parser.add_argument(
-        "--backsync-tags",
-        action="store_true",
-        help="Write merged tags back to wiki notes"
     )
     args = parser.parse_args()
 
@@ -191,7 +170,7 @@ def main():
 
     updated = 0
     for note_id in sorted(note_ids):
-        details = sync_note(note_id, backsync_tags=args.backsync_tags)
+        details = sync_note(note_id)
         if details:
             if len(details) == 1:
                 print(f"  {note_id}: {details[0]}")
