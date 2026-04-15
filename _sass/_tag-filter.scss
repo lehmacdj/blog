@@ -56,6 +56,15 @@
   border-color: $grey-color-light;
   color: $grey-color;
 }
+.tag-clear-btn,
+.tag-expand-btn {
+  &::before {
+    content: '\200b';
+    width: 0;
+    overflow: hidden;
+  }
+  gap: 0;
+}
 .tag-clear-btn {
   padding-left: 0.5em;
   padding-right: 0.5em;
