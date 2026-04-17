@@ -24,10 +24,14 @@ I was enjoying the Summer Pockets anime at the time and eager for more content, 
 
 Unlike WaniKani, flashcards are self graded — you choose whether remembering the kanji/vocabulary was hard/medium/easy or whether you forgot the flashcard nothing/something.
 
+Anki allows using FSRS as its spaced repetition scheduler providing pretty much the same benefits as jpdb.io's scheduler.
+
 I was aware that without strongly committing to an answer, there was a risk that I would assume that I would assume my answer was correct, even when I hadn't really known before seeing the solution. To guard against this I took the time to trace the kanji in the air and subvocalize the vocabulary's meaning and pronunciation before clicking through to see the solution. Deciding how to grade myself was tricky at first. Sometimes when tracing out a kanji, I would draw the right strokes but in the wrong order. Because I was only tracing into the air, it was hard to judge how accurately I'd drawn the shape, so I opted to grade myself more conservatively.
 
 [jpdb.io's spaced repetition algorithm](https://jpdb.io/faq#SpacedRepetitionAlgorithm) also lived up to its promises. I've noticed two main benefits in practice. First, flashcards are pretty much always the right difficulty. My accuracy on jpdb.io ended up being fairly consistent with my accuracy on WaniKani at ~90%. Despite this, I rarely get a flashcard that I want to mark as easy; usually I have to think at least a second or two, before remembering the correct answer. Second, unlike WaniKani I don't get flashcards wrong, only to weeks later on my next review still have no idea what the right answer is. Instead, jpdb.io usually shows me the flashcard again much sooner (i.e. the next day) when I get a flashcard wrong.
 
 All of this remained true even when abandoning jpdb.io for longer periods of time, be it several weeks for a trip, or even once for several months. Just continuing to review my flashcards at whatever pace I manage when I got back, slowly reintroduces me to the flashcards I forgot, while giving me credit for remembering a longer period of time, for the flashcards I got wrong. It's also been really nice to be able to tailor the vocabulary I'm learning to whatever Japanese media I'm consuming over the past year.
+
+I haven't practiced Japanese quite as consistently since switching to jpdb.io. But, I've been using it for at least a year, whereas WaniKani burnt me out after just ~5 months. It effortlessly slots into my life when I want it to, adapting to whatever is going on in my life at the moment, making it as painless as possible to pick it back up again.
 
 *Come back tomorrow for a my conclusion in part 3.*
