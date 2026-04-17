@@ -34,4 +34,4 @@ All of this remained true even when abandoning jpdb.io for longer periods of tim
 
 I haven't practiced Japanese quite as consistently since switching to jpdb.io. But, I've been using it for at least a year, whereas WaniKani burnt me out after just ~5 months. It effortlessly slots into my life when I want it to, adapting to whatever is going on in my life at the moment, making it as painless as possible to pick it back up again.
 
-*Come back tomorrow for a my conclusion in part 3.*
+*Continued in [Against foolproof software](/YLwRkdcbZJyA/against-foolproof-software).*
