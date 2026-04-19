@@ -25,7 +25,7 @@ Much like a TCGs there are different deck archetypes[^more-on-fundamental-archet
 
 [^more-on-fundamental-archetypes]: My terminology here is borrowed from Wandering Winder's [The Five Fundamental Deck Types](https://dominionstrategy.com/2013/01/21/the-five-fundamental-deck-types-introduction/). Sometimes thinking in terms of these archetypes is overly restrictive, but it's a good starting point for understanding the different strategies one might pursue in a Dominion game.
 
-Dominion's strategic deck building decisions dominate the game from the very start. Each turn you have a 5 card hand, only shuffling new cards into your deck after having used up your entire deck. Starting from a 10 card deck, on your first turn, you already know your second hand. Because all of the cards available for purchase are visible at the start of the game[^the-vast-majority-of-the-time], players plan ahead to their final deck before buying a single card.
+Dominion's strategic deck building decisions dominate the game from the very start. Each turn you have a 5 card hand, only shuffling new cards into your deck after having used up your entire deck. Starting from a 10 card deck, on your first turn you already know your second hand. Because all of the cards available for purchase are visible at the start of the game[^the-vast-majority-of-the-time], players plan ahead to their final deck before buying a single card.
 
 [^the-vast-majority-of-the-time]: At least the vast majority of the time. Ignore Black Market, Boons, Treasures, etc.
 
