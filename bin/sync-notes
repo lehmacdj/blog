@@ -70,7 +70,9 @@ def sync_note(note_id: str) -> list[str] | None:
     body = resolve_wikilinks(body)
 
     # Copy images from wiki to blog
-    body, copied_images = copy_images(body, note_id)
+    body, copied_images = copy_images(
+        body, note_id, frontmatter_image=wiki_meta.get("image", ""),
+    )
 
     # Build slug and permalink
     slug = slugify(title)

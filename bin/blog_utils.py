@@ -423,52 +423,81 @@ def _heic_rotation(source: Path) -> int | None:
     return _ORIENTATION_TO_ROTATION.get(tag)
 
 
-def copy_images(body: str, note_id: str) -> tuple[str, list[Path]]:
+def _copy_wiki_image(
+    img_path: str, note_id: str,
+) -> tuple[Path, bool] | None:
     """
-    Copy images referenced in the body from wiki to blog.
+    Resolve a wiki-relative image path and copy/convert it into the blog
+    images directory.
+
+    Returns (dest_path, was_copied_fresh), or None if the source can't be
+    found. was_copied_fresh is True only when a copy or conversion actually
+    ran this call (not when the destination was already up to date).
+    """
+    clean_path = img_path.replace("%20", " ")
+    if clean_path.startswith("./"):
+        clean_path = clean_path[2:]
+
+    source = WIKI_DIR / clean_path
+    if not source.exists():
+        source = WIKI_DIR / img_path
+    if not source.exists():
+        print(f"  Warning: image not found: {img_path}")
+        return None
+
+    dest_name = blog_image_name(note_id, source)
+    dest = IMAGES_DIR / dest_name
+
+    if dest.exists() and source.stat().st_mtime <= dest.stat().st_mtime:
+        return dest, False
+
+    if source.suffix.lower() == ".heic":
+        rot = _heic_rotation(source)
+        cmd = ["sips", "-s", "format", "jpeg"]
+        if rot:
+            cmd += ["-r", str(rot)]
+        cmd += [str(source), "--out", str(dest)]
+        subprocess.run(cmd, check=True, capture_output=True)
+    else:
+        shutil.copy2(source, dest)
+    scrub_metadata(dest)
+    return dest, True
+
+
+def copy_images(
+    body: str, note_id: str, frontmatter_image: str = "",
+) -> tuple[str, list[Path]]:
+    """
+    Copy images referenced by the note (body and optional frontmatter image)
+    from wiki to blog.
 
     Returns:
         Tuple of (updated body with fixed paths, list of copied image paths)
     """
-    image_paths = extract_image_paths(body)
-    copied = []
+    copied: list[Path] = []
+    dest_by_path: dict[str, Path] = {}
 
-    for img_path in image_paths:
-        # Resolve the source path relative to wiki directory
-        # Handle various path formats
-        clean_path = img_path.replace("%20", " ")
-
-        if clean_path.startswith("./"):
-            clean_path = clean_path[2:]
-
-        source = WIKI_DIR / clean_path
-        if not source.exists():
-            # Try without URL encoding
-            source = WIKI_DIR / img_path
-        if not source.exists():
-            print(f"  Warning: image not found: {img_path}")
-            continue
-
-        # Determine destination filename (prefix with note_id for uniqueness)
-        dest_name = blog_image_name(note_id, source)
-        dest = IMAGES_DIR / dest_name
-
-        # Copy (or convert) if not already there or if source is newer
-        if not dest.exists() or source.stat().st_mtime > dest.stat().st_mtime:
-            if source.suffix.lower() == ".heic":
-                # Read EXIF orientation before converting
-                rot = _heic_rotation(source)
-                cmd = ["sips", "-s", "format", "jpeg"]
-                if rot:
-                    cmd += ["-r", str(rot)]
-                cmd += [str(source), "--out", str(dest)]
-                subprocess.run(
-                    cmd, check=True, capture_output=True,
-                )
-            else:
-                shutil.copy2(source, dest)
-            scrub_metadata(dest)
+    def process(img_path: str) -> Path | None:
+        if img_path in dest_by_path:
+            return dest_by_path[img_path]
+        result = _copy_wiki_image(img_path, note_id)
+        if result is None:
+            return None
+        dest, was_copied = result
+        if was_copied:
             copied.append(dest)
+        dest_by_path[img_path] = dest
+        return dest
+
+    frontmatter_image = frontmatter_image.strip()
+    if frontmatter_image:
+        process(frontmatter_image)
+
+    for img_path in extract_image_paths(body):
+        dest = process(img_path)
+        if dest is None:
+            continue
+        dest_name = dest.name
 
         # Update the path in the body to point to the blog images directory
         # Only use angle brackets when filename contains spaces

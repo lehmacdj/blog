@@ -72,7 +72,9 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     body = resolve_wikilinks(body)
 
     # Copy images from wiki to blog
-    body, _ = copy_images(body, note_id)
+    body, _ = copy_images(
+        body, note_id, frontmatter_image=metadata.get("image", ""),
+    )
 
     # Build slug and permalink
     slug = slugify(title)
