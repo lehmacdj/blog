@@ -10,7 +10,7 @@ tags: [inkhaven]
 
 AI agents are getting to be really useful for analyzing giant dumps of unorganized data. But AI can only have access to the data that has already been collected. But AI agents promises to make it easier to get insights from the data I collect, either through custom vibe-coded tooling or agentic search.
 
-I used to want to keep all the data I collect in inside of a single system, sorted with a unified tags, hierarchy, and such. I thought a unified system would make collecting metadata more efficient. I even went so far as building a custom tool for storing stuff with hierarchical tags in a graph like structure[^custom-tool] in pursuit of this goal. But rather than make the collection of more detailed metadata more efficient, this mostly added friction which prevented me from collecting nearly as much info in practice.
+I used to want to keep all the data I collect in inside of a single system, sorted with a unified tags, hierarchy, and such. I thought a unified system would make collecting metadata more efficient. I even went so far as building a custom tool for storing stuff with hierarchical tags in a graph like structure in pursuit of this goal[^custom-tool]. But rather than make the collection of more detailed metadata more efficient, this mostly added friction which prevented me from collecting nearly as much info in practice.
 
 [^custom-tool]: You can find the tool in question at https://github.com/lehmacdj/graph. The most interesting thing it has is a regular expression inspired graph query language.
 
