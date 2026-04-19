@@ -110,8 +110,10 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     sync_all_tag_artifacts()
 
     # Commit and sync
-    subprocess.run(["jj", "commit", "-m", f"Publish {title}"], check=True)
-    subprocess.run(["jj", "tug"], check=True)
+    subprocess.run(
+        ["jj", "commit", "-m", f"Publish {title}"], check=True, cwd=BLOG_DIR,
+    )
+    subprocess.run(["jj", "tug"], check=True, cwd=BLOG_DIR)
 
     return published_url
 

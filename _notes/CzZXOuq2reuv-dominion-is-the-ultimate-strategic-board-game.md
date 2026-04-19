@@ -5,14 +5,14 @@ date: 2026-04-18 20:19 -0700
 permalink: /CzZXOuq2reuv/dominion-is-the-ultimate-strategic-board-game
 redirect_from:
   - /CzZXOuq2reuv
-tags: [board-games, strategy, recommended, inkhaven, unlisted]
+tags: [board-games, strategy, recommended, inkhaven]
 ---
 
 In Hearthstone, Yu-Gi-Oh, Magic the Gathering, or really any TCG the winner of a match is sometimes predetermined before either player has taken their first turn. Control decks are hyperspecialized to clear the tiny minions produced by an aggro deck. An aggro deck will usually swarm the board and beat down a combo deck player before they manage to set up their combo. Combo decks tend to beat control decks, setting up a rock paper scissors like meta-game.
 
 This meta-game has immense strategic depth. Players consider the available pool of cards, and try to craft a deck with the best possible win rate. But another player can decide that they can have a better win-rate by countering the straightforwardly best looking deck. Thus players must imagine the complete distribution of decks and balance using the most powerful cards, being resistant to being countered, and trying to counter their competition. This strategic depth of the meta-game has always been my favorite part of TCGs.
 
-Dominion is a deck-building game that distills this meta-game into the game itself. Players start out with a deck with just 7 coppers and 3 estates, but throughout the game purchase cards, adding them to their deck. Unlike a TCG where the available cards only changes every few months when a new set of cards is released, in Dominion each game has a different set of 10 available kingdom cards. Randomly selecting from over 500 available cards, means that there are well over $$10^25$$ possible kingdoms[^specific-calculation], each with their own best strategies.
+Dominion is a deck-building game that distills this meta-game into the game itself. Players start out with a deck with just 7 coppers and 3 estates, but throughout the game purchase cards, adding them to their deck. Unlike a TCG where the available cards only changes every few months when a new set of cards is released, in Dominion each game has a different set of 10 available kingdom cards. Randomly selecting from over 500 available cards, means that there are well over $$10^{25}$$ possible kingdoms[^extra-selection-criteria], each with their own best strategies.
 
 [^extra-selection-criteria]: There's a bunch of extra selection factors: Landscape cards like Events, Landmarks, Projects, etc. plus cards that require extra cards like Young Witch which requires the selection of a bane, that make calculating the exact number fairly tedious.
 
