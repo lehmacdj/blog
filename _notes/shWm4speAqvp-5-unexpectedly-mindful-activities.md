@@ -6,9 +6,10 @@ permalink: /shWm4speAqvp/5-unexpectedly-mindful-activities
 redirect_from:
   - /shWm4speAqvp
 tags: [mindfulness, inkhaven, recommended]
+image: /images/shWm4speAqvp-D2Hp3DTuBFS9.webp
 ---
 
-I've been increasingly interested in mindfulness over the past year, starting to meditate about ~2 months ago. Overall, it has been fairly transformative in terms of my qualitative stress and overall sense of well being. These are activities that might not seem like they should be mindful, but I often find similar benefits to meditation.
+I've been increasingly interested in mindfulness over the past year, starting to meditate about ~2 months ago. Overall, it has been fairly transformative in terms of my qualitative stress and overall sense of well being. These are activities that didn't seem like they should be mindful, but I ended up finding meditation like benefits in.
 
 ## Playing Riichi Mahjong
 I originally learned Riichi Mahjong at work. When Mahjong Soul added my favorite character from Idolm@ster Shiny Colors in a collab, I started to play online. At first, 5 seconds a turn felt like a tiny amount of time to identify patterns with a 14 tile hand and decide what tile to discard. But, as I got better, simpler hands became easy to play mechanically, and the extra time between turns made it easy for my mind to drift to other things. But the game has a surprising amount of depth. Even if optimal tile efficiency becomes trivial, there's room to improve by paying more attention to what your opponents are discarding, expected value calculations, and so on. However, as a heavily luck based game, it's unfortunately common to play perfectly, and still end up in last place. This creates a good opportunity for equanimity practice, by remaining composed while losing, you maximize your chances of making an extremely satisfying comeback.
