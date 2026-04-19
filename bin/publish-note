@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 from blog_utils import (
     WIKI_DIR,
     NOTES_DIR,
+    BLOG_DIR,
     BASE_URL,
     parse_frontmatter,
     parse_tags,
