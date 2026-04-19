@@ -17,7 +17,7 @@ Dominion is a deck-building game that distills this meta-game into the game itse
 [^extra-selection-criteria]: There's a bunch of extra selection factors: Landscape cards like Events, Landmarks, Projects, etc. plus cards that require extra cards like Young Witch which requires the selection of a bane, that make calculating the exact number fairly tedious.
 
 Much like a TCGs there are different deck archetypes[^more-on-fundamental-archetypes]:
-- **big money** decks aims to buy a province each turn, improving the amount of money the average 5 card hand generates (money density)
+- **big money** decks aims to buy a province each turn, by improving the money the average 5 card hand generates
 - **engines** optimize to draw the entire deck each turn, often buying multiple provinces in a turn
 - **combos** utilize unique card combinations usually culminating in a single big turn in which they end the game
 - **slogs** aim to slow down the game, while acquiring cards that give them a bigger advantage the longer the game lasts
