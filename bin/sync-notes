@@ -59,10 +59,10 @@ def sync_note(note_id: str) -> list[str] | None:
     blog_content = blog_path.read_text()
     blog_meta, _ = parse_frontmatter(blog_content)
 
-    # Extract title from wiki body
-    title, body = extract_title(wiki_body)
+    title = wiki_meta.get("title")
     if not title:
-        return [f"warning: no title found in {wiki_path}"]
+        return [f"warning: no `title:` in frontmatter of {wiki_path}"]
+    _, body = extract_title(wiki_body)
 
     # Keep the original publication date from the blog
     jekyll_date = blog_meta.get("date", "")

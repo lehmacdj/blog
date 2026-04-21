@@ -2,6 +2,7 @@
 Shared utilities for blog publishing scripts.
 """
 
+import json
 import re
 import shutil
 import subprocess
@@ -31,26 +32,55 @@ TZ_OFFSETS = {
 }
 
 
+def parse_yaml_scalar(value: str) -> str:
+    """Parse the subset of YAML scalars used by the publishing scripts.
+
+    JSON strings are valid YAML and are what wiki-lsp emits. Single-quoted YAML
+    strings and the existing unquoted metadata format remain supported.
+    """
+    if len(value) >= 2 and value[0] == '"' and value[-1] == '"':
+        try:
+            decoded = json.loads(value)
+        except json.JSONDecodeError:
+            return value[1:-1]
+        return decoded if isinstance(decoded, str) else value
+    if len(value) >= 2 and value[0] == "'" and value[-1] == "'":
+        return value[1:-1].replace("''", "'")
+    return value
+
+
+def serialize_yaml_scalar(value: str) -> str:
+    """Serialize a string as a JSON-compatible, single-line YAML scalar."""
+    return json.dumps(value, ensure_ascii=False)
+
+
 def parse_frontmatter(content: str) -> tuple[dict, str]:
     """Parse YAML frontmatter and return (metadata, body)."""
-    if not content.startswith("---"):
+    lines = content.splitlines(keepends=True)
+    if not lines or lines[0].rstrip("\r\n") != "---":
         return {}, content
 
-    parts = content.split("---", 2)
-    if len(parts) < 3:
+    closing_index = next(
+        (
+            index
+            for index, line in enumerate(lines[1:], start=1)
+            if line.rstrip("\r\n") == "---"
+        ),
+        None,
+    )
+    if closing_index is None:
         return {}, content
 
-    frontmatter_text = parts[1].strip()
-    body = parts[2].lstrip("\n")
+    frontmatter_text = "".join(lines[1:closing_index])
+    body = "".join(lines[closing_index + 1 :]).lstrip("\r\n")
 
     metadata = {}
-    for line in frontmatter_text.split("\n"):
+    for line in frontmatter_text.splitlines():
+        if line != line.lstrip():
+            continue
         if ":" in line:
             key, value = line.split(":", 1)
-            value = value.strip()
-            if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
-                value = value[1:-1]
-            metadata[key.strip()] = value
+            metadata[key.strip()] = parse_yaml_scalar(value.strip())
 
     return metadata, body
 
@@ -383,7 +413,7 @@ def build_frontmatter(
     lines = [
         "---",
         "layout: post",
-        f"title: \"{title}\"",
+        f"title: {serialize_yaml_scalar(title)}",
         f"date: {date}",
         f"permalink: {permalink}",
         "redirect_from:",
