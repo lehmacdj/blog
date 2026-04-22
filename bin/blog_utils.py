@@ -47,7 +47,10 @@ def parse_frontmatter(content: str) -> tuple[dict, str]:
     for line in frontmatter_text.split("\n"):
         if ":" in line:
             key, value = line.split(":", 1)
-            metadata[key.strip()] = value.strip()
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+                value = value[1:-1]
+            metadata[key.strip()] = value
 
     return metadata, body
 

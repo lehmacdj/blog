@@ -6,7 +6,7 @@ permalink: /ihe0bEPXK5ip/metadata-patterns-not-accounted-for-by-music-apps
 redirect_from:
   - /ihe0bEPXK5ip
 tags: [navigability, idolm@ster, idol, music, recommended, inkhaven]
-image: /images/ihe0bEPXK5ip-Pasted%20image%2020260421234132.png'
+image: /images/ihe0bEPXK5ip-Pasted%20image%2020260421234132.png
 ---
 
 I hesitated a lot when first getting into anime idol music. I was definitely a little self-conscious that the album art can get fairly suggestive.
