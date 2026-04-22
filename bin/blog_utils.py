@@ -263,7 +263,8 @@ def collect_all_tags() -> set[str]:
 
 
 def sync_tag_feeds(tags: set[str] | None = None):
-    """Ensure a feed file exists for every tag used in notes."""
+    """Ensure a feed file exists for every tag used in notes,
+    and remove feeds for tags no longer in use."""
     FEED_DIR.mkdir(exist_ok=True)
     if tags is None:
         tags = collect_all_tags()
@@ -278,8 +279,20 @@ def sync_tag_feeds(tags: set[str] | None = None):
                 f"feed_tag: \"{tag}\"\n---\n"
             )
             created.append(tag)
+
+    removed = []
+    for feed_path in FEED_DIR.glob("*.xml"):
+        if feed_path.stem in tags:
+            continue
+        if "feed_tag:" not in feed_path.read_text():
+            continue
+        feed_path.unlink()
+        removed.append(feed_path.stem)
+
     if created:
         print(f"Created feed(s): {', '.join(created)}")
+    if removed:
+        print(f"Removed feed(s): {', '.join(sorted(removed))}")
 
 
 TAG_PAGE_TEMPLATE = """\
@@ -294,7 +307,8 @@ nav_exclude: true
 
 
 def sync_tag_pages(tags: set[str] | None = None):
-    """Ensure a tag index page exists for every tag used in notes."""
+    """Ensure a tag index page exists for every tag used in notes,
+    and remove pages for tags no longer in use."""
     TAGS_DIR.mkdir(exist_ok=True)
     if tags is None:
         tags = collect_all_tags()
@@ -308,8 +322,27 @@ def sync_tag_pages(tags: set[str] | None = None):
         tag_dir.mkdir(exist_ok=True)
         tag_page.write_text(TAG_PAGE_TEMPLATE.format(tag=tag))
         created.append(tag)
+
+    removed = []
+    for tag_dir in TAGS_DIR.iterdir():
+        if not tag_dir.is_dir() or tag_dir.name in tags:
+            continue
+        tag_page = tag_dir / "index.html"
+        if not tag_page.exists():
+            continue
+        if "active_tag:" not in tag_page.read_text():
+            continue
+        tag_page.unlink()
+        try:
+            tag_dir.rmdir()
+        except OSError:
+            pass
+        removed.append(tag_dir.name)
+
     if created:
         print(f"Created tag page(s): {', '.join(created)}")
+    if removed:
+        print(f"Removed tag page(s): {', '.join(sorted(removed))}")
 
 
 def sync_all_tag_artifacts():
