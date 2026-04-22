@@ -36,6 +36,12 @@ When I got tired of manually importing metadata I discovered [beets](https://git
 
 [^which-franchises]: nayuta, Idolm@ster, Love Live!, Project SEKAI (especially More More Jump! and Nightcord at 25:00) are my favorites. I've even gone to a couple of live shows in Japan.
 
+None of these matter when listening to an algorithm generated playlist on Spotify or YouTube Music. But regardless, I still have a strong desire to navigate — I think it helps me feel more intentional about my music listening.
+
+Classical music once had a lot of similar problems, e.g. the same piece but separate recordings different orchestras/conductors. Eventually, Apple implemented better navigability through specialized services like [Apple Music Classical](https://classical.music.apple.com/us/browse/catalog).
+
+These are the metadata patterns I want custom support for when Claude is able to build me a custom music app.
+
 ## Character vs Voice actor
 Each character is portrayed by a voice actor. Voice actors often also publish music as themselves, and sometimes the same voice actor portrays multiple characters[^example-seiyu-overlap]. If I want to listen to music by a particular singer because I like their voice, I'd love to be able to jump to all of the music by the voice actor. YouTube Music/Spotify usually doesn't even show the voice actor (it depends on the franchise).
 
@@ -59,10 +65,3 @@ Albums often bundle tracks that don't make to listen to typically. Most albums i
 Beyond that there's often variants of the same song: solo versions, short versions (i.e. ~1:30 versions used in rhythm games), and live recordings. MusicBrainz's data model actually works fairly well for variants, [linking recordings to a single song](https://musicbrainz.org/work/b9b4e98c-36ad-40be-8461-10784a71e235), but I haven't found a music app that allows navigating these relationships.
 
 Music apps aren't able to filter these out for general listening, but still expose them when desired.
-
-## Navigability
-None of these matter when listening to an algorithm generated playlist on Spotify or YouTube Music. But regardless, I still have a strong desire to navigate — I think it helps me feel more intentional about my music listening.
-
-Classical music once had a lot of similar problems, e.g. the same piece but separate recordings different orchestras/conductors. Eventually, Apple implemented better navigability through specialized services like [Apple Music Classical](https://classical.music.apple.com/us/browse/catalog).
-
-Fan wikis + searching were sufficient to give me the navigability I desired, but perhaps Claude will make it possible for us to create the bespoke navigation patterns we desire.
