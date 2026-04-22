@@ -6,9 +6,27 @@ permalink: /ihe0bEPXK5ip/metadata-patterns-not-accounted-for-by-music-apps
 redirect_from:
   - /ihe0bEPXK5ip
 tags: [navigability, idolm@ster, idol, music, recommended, inkhaven]
+image: /images/ihe0bEPXK5ip-Pasted%20image%2020260421234132.png'
 ---
 
-I hesitated a lot when first getting into anime idol music. Part of it was definitely that I was a little self-conscious about the fact that the album art can get fairly suggestive.
+I hesitated a lot when first getting into anime idol music. I was definitely a little self-conscious that the album art can get fairly suggestive.
+<style>
+.img-blur-reveal { position: relative; flex: 1; overflow: hidden; }
+.img-blur-reveal img { width: 100%; height: auto; display: block; filter: blur(20px); transition: filter 0.3s; }
+.img-blur-reveal:hover img { filter: none; }
+.img-blur-reveal .overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0.5em; pointer-events: none; transition: opacity 0.3s; }
+.img-blur-reveal:hover .overlay { opacity: 0; }
+</style>
+
+<div style="display: flex; gap: 1em; width: 100%; align-items: flex-start;">
+  <div style="flex: 1;">
+    <img src="/images/ihe0bEPXK5ip-Pasted%20image%2020260421234132.png" alt='Album art from THE IDOLM@STER SHINY COLORS "CANVAS" 06' style="width: 100%; height: auto; display: block;">
+  </div>
+  <div class="img-blur-reveal">
+    <img src="/images/ihe0bEPXK5ip-Pasted%20image%2020260421234152.png" alt="Abum art from Duo & Trio Collection CD Vol. 1 Summer Vacation">
+    <div class="overlay">13+ album art with characters wearing swimsuits</div>
+  </div>
+</div>
 
 But more importantly I feared its complexity would render my music cluttered and unnavigable. I mostly engaged with my music *navigationally* as opposed to *searching*. I liked to select a genre, an artist within that genre, and then pick out an album within that genre to listen to. Instead of staring at an empty search field, wanting music for focusing, I could pick Soundtrack, evaluating that Joe Hisaishi (i.e. Ghibli Soundtracks) was chiller than John Williams (Star Wars), then Spirited Away, deciding Princess Mononoke was too gloomy and I needed a little more whimsy.
 

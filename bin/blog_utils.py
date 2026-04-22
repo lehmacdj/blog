@@ -7,6 +7,7 @@ import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
 
 WIKI_DIR = Path.home() / "wiki"
 BLOG_DIR = Path(__file__).parent.parent.resolve()
@@ -406,6 +407,7 @@ def extract_image_paths(body: str) -> list[str]:
       - ![alt](path) - standard markdown
       - ![alt](<path>) - markdown with angle brackets (allows spaces)
       - ![[path]] - Obsidian-style wikilinks
+      - <img src="path" ...> - inline HTML, single or double-quoted src
     """
     paths = []
 
@@ -423,6 +425,15 @@ def extract_image_paths(body: str) -> list[str]:
     obsidian_pattern = r'!\[\[([^\]]+)\]\]'
     for match in re.finditer(obsidian_pattern, body):
         paths.append(match.group(1))
+
+    # HTML <img> tags: <img ... src="path" ...> or src='path'
+    html_pattern = r'<img\s[^>]*\bsrc\s*=\s*(?:"([^"]+)"|\'([^\']+)\')'
+    for match in re.finditer(html_pattern, body):
+        src = match.group(1) or match.group(2)
+        # Skip absolute URLs and site-root-relative paths
+        if src.startswith(("http://", "https://", "//", "/")):
+            continue
+        paths.append(src)
 
     return paths
 
@@ -559,5 +570,15 @@ def copy_images(
             f'![]({new_path})',
             body
         )
+
+        # Rewrite <img src="..."> references (both encoded and unencoded)
+        html_new_src = "/images/" + quote(dest_name)
+        html_src_variants = {img_path, img_path.replace(" ", "%20")}
+        for variant in html_src_variants:
+            body = re.sub(
+                rf'(<img\s[^>]*\bsrc\s*=\s*)(["\']){re.escape(variant)}\2',
+                rf'\g<1>\g<2>{html_new_src}\g<2>',
+                body
+            )
 
     return body, copied
