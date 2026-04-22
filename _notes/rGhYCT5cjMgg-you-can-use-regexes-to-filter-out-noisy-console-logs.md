@@ -12,6 +12,8 @@ redirect_from:
 tags: [browser, debugging, recommended]
 ---
 
+*You should probably just use Claude's Chrome Extension to develop browser plugins. It can filter/extract relevant logs without you needing to copy/paste nowadays. This is still useful advice if you find yourself using the console by hand.*
+
 When building browser extensions/ad-hoc scripts that run in the browser I often run into a lot of noisy warnings/logs emitted by the website my script runs on. Here's just a sampling of what I encountered while writing a Tampermonkey script to bulk download statements from Fidelity:
 ![Screenshot of some noisy debug logs](</images/rGhYCT5cjMgg-Screenshot 2025-12-29 at 16.17.15.png>)
 
