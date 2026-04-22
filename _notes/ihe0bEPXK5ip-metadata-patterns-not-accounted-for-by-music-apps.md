@@ -61,7 +61,7 @@ Beyond that there's often variants of the same song: solo versions, short versio
 Music apps aren't able to filter these out for general listening, but still expose them when desired.
 
 ## Navigability
-None of these matter when listening to an algorithm generated playlist on Spotify or YouTube Music. But regardless, I still have a strong desire to navigate - I think it helps me feel more intentional about my music listening.
+None of these matter when listening to an algorithm generated playlist on Spotify or YouTube Music. But regardless, I still have a strong desire to navigate — I think it helps me feel more intentional about my music listening.
 
 Classical music once had a lot of similar problems, e.g. the same piece but separate recordings different orchestras/conductors. Eventually, Apple implemented better navigability through specialized services like [Apple Music Classical](https://classical.music.apple.com/us/browse/catalog).
 
