@@ -5,7 +5,7 @@ date: 2026-04-22 23:02 -0700
 permalink: /LylN8Ju8BGfr/my-neovim-configuration
 redirect_from:
   - /LylN8Ju8BGfr
-tags: [vim, recommended, inkhaven]
+tags: [vim, recommended, inkhaven, wiki]
 ---
 
 I use Neovim for 95%+ of my writing, both prose and code. I originally picked Vim over Emacs because I liked its modal text editing. Over the following years I've honed it to my preferences, building up over ~4000 lines of configuration. I've flirted with switching to Emacs with evil-mode for a better plugin ecosystem, but Vim is too deeply engraved in my muscle memory to move away from.
