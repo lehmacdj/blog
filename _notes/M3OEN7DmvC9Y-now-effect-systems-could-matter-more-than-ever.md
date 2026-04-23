@@ -5,7 +5,7 @@ date: 2026-04-20 22:40 -0700
 permalink: /M3OEN7DmvC9Y/now-effect-systems-could-matter-more-than-ever
 redirect_from:
   - /M3OEN7DmvC9Y
-tags: [effects, swift, agentic-programming]
+tags: [effects, swift, agentic-programming, inkhaven]
 ---
 
 Side-effects are where software gets risky. Most programming languages don't include effects in their type signatures.
