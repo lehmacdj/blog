@@ -5,7 +5,7 @@ date: 2026-04-23 17:12 -0700
 permalink: /dCtl1IFIC8VF/programming-language-features-and-optimizations
 redirect_from:
   - /dCtl1IFIC8VF
-tags: [inkhaven]
+tags: [inkhaven, recommended, programming-languages]
 ---
 
 My dream programming language would be able to express the syntax and semantics of every other programming language idiomatically. In this framing a good programming language would have few builtins[^builtins] but would still be able to manifest many more specific features as library definitions.
@@ -63,7 +63,7 @@ This category encapsulates language features that make working with effects easi
 - See also: [Effects](/t1WnMS8gb0uo/effects)
 
 ## working with coeffects
-- [method (/with) notation](/zOnT5C3LH1V2/method-notation-with-notation): relatively undeveloped, but interesting
+- [method (/with) notation](/zOnT5C3LH1V2/method-with-notation): relatively undeveloped, but interesting
 - [coeffects can act as interpreters for effects](/0yMXYaW73qbq/coeffects-can-act-as-interpreters-for-effects): vague but interesting, method notation has some extra ideas for this
 - See also: [coeffects / consumer effects](/mxPjuprza4i8/coeffects-consumer-effects)
 
