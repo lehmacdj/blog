@@ -8,7 +8,7 @@ redirect_from:
 ---
 
 Ability of a type system to determine the type of a term. In general undecidable for complicated type systems, however there are fairly good inference schemes for restricted scenarios.
-- MLSub (subtypes / subtyping)
+- MLSub ([subtypes / subtyping](/E6doTkK2Znp0/subtypes-subtyping))
 - Quicklook (impredicative polymorphism)
 - Hindley Milner (full inference for rank 1 types)
 - Bidirectional type checking (extensible, relatively easy to implement approach)

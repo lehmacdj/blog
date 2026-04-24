@@ -8,4 +8,4 @@ redirect_from:
 ---
 
 Particularly useful in RAII contexts:
-- AnyCancellable / deinitializers
+- [AnyCancellable / deinitializers](/Krx3UvnKso90/anycancellable-deinitializers)

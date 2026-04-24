@@ -7,6 +7,6 @@ redirect_from:
   - /TiqCn7SeTYUQ
 ---
 
-When compiling code in an ide, generally there will only be a single set of flags active, therefore it is possible for there to be a compile error in a piece of code that isn't checked in the configuration used for ide diagnostics. This is a problem with C pre-processor (CPP) and rust `#[cfg(test)]` pragmas in particular.
+When compiling code in an ide, generally there will only be a single set of flags active, therefore it is possible for there to be a compile error in a piece of code that isn't checked in the configuration used for ide diagnostics. This is a problem with C pre-processor (CPP) and rust `#[cfg(test)]` pragmas.
 
-The solution to this is to compile every configuration separately when compiling for ide diagnostics, but this can potentially lead to a blow up of possibilities, which could be expensive as building a project takes a long time without compiling it 2, 4 or even 8 times. A solution to this is to have compilation take into account different alternatives when compiling code natively, so that each file can still be compiled in a single pass (using for example external dependency requirement coeffect.
+This can be solved by compiling for every configuration separately, but the exponential blowup can make this expensive for large projects with lots of configuration options. A solution to this is to have compilation take into account different alternatives when compiling code natively, so that each file can still be compiled in a single pass (using for example [external dependency requirement coeffect](/Jnv3qiL1AYiP/external-dependency-requirement-coeffect)).

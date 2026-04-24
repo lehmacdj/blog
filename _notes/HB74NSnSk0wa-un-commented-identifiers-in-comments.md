@@ -15,4 +15,4 @@ func foo() {}
 
 This allows such references to be clicked with go to definition as well.
 
-Swift does not offer syntax for get runtime string of compile-time identifier.
+Swift does not offer syntax for [get runtime string of compile-time identifier](/QKeZY0XKOiI6/get-runtime-string-of-compile-time-identifier).

@@ -7,9 +7,7 @@ redirect_from:
   - /A4bq6bKLHbQx
 ---
 
-It should be easy to keep related things close together in the codebase. This
-gets very hard when considering the expression problem, as it sometimes becomes
-necessary to split things up by vertical/horizontal.
+It should be easy to keep related things close together in the codebase. This gets very hard when considering the expression problem, as it sometimes becomes necessary to split things up by vertical/horizontal.
 
 ## Things that should be co-locatable
 - [unit tests can be co-located with code](/DB3xJAOpe0Bf/unit-tests-can-be-co-located-with-code).

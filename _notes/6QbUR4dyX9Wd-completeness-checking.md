@@ -12,5 +12,5 @@ redirect_from:
 - or that all record fields have been populated/provided.
 
 See also:
-- co-completeness checking
+- [co-completeness checking](/6gtykpBojvhd/co-completeness-checking)
 - [pattern matching](/GQrJD6Vydss6/pattern-matching)

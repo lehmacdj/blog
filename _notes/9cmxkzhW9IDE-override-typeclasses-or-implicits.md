@@ -20,4 +20,4 @@ with (Monoid Any) (uses (someList.traverse) (== x))
 [givens (Scala 3)](/A2tVR0i9YcsB/givens-scala-3) has a fairly good picture for how this can be implemented.
 
 See also:
-- scoped typeclasses or implicits
+- [scoped typeclasses or implicits](/TChq81fMCv9p/scoped-typeclasses-or-implicits)

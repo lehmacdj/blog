@@ -7,11 +7,9 @@ redirect_from:
   - /iJCO4lkr7tNY
 ---
 
-It would be really nice if constructor tags were reified into the language and
-allowed pattern matching on them.
+It would be really nice if constructor tags were reified into the language and allowed pattern matching on them.
 
-For example, given a data type with three constructors it might be nice write a
-function converting a value to a string like so:
+For example, given a data type with three constructors it might be nice write a function converting a value to a string like so:
 ```haskell
 data Op = Add Expr Expr | Sub Expr Expr | Mult Expr Expr
 

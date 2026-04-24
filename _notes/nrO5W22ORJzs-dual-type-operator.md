@@ -19,6 +19,6 @@ You might want to be able to express `Dual (Either a b)` which should be isomorp
 data DualEither a b = DualEither {left :: a, right :: b}
 ```
 
-One might want this for co-completeness checking.
+One might want this for [co-completeness checking](/6gtykpBojvhd/co-completeness-checking).
 
 Maybe you kind of get for free in certain linear logic like type systems (literally the dual relationship?)?

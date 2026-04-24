@@ -7,4 +7,4 @@ redirect_from:
   - /JJkIIMTFCOS2
 ---
 
-`IEnumerable`/`IQueryable` + other protocols that C# uses to provide an SQL like EDSL within the confines of the language. They even offer custom syntax that lets you use SQL languages-like query syntax.
+`IEnumerable`/`IQueryable` + other protocols that C# uses to provide an SQL like EDSL within the confines of the language. They even offer custom syntax that lets you use [SQL languages](/pcRQ1yutjbRF/sql-languages)-like query syntax.

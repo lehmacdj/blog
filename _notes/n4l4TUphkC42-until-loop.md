@@ -11,7 +11,7 @@ Opposite of [while loop](/sSiTDOesjtyI/while-loop).
 
 This would be useful in Swift in combination with `if let` for unwrapping optionals, e.g.
 ```swift
-unless let somethingThatMustBeNonNil {
+until let somethingThatMustBeNonNil {
   // try to initialize somethingThatMustBeNonNil
 }
 // it is now non-nil

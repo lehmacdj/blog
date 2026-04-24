@@ -7,7 +7,7 @@ redirect_from:
   - /t1WnMS8gb0uo
 ---
 
-Effects refer to side-effects performed by a computation. Generally these are producer effects, but more generally effects can refer to coeffects / consumer effects as well.
+Effects refer to side-effects performed by a computation. Generally these are producer effects, but more generally effects can refer to [coeffects / consumer effects](/mxPjuprza4i8/coeffects-consumer-effects) as well.
 - [Analysis/comparison](https://github.com/lexi-lambda/eff/blob/master/notes/semantics-zoo.md) of the semantics of producer effects in Haskell libraries
 - Why use an effect system?
 

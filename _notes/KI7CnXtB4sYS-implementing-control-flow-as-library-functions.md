@@ -14,5 +14,5 @@ Lazy languages like Haskell make this very easy, because the thunking is implici
 Swift also offers a `@autoclosure` trait that allows wrapping non-closure parameters with parameters. This is useful for `assert` or logging functions that might not need to compute all of their parameters all the time.
 
 Examples:
-- bracket operations in Haskell implement with/using blocks
+- bracket operations in Haskell implement [with/using blocks](/KAvQgJqAafP2/with-using-blocks)
 - C#/Java/Swift stream processing libraries offer functions like `.ForEach` which executes an action for each element of an `IEnumerable` (analogous to a `for each` loop)

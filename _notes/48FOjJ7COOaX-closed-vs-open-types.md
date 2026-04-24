@@ -11,7 +11,7 @@ Both sum and product types have closed and open variations:
 
 |        | Product                             | Sum                             |
 |--------|-------------------------------------|---------------------------------|
-| Closed | structs/record types                | coproducts / variants / enums   |
-| Open   | row types (i.e. extensible records) | polymorphic variants            |
+| Closed | [structs/record types](/3dDEa8tnSN83/structs-record-types)                | [coproducts / variants / enums](/EdP0HQuZhLDD/coproducts-variants-enums)   |
+| Open   | row types (i.e. extensible records) | [polymorphic variants](/XuvkOLlAiCEm/polymorphic-variants)            |
 
 Interestingly I don't think it is possible to define open variants of the dependent product / dependent sum. Without a specific domain to scope over, dependent types seem fairly ill scoped.

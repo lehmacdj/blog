@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "method notation (with notation)"
+title: "method (/with) notation"
 date: 2026-04-23 17:18 -0700
-permalink: /zOnT5C3LH1V2/method-notation-with-notation
+permalink: /zOnT5C3LH1V2/method-with-notation
 redirect_from:
   - /zOnT5C3LH1V2
+  - /zOnT5C3LH1V2/method-notation-with-notation
 ---
 
 This notation was originally introduced by Comonads are objects and provides a syntax similar to do notation which makes programming with comonads easier.
@@ -52,7 +53,7 @@ where expr1, expr2, and expr3 may contain `this` a reference to the "current" co
 
 In other words, a comonadic computation is expressed as subsequent values of comonadic type composed together. The prompts[^prompt] `wa>` and `wc>` bring previous values into scope for all subsequent statements kind of like creating a copy of an object in the object oriented analogy[^immutability].
 
-$For the language: (Co)effects/(In)equalities/Meta phases I want to try to give the prompts syntax that is closer to como's syntax for saving unpattern matched values, because the method notation and pattern matching syntax seem related to me. See also: pattern matching provides a dual expression language for details on how pattern matching seems comonadic. It is also probably worth investigating what this kind of syntactic sugar should look like in pattern matches.
+$For my programming language I want to try to give the prompts syntax that is closer to como's syntax for saving unpattern matched values, because the method notation and pattern matching syntax seem related to me. See also: pattern matching provides a dual expression language for details on how pattern matching seems comonadic. It is also probably worth investigating what this kind of syntactic sugar should look like in pattern matches.
 
 [^immutability]: Of course, in Haskell everything is immutable so saving copies is pretty cheap.
 [^prompt]: This comes from `>` being a common character to end prompts in REPLs.

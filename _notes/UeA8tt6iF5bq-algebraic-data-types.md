@@ -39,7 +39,7 @@ Algebraic data types tend to make it easy to describe data that might come in se
 
 Essentially they're a single feature bundling together:
 - [structs/record types](/3dDEa8tnSN83/structs-record-types)
-- coproducts / variants / enums
+- [coproducts / variants / enums](/EdP0HQuZhLDD/coproducts-variants-enums)
 - [recursive (µ) types](/EJjBX51KQ1Yy/recursive-µ-types)
 - [nominative (ν) types](/qQ783yMXPPbQ/nominative-ν-types)
 

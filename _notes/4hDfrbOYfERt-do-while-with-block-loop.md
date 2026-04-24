@@ -7,8 +7,7 @@ redirect_from:
   - /4hDfrbOYfERt
 ---
 
-When doing imperative programming, a surprising amount of the time I find myself
-wishing for a loop that might look something like this:
+When doing imperative programming, a surprising amount of the time I find myself wishing for a loop that might look something like this:
 ```
 do {
   // initialization logic to be executed each loop
@@ -17,9 +16,7 @@ do {
 }
 ```
 
-This is useful when you have code that makes sense as a do while loop but
-requires a condition before executing some logic that's required for the next
-iteration. This can be emulated in most imperative programming languages using:
+This is useful when you have code that makes sense as a do while loop but requires a condition before executing some logic that's required for the next iteration. This can be emulated in most imperative programming languages using:
 ```
 // initialization logic
 while (<condition>) {
