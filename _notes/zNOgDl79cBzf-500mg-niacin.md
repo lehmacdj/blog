@@ -101,3 +101,6 @@ One tip: no matter how itchy you get, resist itching.
 20:55 I still feel a little bit light headed as an aftereffect
 21:31 My only noticeable symptom at this point is a little bit of a stomach warmth and a little bit of soreness
 21:40 I still feel a little light headed especially when I walk around
+
+## Disclaimer
+This is not medical advice. Read the label and exercise appropriate caution.
