@@ -6,7 +6,10 @@ permalink: /zNOgDl79cBzf/500mg-niacin
 redirect_from:
   - /zNOgDl79cBzf
 tags: [inkhaven]
+image: /images/zNOgDl79cBzf-IMG_5704.jpeg
 ---
+
+![Niacin bottle label. Description in quote below.](/images/zNOgDl79cBzf-IMG_5704.jpeg)
 
 > Experience: Temp full body sunburn
 >
