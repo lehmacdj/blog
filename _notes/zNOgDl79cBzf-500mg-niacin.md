@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "500mg niacin"
+title: "500mg Niacin"
 date: 2026-04-25 20:38 -0700
 permalink: /zNOgDl79cBzf/500mg-niacin
 redirect_from:

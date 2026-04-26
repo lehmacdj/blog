@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Why not a 0% inflation target? (unlisted)"
+title: "Why not a 0% inflation target?"
 date: 2026-04-10 13:57 -0700
-permalink: /zmR78TJot3E7/why-not-a-0-inflation-target-unlisted
+permalink: /zmR78TJot3E7/why-not-a-0-inflation-target
 redirect_from:
   - /zmR78TJot3E7
   - /zmR78TJot3E7/inflation-is-a-bad-implementation-of-a-wealth-tax-unlisted
+  - /zmR78TJot3E7/why-not-a-0-inflation-target-unlisted
 tags: [economics, unlisted]
 ---
 
