@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "Dominion is pure strategy"
+title: "Dominion is the ultimate strategic board game"
 date: 2026-04-18 20:19 -0700
-permalink: /CzZXOuq2reuv/dominion-is-pure-strategy
+permalink: /CzZXOuq2reuv/dominion-is-the-ultimate-strategic-board-game
 redirect_from:
   - /CzZXOuq2reuv
+  - /CzZXOuq2reuv/dominion-is-pure-strategy
   - /CzZXOuq2reuv/dominion-is-the-ultimate-strategic-board-game
 tags: [board-games, strategy, recommended, inkhaven]
 ---
@@ -32,8 +33,12 @@ Different deck archetypes need very different cards, and often want to make very
 
 Other deck-builders fail to have this strategic depth. For example, in Slay the Spire, you only see 3 cards at a time and pick one. You don't know what cards you'll be able to acquire later in a run. This makes committing to a longer term strategic plan foolish, because it significantly cuts your optionality[^lol-i-dont-care]. Instead of replicating the, any card goes, deck building of constructed TCG formats, it replicates drafting.
 
-[^lol-i-dont-care]: Because engines/combos strongly appeal to me (and often are the strongest strategies in Dominion), I usually go for silly infinite combo decks with the Silent, resetting if I don't get the cards I need. But this is more playing a slot machine, rather than finding strategic depth in Slay the Spire.
+[^lol-i-dont-care]: Because engines/combos appeal to me (and often are the strongest strategies in Dominion), I usually go for silly infinite combo decks with the Silent, resetting if I don't get the cards I need. But this is more playing a slot machine, rather than finding strategic depth in Slay the Spire.
 
-After creating your game plan, Dominion's tactical gameplay is mostly mechanical. You track your deck and concretize your plan by reacting to your particular shuffle luck plus your opponents behavior. In a close game, the endgame features Dominion's heaviest tactics, as players vie to ensure that they will be able to end the game on their turn in the lead. If you missed a good strategy, your opponent catching you off guard, it's usually already too late to pivot.
+After creating your game plan, Dominion's tactical gameplay is mostly mechanical. You track your deck and concretize your plan by reacting to your particular shuffle luck plus your opponents behavior. In a close game, the endgame features Dominion's heaviest tactics, as players vie to ensure that they will be able to end the game on their turn in the lead. If you missed a good strategy, and your opponent catching you off guard, it's usually already too late to pivot.
 
-Because winning or losing hinges on strategic deck building choices, Dominion players love to analyze kingdoms, debating at length the subtleties of different plans without even playing the game. Freed from the burden of shuffling, playing online Dominion makes it possible to play entire games in just 10-15 minutes. At least the first 3-5 minutes is spent figuring out what deck best suits the given kingdom. Dominion more than any other game rewards playing with a bird's eye view, planning for the very end of the game, right from the start.
+Because winning or losing hinges on strategic deck building choices, Dominion players love to analyze kingdoms, debating at length the subtleties of different plans without even playing the game. Freed from the burden of shuffling, online Dominion games last just 10-15 minutes. Usually the first 3-5 minutes is spent figuring out what deck best suits the given kingdom.
+
+In Dominion more than any other game[^other-games], strategy dominates over tactics. It doesn't just give you the ability to, but requires playing with a bird's eye view, thinking about the deck you plan to build, right from the start.
+
+[^other-games]: [Prismata](https://en.wikipedia.org/wiki/Prismata) arguably edges out Dominion, because it removes luck. Unfortunately, it never took off, and doesn't have as many varied "units" (the equivalent of cards), which makes its strategic landscape quite a bit shallower.

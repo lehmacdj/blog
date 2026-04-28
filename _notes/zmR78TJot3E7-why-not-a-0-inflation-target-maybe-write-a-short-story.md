@@ -1,14 +1,17 @@
 ---
 layout: post
-title: "Why not a 0% inflation target?"
+title: "Why not a 0% inflation target? (maybe write a short story?)"
 date: 2026-04-10 13:57 -0700
-permalink: /zmR78TJot3E7/why-not-a-0-inflation-target
+permalink: /zmR78TJot3E7/why-not-a-0-inflation-target-maybe-write-a-short-story
 redirect_from:
   - /zmR78TJot3E7
   - /zmR78TJot3E7/inflation-is-a-bad-implementation-of-a-wealth-tax-unlisted
+  - /zmR78TJot3E7/why-not-a-0-inflation-target
   - /zmR78TJot3E7/why-not-a-0-inflation-target-unlisted
 tags: [economics, unlisted]
 ---
+
+This could be a short story.
 
 Modern monetary policy has the consensus opinion that the ideal inflation target is about 2% annually.
 
