@@ -232,6 +232,16 @@ ruby:hover rt,
     opacity: 1;
 }
 
+/**
+ * Horizontal rules: a thin, light line as a thematic break.
+ */
+hr {
+    border: 0;
+    border-top: 2px solid $grey-color-light;
+    height: 0;
+    margin: $spacing-unit * 0.75 0;
+}
+
 .contact-list a {
     text-decoration-color: transparent;
 
