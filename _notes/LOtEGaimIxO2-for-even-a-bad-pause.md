@@ -5,6 +5,7 @@ date: 2026-04-28 23:51 -0700
 permalink: /LOtEGaimIxO2/for-even-a-bad-pause
 redirect_from:
   - /LOtEGaimIxO2
+tags: [inkhaven, recommended, ai, ai-safety, pause]
 ---
 
 Even a global treaty pausing all new training of frontier AI models, would leave a lot of room for existing models to continue to disrupt.
