@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Dominion is the ultimate strategic board game"
+title: "Dominion is the ultimate strategic deck-builder"
 date: 2026-04-18 20:19 -0700
-permalink: /CzZXOuq2reuv/dominion-is-the-ultimate-strategic-board-game
+permalink: /CzZXOuq2reuv/dominion-is-the-ultimate-strategic-deck-builder
 redirect_from:
   - /CzZXOuq2reuv
   - /CzZXOuq2reuv/dominion-is-pure-strategy
@@ -41,4 +41,9 @@ Because winning or losing hinges on strategic deck building choices, Dominion pl
 
 In Dominion more than any other game[^other-games], strategy dominates over tactics. It doesn't just give you the ability to, but requires playing with a bird's eye view, thinking about the deck you plan to build, right from the start.
 
-[^other-games]: [Prismata](https://en.wikipedia.org/wiki/Prismata) arguably edges out Dominion, because it removes luck. Unfortunately, it never took off, and doesn't have as many varied "units" (the equivalent of cards), which makes its strategic landscape quite a bit shallower.
+[^other-games]:
+  I've mostly framed this as being about deck-builders, because it's a lot easier to compare apples with apples. That said, I think Dominion has a particularly high density of strategy to tactics for any game.
+
+  Consider chess. Though opening theory is arguably fairly strategic, it's extremely memorization heavy. Beyond that, tactics tend to dominate. The game tree is too chaotic to make concrete plans about end-game strategy in the mid-game.
+
+  [Prismata](https://en.wikipedia.org/wiki/Prismata) takes Dominion's open market and removes luck completely. It's the main game that I'd argue is denser strategically than Dominion. Sadly, it never took off, and doesn't have as many "units" (the equivalent of cards), which makes its strategic landscape shallower.
