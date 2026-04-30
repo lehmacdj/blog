@@ -5,6 +5,7 @@ date: 2026-04-30 16:25 -0700
 permalink: /PK2boIoMk82X/inkhaven-retrospective
 redirect_from:
   - /PK2boIoMk82X
+tags: [inkhaven, meta, personal]
 ---
 
 Inkhaven is at least two different events stapled into one.
