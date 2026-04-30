@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "My quest to materialize my thoughts on my computer"
+title: "Why I'm building my own knowledge management system"
 date: 2026-04-29 23:50 -0700
-permalink: /1nWDiPLwMooh/my-quest-to-materialize-my-thoughts-on-my-computer
+permalink: /1nWDiPLwMooh/why-im-building-my-own-knowledge-management-system
 redirect_from:
   - /1nWDiPLwMooh
+  - /1nWDiPLwMooh/my-quest-to-materialize-my-thoughts-on-my-computer
 tags: [inkhaven, knowledge-management]
 ---
 
