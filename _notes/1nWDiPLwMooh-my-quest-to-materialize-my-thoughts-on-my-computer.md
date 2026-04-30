@@ -5,6 +5,7 @@ date: 2026-04-29 23:50 -0700
 permalink: /1nWDiPLwMooh/my-quest-to-materialize-my-thoughts-on-my-computer
 redirect_from:
   - /1nWDiPLwMooh
+tags: [inkhaven, knowledge-management]
 ---
 
 File systems are the default categorization system for personal information on a computer. They make it easy to store files, notes, repositories, or whatever in hierarchies.
