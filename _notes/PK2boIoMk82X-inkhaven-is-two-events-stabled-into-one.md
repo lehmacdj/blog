@@ -1,12 +1,15 @@
 ---
 layout: post
-title: "Inkhaven retrospective"
+title: "Inkhaven is two events stabled into one"
 date: 2026-04-30 16:25 -0700
-permalink: /PK2boIoMk82X/inkhaven-retrospective
+permalink: /PK2boIoMk82X/inkhaven-is-two-events-stabled-into-one
 redirect_from:
   - /PK2boIoMk82X
+  - /PK2boIoMk82X/inkhaven-retrospective
 tags: [inkhaven, meta, personal]
 ---
+
+*More to add here later + some editing, but the Closing Ceremony is about to start, so I'm going ahead and publishing this in its unfinished state for now!*
 
 Inkhaven is at least two different events stapled into one.
 
@@ -62,5 +65,3 @@ I aspire to make UnformedDelta a public archive of my notes similar <https://gwe
 Inkhaven is also not so secretly an opportunity to meet a bunch of interesting people and explore the Bay Area.
 
 I'm proud to have organized an evening playing board games, an outing to see Project Hail Mary, and a trip into the city to try Wildtype Salmon.
-
-*More to add here later + some editing, but the Closing Ceremony is about to start, so I'm going ahead and publishing this in its unfinished state for now!*
