@@ -105,20 +105,32 @@ def get_published_url(note_id: str) -> str | None:
     return f"/{note_id}/{slug}"
 
 
+def get_public_alternate_url(note_id: str) -> str | None:
+    """Return the `public_alternate` frontmatter URL for an unpublished
+    wiki note, if any."""
+    wiki_path = WIKI_DIR / f"{note_id}.md"
+    if not wiki_path.exists():
+        return None
+    metadata, _ = parse_frontmatter(wiki_path.read_text())
+    alternate = metadata.get("public_alternate", "").strip()
+    return alternate or None
+
+
 def resolve_wikilinks(body: str) -> str:
     """
     Resolve wiki-links in the body.
     [[id|text]] or [[id|text]]<!--wls--> -> [text](url) if published,
-    otherwise just text
+    or [text](public_alternate) if the linked note has one in
+    frontmatter, otherwise just text.
     """
     pattern = r"\[\[([A-Za-z0-9]+)\|([^\]]+)\]\](?:<!--wls-->)?"
 
     def replace_wikilink(match):
         note_id = match.group(1)
         text = match.group(2)
-        published_url = get_published_url(note_id)
-        if published_url:
-            return f"[{text}]({published_url})"
+        url = get_published_url(note_id) or get_public_alternate_url(note_id)
+        if url:
+            return f"[{text}]({url})"
         else:
             return text
 
