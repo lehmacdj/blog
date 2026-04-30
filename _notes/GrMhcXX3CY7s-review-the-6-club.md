@@ -12,7 +12,7 @@ The 6% Club offers a 100% money-back guarantee if you complete the program, publ
 
 I found The 6% Club on a distracted workday after reading an article by Utsav Mamoria, one of the program's founders/mentors. The 6% Club is designed to help you build a creative project and habit in just 8 weeks. I scheduled a 30 minute call with Utsav, who helped me decide that the program was a good fit for me: I was journaling and writing frequently but was afraid of and lacked the motivation to publish.
 
-I spent the next several months telling myself that I should improve my website, write more often, or otherwise prepare to publish, but the program not starting for two months gave me a convenient excuse to procrastinate.
+I spent the next several months telling myself that I should improve my website, write more often, or otherwise prepare to publish, but the program starting in two months gave me a convenient excuse to procrastinate.
 
 By the time the program started, the fire that led me to sign up for the program had dimmed, and though I'd known before, I was dreading staying up late for sessions that lasted until 2:30am because the program was based out of India.
 
@@ -30,10 +30,10 @@ I returned from vacation and made my commitment to publish a short piece once a 
 
 The next two weeks, I published a piece each week. The high I felt after publishing stuck with me throughout the entire week, even making work feel like it had color again. The third week, I spent longer writing than I had either previous week, but having lapsed on my Kanji flashcards, I no longer felt authoritative enough to publish my article comparing the tools I'd used[^which-tools].
 
-[^which-tools]: WaniKani and jpdb.io. jpdb.io is better. Probably I'll manage to publish this article during Inkhaven.
+[^which-tools]: WaniKani and jpdb.io. I managed to write this during Inkhaven, it ended up being a 3 post series, starting with an overview of my experience with [WaniKani](/v8mH7WGj5fNz/what-makes-a-good-spaced-repetition-system-wanikani), then [jpdb.io](/0THf60NuwInF/what-makes-a-good-spaced-repetition-system-jpdbio), finishing with [Against foolproof software](/YLwRkdcbZJyA/against-foolproof-software).
 
-I hoped that someone would come after me and tell me, you didn't fulfill your posting commitment. A couple of weeks later I hoped they never would, and stopped feeling guilty for being part of the 94%.
+At first, I hoped that someone would come after me and tell me, you didn't fulfill your posting commitment. A couple of weeks later I hoped they never would, and stopped feeling guilty for being part of the 94%.
 
 In the space afforded by not writing, I decided that I should probably quit my job. Slowly, I was able to regain my motivation and resumed writing. In February, I left my job, focusing on deepening my friendships, and applied to Inkhaven.
 
-For just $250 and a few late nights, The 6% Club rekindled my joy for creation. I'd say that helped me.
+For just $250 and a few late nights, The 6% Club rekindled my joy for creation. I'd say that helped.

@@ -11,7 +11,7 @@ A way of having two files that reference the same underlying data, such that mod
 
 In the context of file system implementation, technically a hardlink is just a directory entry associating a name with an [inode](https://en.wikipedia.org/wiki/Inode). Every addressable file has at least one, but in colloquial usage it's more common to only talk about hardlinks when there are multiple for a single inode.
 
-Most file systems support file hardlinks, associating multiple paths to a single inode. Using file hardlinks is fairly brittle.
+Most file systems support file hardlinks, associating multiple paths to a single inode. [Using file hardlinks is fairly brittle](/FzO9RP3zvyBM/problems-with-hardlinks).
 
 Directory hardlinks usually aren't supported because they create directory cycles, and most tools that traverse file systems assume a tree structure.
 

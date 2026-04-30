@@ -109,6 +109,7 @@ Primitive types:
   - dependent sum
   - interval / cubic type theory / univalence
   - cumulative universes
+- linear types
 
 Broader concepts:
 - [type inference (+ list of methods) / elaboration](/ZS3QCNHImVwZ/type-inference-list-of-methods-elaboration)
@@ -116,6 +117,8 @@ Broader concepts:
 - [subtypes / subtyping](/E6doTkK2Znp0/subtypes-subtyping)
 - [structural types](/o8Dyaxi0ZKPK/structural-types)
 - gradual typing / migratory typing
+- pure functions, mutability
+  - ST monad
 
 Weird/highly non-standard stuff:
 - [dual type operator](/nrO5W22ORJzs/dual-type-operator)

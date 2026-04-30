@@ -9,7 +9,7 @@ redirect_from:
 
 These are patterns that editors might use when writing changes to a file after editing it.
 - **Truncate-and-rewrite.** `open(path, O_WRONLY|O_TRUNC)`, `write(...)`, `close()`.
-- **Modify-in-place.** Same as above but without truncating. Same considerations
+- **Modify-in-place.** Same as above but without truncating. Same considerations, but worse because it can cause corruption when editing simultaneously.
 - **Write-tempfile-then-rename.** `open("path.tmp.XXX", O_WRONLY|O_CREAT)`, `write(...)`, `fsync()`, `close()`, `rename("path.tmp.XXX", "path")` (e.g. vim)
 - **Backup-rename-write.** `rename("path", "path~")`, `open("path", O_WRONLY|O_CREAT)`, `write(...)`, `close()`, optionally `unlink("path~")` (e.g. vim with backupfile=no)
 - **macOS-specific atomic replace.** `renamex_np()` with `RENAME_SWAP`, or `FSReplaceObject` from the higher-level APIs. TextEdit, some Apple apps
