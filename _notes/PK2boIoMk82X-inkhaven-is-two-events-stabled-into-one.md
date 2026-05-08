@@ -26,17 +26,14 @@ At first this made me feel like a failure. But over the course of the month, I f
 
 Some of the ideas ended up eluding me the entire month[^code-is-communication]. Other ideas just took longer than I expected[^wanikani-vs-jpdbio]. And sometimes I managed to publish a follow up that more clearly expressed the idea[^expressivity]. Publishing even something mediocre about the ideas I care about it easier to come back to them.
 
-[^code-is-communication]: \
-  After failing to write "Code is communication", I refined my thesis to "Code that is grown" but even after writing and trying to express my thoughts for hours I still wasn't able to publish by the end of the month. (Stay tuned, I still want to write this post Inkhaven.)
+[^code-is-communication]: After failing to write "Code is communication", I refined my thesis to "Code that is grown" but even after writing and trying to express my thoughts for hours I still wasn't able to publish by the end of the month. (Stay tuned, I still want to write this post Inkhaven.)
 
-[^wanikani-vs-jpdbio]: \
-  My article comparing WaniKani and jpdb.io which broke my The 6% Club publishing streak in September turned into a 3 article series:
+[^wanikani-vs-jpdbio]: My article comparing WaniKani and jpdb.io which broke my The 6% Club publishing streak in September turned into a 3 article series:
   - [What makes a good spaced repetition system? (WaniKani)](/v8mH7WGj5fNz/what-makes-a-good-spaced-repetition-system-wanikani)
   - [What makes a good spaced repetition system? (jpdb.io)](/0THf60NuwInF/what-makes-a-good-spaced-repetition-system-jpdbio)
   - [Against foolproof software](/YLwRkdcbZJyA/against-foolproof-software)
 
-[^expressivity]: \
-  In some the introduction I wrote for [programming language features (and optimizations)](/dCtl1IFIC8VF/programming-language-features-and-optimizations) is follow up to [an expressive programming language](/GEbCU1EGqkQU/an-expressive-programming-language), more clearly expressing why I care about expressivity of programming languages. This still isn't perfect but designing my ideal programming language is a big project.
+[^expressivity]: In some the introduction I wrote for [programming language features (and optimizations)](/dCtl1IFIC8VF/programming-language-features-and-optimizations) is follow up to [an expressive programming language](/GEbCU1EGqkQU/an-expressive-programming-language), more clearly expressing why I care about expressivity of programming languages. This still isn't perfect but designing my ideal programming language is a big project.
 
 The most valuable lesson for me from the commitment mechanism was the value of setting aside time to write. Though I still get writers block for specific ideas, I find it a lot easier to sit down with the intention to write. And doing that helps me think about and research my more difficult ideas.
 
