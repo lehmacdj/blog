@@ -42,7 +42,7 @@ Because winning or losing hinges on strategic deck building choices, Dominion pl
 In Dominion more than any other game[^other-games], strategy dominates over tactics. It doesn't just give you the ability to, but requires playing with a bird's eye view, thinking about the deck you plan to build, right from the start.
 
 [^other-games]: I've mostly framed this as being about deck-builders, because it's a lot easier to compare apples with apples. That said, I think Dominion has a particularly high density of strategy to tactics for any game.
-
+   \
    Consider chess. Though opening theory is arguably fairly strategic, it's extremely memorization heavy. Beyond that, tactics tend to dominate. The game tree is too chaotic to make concrete plans about end-game strategy in the mid-game.
-
+   \
    In my opinion the strongest contender for strategically most dense game is [Prismata](https://en.wikipedia.org/wiki/Prismata), which takes Dominion's open market and removes luck completely. It never took off, and doesn't have as many different "units" (the equivalent of kingdom cards), which makes its strategic landscape shallower.
