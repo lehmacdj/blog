@@ -41,6 +41,6 @@ Because winning or losing hinges on strategic deck building choices, Dominion pl
 
 In Dominion more than any other game[^other-games], strategy dominates over tactics. It doesn't just give you the ability to, but requires playing with a bird's eye view, thinking about the deck you plan to build, right from the start.
 
-[^other-games]:
+[^other-games]: \
   I've mostly framed this as being about deck-builders, because that's the main comparison I think I can win. That said:
   [Prismata](https://en.wikipedia.org/wiki/Prismata) . Unfortunately, it never took off, and doesn't have as many varied "units" (the equivalent of cards), which makes its strategic landscape quite a bit shallower.
