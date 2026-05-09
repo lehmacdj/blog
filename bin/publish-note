@@ -15,14 +15,12 @@ Transforms:
   - Adds published: URL backlink to original note
 """
 
-import subprocess
 import sys
 from datetime import datetime, timezone
 
 from blog_utils import (
     WIKI_DIR,
     NOTES_DIR,
-    BLOG_DIR,
     BASE_URL,
     parse_frontmatter,
     parse_tags,
@@ -33,6 +31,8 @@ from blog_utils import (
     build_frontmatter,
     copy_images,
     sync_all_tag_artifacts,
+    commit_if_pending,
+    jj_tug,
 )
 
 
@@ -63,6 +63,9 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     title, body = extract_title(body)
     if not title:
         raise ValueError("No title found (expected # heading)")
+
+    # Separate any pre-existing WIP from this publish run.
+    commit_if_pending()
 
     # Use current date as publication date with local timezone
     now = datetime.now().astimezone()
@@ -111,11 +114,8 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     # Ensure feed and tag pages exist for any new tags
     sync_all_tag_artifacts()
 
-    # Commit and sync
-    subprocess.run(
-        ["jj", "commit", "-m", f"Publish {title}"], check=True, cwd=BLOG_DIR,
-    )
-    subprocess.run(["jj", "tug"], check=True, cwd=BLOG_DIR)
+    if commit_if_pending(f"Publish {title}"):
+        jj_tug()
 
     return published_url
 

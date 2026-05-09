@@ -523,6 +523,36 @@ def _copy_wiki_image(
     return dest, True
 
 
+def _wc_status() -> tuple[bool, str]:
+    """Return (is_empty, description) for @ in one jj invocation."""
+    result = subprocess.run(
+        ["jj", "log", "-r", "@", "--no-graph",
+         "-T", r'if(empty, "1", "0") ++ "\n" ++ description'],
+        capture_output=True, text=True, cwd=BLOG_DIR, check=True,
+    )
+    head, _, rest = result.stdout.partition("\n")
+    return head.strip() == "1", rest.rstrip()
+
+
+def commit_if_pending(msg: str | None = None) -> bool:
+    """Commit the working copy if it has changes. Falls back to the
+    existing wc description, then "WIP", when msg is None. Returns
+    True if a commit was created."""
+    is_empty, current_desc = _wc_status()
+    if is_empty:
+        return False
+    final_msg = msg or current_desc or "WIP"
+    subprocess.run(
+        ["jj", "commit", "-m", final_msg],
+        check=True, cwd=BLOG_DIR,
+    )
+    return True
+
+
+def jj_tug() -> None:
+    subprocess.run(["jj", "tug"], check=True, cwd=BLOG_DIR)
+
+
 def copy_images(
     body: str, note_id: str, frontmatter_image: str = "",
 ) -> tuple[str, list[Path]]:

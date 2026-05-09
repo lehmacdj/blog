@@ -15,7 +15,6 @@ For each published note:
 
 import argparse
 import re
-import sys
 
 from blog_utils import (
     WIKI_DIR,
@@ -32,6 +31,8 @@ from blog_utils import (
     build_frontmatter,
     copy_images,
     sync_all_tag_artifacts,
+    commit_if_pending,
+    jj_tug,
 )
 
 
@@ -142,6 +143,27 @@ def sync_note(note_id: str) -> list[str] | None:
     return None
 
 
+def build_sync_commit_message(updated: dict[str, list[str]]) -> str:
+    if not updated:
+        return "Sync notes"
+
+    if len(updated) == 1:
+        subject = f"Sync {next(iter(updated))}"
+    else:
+        subject = f"Sync {len(updated)} notes"
+
+    body_lines = []
+    for note_id, details in updated.items():
+        if len(details) == 1:
+            body_lines.append(f"{note_id}: {details[0]}")
+        else:
+            body_lines.append(f"{note_id}:")
+            for detail in details:
+                body_lines.append(f"  {detail}")
+
+    return f"{subject}\n\n" + "\n".join(body_lines)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Sync published notes from ~/wiki to the blog."
@@ -153,7 +175,6 @@ def main():
     )
     args = parser.parse_args()
 
-    # Get list of note IDs to sync
     if args.note_ids:
         note_ids = args.note_ids
     else:
@@ -168,26 +189,33 @@ def main():
         print("No notes to sync.")
         return
 
+    # Separate any pre-existing WIP from this sync run.
+    commit_if_pending()
+
     print(f"Syncing {len(note_ids)} note(s)...")
 
-    updated = 0
+    updated: dict[str, list[str]] = {}
     for note_id in sorted(note_ids):
         details = sync_note(note_id)
-        if details:
-            if len(details) == 1:
-                print(f"  {note_id}: {details[0]}")
-            else:
-                print(f"  {note_id}:")
-                for detail in details:
-                    print(f"    {detail}")
-            updated += 1
+        if not details:
+            continue
+        updated[note_id] = details
+        if len(details) == 1:
+            print(f"  {note_id}: {details[0]}")
+        else:
+            print(f"  {note_id}:")
+            for detail in details:
+                print(f"    {detail}")
 
     sync_all_tag_artifacts()
-    unchanged = len(note_ids) - updated
+    unchanged = len(note_ids) - len(updated)
     print(
-        f"Done. Updated {updated} note(s), "
+        f"Done. Updated {len(updated)} note(s), "
         f"{unchanged} note(s) unchanged."
     )
+
+    if commit_if_pending(build_sync_commit_message(updated)):
+        jj_tug()
 
 
 if __name__ == "__main__":
