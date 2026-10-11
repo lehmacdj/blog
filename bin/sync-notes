@@ -36,20 +36,25 @@ from blog_utils import (
 )
 
 
+class SkipNote(Exception):
+    """Raised when a note can't be synced; nothing was changed for it."""
+
+
 def sync_note(note_id: str) -> list[str] | None:
     """
     Sync a single note from wiki to blog.
 
     Returns a list of change descriptions, or None if unchanged.
+    Raises SkipNote if the note can't be synced.
     """
     wiki_path = WIKI_DIR / f"{note_id}.md"
     blog_path = find_blog_note(note_id)
 
     if not wiki_path.exists():
-        return [f"warning: wiki note not found: {wiki_path}"]
+        raise SkipNote(f"wiki note not found: {wiki_path}")
 
     if not blog_path:
-        return ["warning: blog note not found (publish first)"]
+        raise SkipNote("blog note not found (publish first)")
 
     # Read wiki note
     wiki_content = wiki_path.read_text()
@@ -61,7 +66,7 @@ def sync_note(note_id: str) -> list[str] | None:
 
     title = wiki_meta.get("title")
     if not title:
-        return [f"warning: no `title:` in frontmatter of {wiki_path}"]
+        raise SkipNote(f"no `title:` in frontmatter of {wiki_path}")
     _, body = extract_title(wiki_body)
 
     # Keep the original publication date from the blog
@@ -195,8 +200,14 @@ def main():
     print(f"Syncing {len(note_ids)} note(s)...")
 
     updated: dict[str, list[str]] = {}
+    skipped = 0
     for note_id in sorted(note_ids):
-        details = sync_note(note_id)
+        try:
+            details = sync_note(note_id)
+        except SkipNote as e:
+            skipped += 1
+            print(f"  {note_id}: warning: {e}")
+            continue
         if not details:
             continue
         updated[note_id] = details
@@ -208,11 +219,14 @@ def main():
                 print(f"    {detail}")
 
     sync_all_tag_artifacts()
-    unchanged = len(note_ids) - len(updated)
-    print(
+    unchanged = len(note_ids) - len(updated) - skipped
+    summary = (
         f"Done. Updated {len(updated)} note(s), "
-        f"{unchanged} note(s) unchanged."
+        f"{unchanged} note(s) unchanged"
     )
+    if skipped:
+        summary += f", {skipped} note(s) skipped with warnings"
+    print(summary + ".")
 
     if commit_if_pending(build_sync_commit_message(updated)):
         jj_tug()
