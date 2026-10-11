@@ -5,6 +5,7 @@ date: 2026-10-11 18:00 -0400
 permalink: /hzYgabk54LrE/mint-oreo-brownies
 redirect_from:
   - /hzYgabk54LrE
+tags: [recommended, recipe, dessert, vegetarian]
 image: /images/hzYgabk54LrE-IMG_7198.jpeg
 ---
 
