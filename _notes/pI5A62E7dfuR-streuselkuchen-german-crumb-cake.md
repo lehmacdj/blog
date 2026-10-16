@@ -41,14 +41,18 @@ Toppings:
 
 ## Instructions
 Prepare the dough:
-1. Warm milk, add sugar and yeast. Proof the yeast for ~10 minutes till you see bubbles to make sure the yeast is alive.
+1. Warm milk, add sugar and yeast. Proof the yeast for ~10 minutes till you see bubbles to make sure the yeast is alive.[^skippable]
 2. Add eggs, flour, and salt then knead until the dough forms a smooth ball
 3. Integrate the softened butter kneading until the dough is uniform.
-4. Let rise until doubled (~2 hours at 70°F)
+4. Let rise[^rise-in-a-rectangular-container] until doubled (~2 hours at 70°F).
 5. Roll out the dough into a uniformly thick 9x13in rectangle.
 6. Line a 9x13in baking sheet with a silicon mat or parchment paper. This is important for making it easier to remove the cake in one piece when done baking.
 7. Place rolled out dough into the baking sheet trimming excess for use in the Streusel.
 8. Let the dough rise for 30 minutes while preparing the fruit and Streusel.
+
+[^skippable]: You can skip this if you are sure your yeast is alive. Worst case scenario you have a hard time integrating new alive yeast with your finished dough or start over if your dough turns out not to rise.
+
+[^rise-in-a-rectangular-container]: I recommend rising the dough in a rectangular container if you have one. This helps align the gluten strands and makes it easier to roll out the finished dough. I rise the dough in a rectangular 8x11 baking dish with a silicon lid.
 
 Prepare the toppings:
 1. Preheat your oven to 350°F
