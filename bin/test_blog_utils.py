@@ -114,14 +114,15 @@ class PublishingTitleTests(unittest.TestCase):
             globals_["WIKI_DIR"] = wiki_dir
             globals_["find_blog_note"] = lambda _: blog_path
             try:
-                result = self.sync_module["sync_note"]("note1234")
+                with self.assertRaises(self.sync_module["SkipNote"]) as cm:
+                    self.sync_module["sync_note"]("note1234")
             finally:
                 globals_["WIKI_DIR"] = old_wiki_dir
                 globals_["find_blog_note"] = old_find_blog_note
 
             self.assertEqual(
-                result,
-                [f"warning: no `title:` in frontmatter of {wiki_path}"],
+                str(cm.exception),
+                f"no `title:` in frontmatter of {wiki_path}",
             )
 
 
