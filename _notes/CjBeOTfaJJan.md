@@ -2,7 +2,7 @@
 layout: post
 title: "Missed chanta"
 untitled: true
-date: 2026-11-03 02:39 -0500
+date: 2026-10-18 10:52 -0400
 permalink: /CjBeOTfaJJan
 tags: [photo, riichi-analysis]
 image: /images/CjBeOTfaJJan-IMG_1099.png

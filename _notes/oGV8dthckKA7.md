@@ -2,7 +2,7 @@
 layout: post
 title: "discarding 3p here slows down both hands I could be going…"
 untitled: true
-date: 2026-11-03 02:35 -0500
+date: 2026-10-26 00:11 -0400
 permalink: /oGV8dthckKA7
 tags: [photo, riichi-analysis]
 image: /images/oGV8dthckKA7-Screenshot 2026-10-26 at 00.11.01.png

@@ -2,7 +2,7 @@
 layout: post
 title: "Two players have made calls, our hand is 4-shanten, so we…"
 untitled: true
-date: 2026-11-03 02:39 -0500
+date: 2026-10-21 12:30 -0400
 permalink: /sRKc4wB2aM6K
 tags: [photo, riichi-analysis]
 image: /images/sRKc4wB2aM6K-IMG_1106.png

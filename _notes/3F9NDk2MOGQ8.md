@@ -2,7 +2,7 @@
 layout: post
 title: "90% of this text was written with Claude. I only did…"
 untitled: true
-date: 2026-11-03 02:43 -0500
+date: 2026-10-18 01:09 -0400
 permalink: /3F9NDk2MOGQ8
 tags: [photo, ai]
 image: /images/3F9NDk2MOGQ8-Screenshot 2026-10-18 at 01.09.12.png

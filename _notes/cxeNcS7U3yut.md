@@ -2,7 +2,7 @@
 layout: post
 title: "The 5m is just better than the 2s"
 untitled: true
-date: 2026-11-03 02:39 -0500
+date: 2026-10-18 10:54 -0400
 permalink: /cxeNcS7U3yut
 tags: [photo, riichi-analysis]
 image: /images/cxeNcS7U3yut-IMG_1100.png
