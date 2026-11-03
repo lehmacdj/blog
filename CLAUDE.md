@@ -4,7 +4,7 @@ Jekyll blog that syncs notes from `~/wiki/`.
 
 ## Key Files
 - `bin/publish-note` / `bin/sync-notes` - Publishing scripts
-- `bin/sync-photos` - Publishes captioned photos from the Photos library as `photo`-tagged notes (blog-only: no wiki note; source recorded as `photo: <uuid>` frontmatter, opted-out photos in `_ignored-photos.txt`)
+- `bin/sync-photos` - Publishes captioned photos from the Photos library as `photo`-tagged notes (blog-only: no wiki note; source recorded as `photo: <uuid>` frontmatter, opted-out photos in the gitignored `_ignored-photos.txt` so they stay private; caption edits during triage are written back to Photos)
 - `bin/blog_utils.py` - Shared utilities
 - `_notes/` - Published posts (`{id}-{slug}.md`)
 - `index.html` - Home page with tag filtering

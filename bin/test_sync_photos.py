@@ -1,4 +1,8 @@
+import contextlib
+import io
+import os
 import runpy
+import subprocess
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -74,15 +78,60 @@ class SyncPhotosTests(unittest.TestCase):
         remaining = [p.uuid for p in self.g["untriaged"](photos)]
         self.assertEqual(remaining, ["NEW"])
 
+    def edit_with(self, new_text: str, fail_save: bool = False):
+        """Run edit_caption with an editor that writes new_text and a fake
+        Photos write. Returns (photo, captions saved to Photos)."""
+        root = Path(self.tmp.name)
+        (root / "new.txt").write_text(new_text)
+        editor = root / "editor"
+        editor.write_text(f'#!/bin/sh\ncp "{root / "new.txt"}" "$1"\n')
+        editor.chmod(0o755)
+        saved = []
+
+        def fake_set_caption(photo, caption):
+            if fail_save:
+                raise subprocess.CalledProcessError(
+                    1, ["osascript"], stderr=b"not allowed"
+                )
+            saved.append(caption)
+
+        photo = self.photo("U1", "old caption")
+        old = (self.g["set_caption"], os.environ.get("VISUAL"))
+        self.g["set_caption"] = fake_set_caption
+        os.environ["VISUAL"] = str(editor)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.g["edit_caption"](photo)
+        finally:
+            self.g["set_caption"] = old[0]
+            if old[1] is None:
+                del os.environ["VISUAL"]
+            else:
+                os.environ["VISUAL"] = old[1]
+        return photo, saved
+
+    def test_edit_caption_saves_to_photos(self):
+        photo, saved = self.edit_with("new caption\nline two\n")
+        self.assertEqual(saved, ["new caption\nline two"])
+        self.assertEqual(photo.caption, "new caption\nline two")
+
+    def test_edit_caption_rejects_empty(self):
+        photo, saved = self.edit_with("  \n")
+        self.assertEqual(saved, [])
+        self.assertEqual(photo.caption, "old caption")
+
+    def test_edit_caption_keeps_old_caption_if_save_fails(self):
+        photo, saved = self.edit_with("new", fail_save=True)
+        self.assertEqual(photo.caption, "old caption")
+
     def test_commit_message(self):
         message = self.g["commit_message"]
-        self.assertEqual(message(["Pink"], 0, 0), "Publish photo Pink")
+        self.assertEqual(message(["Pink"], 0), "Publish photo Pink")
         self.assertEqual(
-            message(["A", "B"], 2, 1),
-            "Publish 2 photos, refresh 1 photo caption(s), ignore 2 "
-            "photo(s)\n\n- A\n- B",
+            message(["A", "B"], 1),
+            "Publish 2 photos, refresh 1 photo caption(s)\n\n- A\n- B",
         )
-        self.assertEqual(message([], 3, 0), "Ignore 3 photo(s)")
+        self.assertEqual(message([], 3), "Refresh 3 photo caption(s)")
 
 
 if __name__ == "__main__":

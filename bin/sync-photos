@@ -14,15 +14,20 @@ copies a resized, metadata-free image to images/, and writes a note tagged
 `photo` with the caption as its body.
 
 A published note records its source in `photo: <uuid>` frontmatter. Photos you
-choose never to publish are listed by UUID in IGNORED_FILE.
+choose never to publish are listed by UUID in IGNORED_FILE, which is
+gitignored so those choices stay private. Editing a caption
+during triage saves it back to the Photos library, which stays the source of
+truth for captions.
 """
 
 import argparse
+import os
 import random
 import sqlite3
 import string
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -259,12 +264,79 @@ def confirm_title(photo: Photo) -> str | None:
     return answer or suggested
 
 
+# Photos.app identifies media items as "<uuid>/L0/001".
+SET_CAPTION_SCRIPT = """
+on run argv
+  tell application "Photos"
+    set description of media item id (item 1 of argv) to (item 2 of argv)
+  end tell
+end run
+"""
+
+
+def set_caption(photo: Photo, caption: str) -> None:
+    """Save caption to the photo in the Photos library."""
+    subprocess.run(
+        ["osascript", "-e", SET_CAPTION_SCRIPT, f"{photo.uuid}/L0/001",
+         caption],
+        check=True, capture_output=True,
+    )
+
+
+def edit_text(text: str) -> str:
+    """Let the user edit text in $VISUAL or $EDITOR (default vi)."""
+    editor = os.environ.get("VISUAL") or os.environ.get("EDITOR") or "vi"
+    with tempfile.NamedTemporaryFile(
+        "w+", suffix=".txt", prefix="caption-", delete=False,
+    ) as f:
+        f.write(text + "\n")
+        path = Path(f.name)
+    try:
+        # The editor variable may include arguments, e.g. "code --wait".
+        subprocess.run(
+            ["/bin/sh", "-c", f'{editor} "$1"', "sh", str(path)],
+            check=True,
+        )
+        return path.read_text().strip()
+    finally:
+        path.unlink(missing_ok=True)
+
+
+def edit_caption(photo: Photo) -> None:
+    """Edit photo's caption and save it back to the Photos library."""
+    try:
+        caption = edit_text(photo.caption)
+    except (OSError, subprocess.CalledProcessError) as e:
+        print(f"  Error: couldn't run the editor: {error_text(e)}")
+        return
+    if not caption:
+        print("  Caption can't be empty; left unchanged.")
+        return
+    if caption == photo.caption:
+        print("  Caption unchanged.")
+        return
+    try:
+        set_caption(photo, caption)
+    except (OSError, subprocess.CalledProcessError) as e:
+        print(
+            "  Error: couldn't save the caption to Photos (macOS may need "
+            "permission for your terminal to control Photos, under System "
+            "Settings > Privacy & Security > Automation): "
+            f"{error_text(e)}"
+        )
+        return
+    photo.caption = caption
+    print("  Caption saved to Photos:")
+    print("  " + photo.caption.replace("\n", "\n  "))
+
+
 TRIAGE_HELP = """\
   p  publish this photo (you'll confirm the title first)
+  e  edit the caption (saved back to Photos)
   i  ignore: never offer this photo again
   s  skip: decide later
   v  view the photo again
-  q  quit (publishes and ignores so far are committed)"""
+  q  quit (publishes so far are committed)"""
 
 
 def triage(photos: list[Photo]) -> tuple[list[str], int]:
@@ -286,7 +358,9 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
         proc = preview(photo)
         try:
             while True:
-                choice = ask("  [p]ublish [i]gnore [s]kip [v]iew [q]uit? ")
+                choice = ask(
+                    "  [p]ublish [e]dit [i]gnore [s]kip [v]iew [q]uit? "
+                )
                 choice = choice[:1].lower()
                 if choice == "p":
                     title = confirm_title(photo)
@@ -301,6 +375,9 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
                     print(f"  Will be at {url}")
                     published_titles.append(title)
                     break
+                if choice == "e":
+                    edit_caption(photo)
+                    continue
                 if choice == "i":
                     ignored.add(photo.uuid)
                     write_ignored(ignored)
@@ -338,7 +415,7 @@ def find_photo(photos: list[Photo], uuid: str) -> Photo:
     sys.exit(f"Error: no captioned photo with UUID {uuid}")
 
 
-def commit_message(published: list[str], ignored: int, refreshed: int) -> str:
+def commit_message(published: list[str], refreshed: int) -> str:
     parts = []
     if published:
         parts.append(
@@ -347,8 +424,6 @@ def commit_message(published: list[str], ignored: int, refreshed: int) -> str:
         )
     if refreshed:
         parts.append(f"refresh {refreshed} photo caption(s)")
-    if ignored:
-        parts.append(f"ignore {ignored} photo(s)")
     subject = ", ".join(parts)
     subject = subject[:1].upper() + subject[1:]
     if len(published) > 1:
@@ -430,7 +505,9 @@ def main():
 
     if published:
         sync_all_tag_artifacts()
-    if commit_if_pending(commit_message(published, ignored, refreshed)):
+    if ignored:
+        print(f"Ignored {ignored} photo(s).")
+    if commit_if_pending(commit_message(published, refreshed)):
         jj_tug()
 
 
