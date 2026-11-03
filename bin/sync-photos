@@ -368,10 +368,9 @@ def tag_completion(tags: list[str]):
 
 
 def ask_title() -> str | None:
-    """Ask for an optional title. Returns "" for no title, or None if the
-    user backs out."""
-    answer = ask("  Title (Enter for none, '-' to go back): ")
-    return None if answer == "-" else answer
+    """Ask for a title. Returns None if the user backs out."""
+    answer = ask("  Title (Enter to go back): ")
+    return answer or None
 
 
 # Photos.app identifies media items as "<uuid>/L0/001".
@@ -441,7 +440,8 @@ def edit_caption(photo: Photo) -> None:
 
 
 TRIAGE_HELP = """\
-  p  publish this photo (you can give it a title and tags first)
+  p  publish this photo untitled (you can add tags first)
+  t  publish this photo with a title (and tags)
   e  edit the caption (saved back to Photos)
   i  ignore: never offer this photo again
   s  skip: decide later
@@ -470,18 +470,21 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
         try:
             while True:
                 choice = ask(
-                    "  [p]ublish [e]dit [i]gnore [s]kip [v]iew [q]uit? "
+                    "  [p]ublish, publish with [t]itle, [e]dit, [i]gnore, "
+                    "[s]kip, [v]iew, [q]uit? "
                 )
                 choice = choice[:1].lower()
-                if choice == "p":
-                    title = ask_title()
-                    if title is None:
-                        continue
+                if choice in ("p", "t"):
+                    title = None
+                    if choice == "t":
+                        title = ask_title()
+                        if title is None:
+                            continue
                     tags = ask_tags()
                     if tags is None:
                         continue
                     try:
-                        url = publish_photo(photo, title or None, tags)
+                        url = publish_photo(photo, title, tags)
                     except (FileNotFoundError,
                             subprocess.CalledProcessError) as e:
                         print(f"  Error: couldn't publish: {error_text(e)}")
