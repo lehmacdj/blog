@@ -13,6 +13,12 @@ repo until you choose to publish it. Publishing assigns the photo a note ID,
 copies a resized, metadata-free image to images/, and writes a note tagged
 `photo` with the caption as its body.
 
+Photo posts are untitled unless you give them a title. An untitled post is
+marked `untitled: true`, lives at /<id>, and is shown as its photo and caption
+instead of a heading. Its `title` is a summary of the caption, used only where
+text is required (browser tabs, link previews, commit messages), and follows
+caption changes.
+
 A published note records its source in `photo: <uuid>` frontmatter. Photos you
 choose never to publish are listed by UUID in IGNORED_FILE, which is
 gitignored so those choices stay private. Editing a caption
@@ -21,8 +27,10 @@ truth for captions.
 """
 
 import argparse
+import contextlib
 import os
 import random
+import re
 import sqlite3
 import string
 import subprocess
@@ -39,11 +47,12 @@ from blog_utils import (
     NOTES_DIR,
     WIKI_DIR,
     blog_image_name,
-    build_frontmatter,
+    collect_all_tags,
     commit_if_pending,
     import_image,
     jj_tug,
     parse_frontmatter,
+    serialize_yaml_scalar,
     slugify,
     sync_all_tag_artifacts,
 )
@@ -144,7 +153,7 @@ def published_photos() -> dict[str, Path]:
     return published
 
 
-def default_title(caption: str) -> str:
+def caption_summary(caption: str) -> str:
     """The caption's first line, shortened at a word boundary if long."""
     first_line = caption.strip().splitlines()[0].strip()
     if len(first_line) <= MAX_TITLE_LENGTH:
@@ -177,8 +186,58 @@ def new_note_id() -> str:
             return note_id
 
 
-def publish_photo(photo: Photo, title: str) -> str:
-    """Write the image and note for photo. Returns the published URL."""
+def parse_tag_input(text: str) -> list[str]:
+    """Tags typed as a comma or space separated list, normalized to
+    lowercase-with-hyphens (each tag names a feed file and a directory).
+    The photo tag is implied, so it's dropped here."""
+    tags = []
+    for word in re.split(r"[,\s]+", text):
+        tag = slugify(word)
+        if tag and tag != PHOTO_TAG and tag not in tags:
+            tags.append(tag)
+    return tags
+
+
+def photo_frontmatter(
+    note_id: str, title: str | None, caption: str, date: str,
+    image_name: str, uuid: str, tags: list[str] = (),
+) -> str:
+    """Frontmatter for a photo note; title None makes it untitled."""
+    lines = ["---", "layout: post"]
+    if title:
+        slug = slugify(title)
+        lines += [
+            f"title: {serialize_yaml_scalar(title)}",
+            f"date: {date}",
+            f"permalink: /{note_id}/{slug}",
+            "redirect_from:",
+            f"  - /{note_id}",
+        ]
+    else:
+        lines += [
+            f"title: {serialize_yaml_scalar(caption_summary(caption))}",
+            "untitled: true",
+            f"date: {date}",
+            f"permalink: /{note_id}",
+        ]
+    lines += [
+        f"tags: [{', '.join([PHOTO_TAG, *tags])}]",
+        f"image: /images/{image_name}",
+        f"photo: {uuid}",
+        "---",
+    ]
+    return "\n".join(lines)
+
+
+def photo_note_name(note_id: str, title: str | None) -> str:
+    return f"{note_id}-{slugify(title)}.md" if title else f"{note_id}.md"
+
+
+def publish_photo(
+    photo: Photo, title: str | None, tags: list[str] = (),
+) -> str:
+    """Write the image and note for photo; title None makes it untitled.
+    Returns the published URL."""
     if not photo.source.exists():
         raise FileNotFoundError(
             f"image file isn't in the library (it may only be in iCloud): "
@@ -193,28 +252,34 @@ def publish_photo(photo: Photo, title: str) -> str:
     import_image(photo.source, IMAGES_DIR / image_name, MAX_IMAGE_SIZE)
 
     now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %z")
-    frontmatter = build_frontmatter(note_id, title, now, [PHOTO_TAG], {})
-    frontmatter = frontmatter.removesuffix("---") + (
-        f"image: /images/{image_name}\nphoto: {photo.uuid}\n---"
+    frontmatter = photo_frontmatter(
+        note_id, title, photo.caption, now, image_name, photo.uuid, tags,
     )
-    slug = slugify(title)
-    path = NOTES_DIR / f"{note_id}-{slug}.md"
+    path = NOTES_DIR / photo_note_name(note_id, title)
     path.write_text(frontmatter + "\n\n" + note_body(image_name, photo.caption))
     print(f"Created: _notes/{path.name}")
-    return f"{BASE_URL}/{note_id}/{slug}"
+    permalink = parse_frontmatter(frontmatter + "\n")[0]["permalink"]
+    return BASE_URL + permalink
 
 
 def refresh_caption(photo: Photo, note_path: Path) -> bool:
-    """Update a published note's body to the photo's current caption.
-    Title, date and image are left alone. Returns True if changed."""
+    """Update a published note to the photo's current caption: its body,
+    and for an untitled note its caption summary title. A chosen title,
+    date and image are left alone. Returns True if changed."""
     content = note_path.read_text()
     metadata, body = parse_frontmatter(content)
     image_name = metadata.get("image", "").removeprefix("/images/")
-    new_body = note_body(image_name, photo.caption)
-    if body == new_body:
-        return False
     frontmatter = content[: len(content) - len(body)]
-    note_path.write_text(frontmatter + new_body)
+    if metadata.get("untitled") == "true":
+        summary = serialize_yaml_scalar(caption_summary(photo.caption))
+        frontmatter = re.sub(
+            r"^title: .*$", lambda _: f"title: {summary}", frontmatter,
+            count=1, flags=re.MULTILINE,
+        )
+    new_content = frontmatter + note_body(image_name, photo.caption)
+    if new_content == content:
+        return False
+    note_path.write_text(new_content)
     return True
 
 
@@ -253,15 +318,50 @@ def ask(prompt: str) -> str:
         return "q"
 
 
-def confirm_title(photo: Photo) -> str | None:
-    """Ask for a title, defaulting to one derived from the caption.
+def ask_tags() -> list[str] | None:
+    """Ask for extra tags, with tab completion of existing ones.
     Returns None if the user backs out."""
-    suggested = default_title(photo.caption)
-    print(f"  Title: {suggested}")
-    answer = ask("  Enter to accept, type a new title, or '-' to go back: ")
-    if answer == "-":
-        return None
-    return answer or suggested
+    known = sorted(collect_all_tags() - {PHOTO_TAG})
+    print(f"  Existing tags: {', '.join(known)}")
+    with tag_completion(known):
+        answer = ask("  Tags (Enter for none, '-' to go back): ")
+    return None if answer == "-" else parse_tag_input(answer)
+
+
+@contextlib.contextmanager
+def tag_completion(tags: list[str]):
+    """Tab-complete the word being typed from tags, if readline exists."""
+    try:
+        import readline
+    except ImportError:
+        yield
+        return
+
+    def complete(text: str, state: int) -> str | None:
+        matches = [t for t in tags if t.startswith(text)]
+        return matches[state] if state < len(matches) else None
+
+    old_completer = readline.get_completer()
+    old_delims = readline.get_completer_delims()
+    readline.set_completer(complete)
+    readline.set_completer_delims(" ,")
+    # macOS Python may use libedit, which spells the binding differently.
+    if "libedit" in (readline.__doc__ or ""):
+        readline.parse_and_bind("bind ^I rl_complete")
+    else:
+        readline.parse_and_bind("tab: complete")
+    try:
+        yield
+    finally:
+        readline.set_completer(old_completer)
+        readline.set_completer_delims(old_delims)
+
+
+def ask_title() -> str | None:
+    """Ask for an optional title. Returns "" for no title, or None if the
+    user backs out."""
+    answer = ask("  Title (Enter for none, '-' to go back): ")
+    return None if answer == "-" else answer
 
 
 # Photos.app identifies media items as "<uuid>/L0/001".
@@ -331,7 +431,7 @@ def edit_caption(photo: Photo) -> None:
 
 
 TRIAGE_HELP = """\
-  p  publish this photo (you'll confirm the title first)
+  p  publish this photo (you can give it a title and tags first)
   e  edit the caption (saved back to Photos)
   i  ignore: never offer this photo again
   s  skip: decide later
@@ -341,7 +441,8 @@ TRIAGE_HELP = """\
 
 def triage(photos: list[Photo]) -> tuple[list[str], int]:
     """Interactively decide on untriaged photos.
-    Returns (titles of published photos, number ignored)."""
+    Returns (titles or caption summaries of published photos,
+    number ignored)."""
     pending = untriaged(photos)
     if not pending:
         print("No untriaged captioned photos.")
@@ -363,17 +464,22 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
                 )
                 choice = choice[:1].lower()
                 if choice == "p":
-                    title = confirm_title(photo)
+                    title = ask_title()
                     if title is None:
                         continue
+                    tags = ask_tags()
+                    if tags is None:
+                        continue
                     try:
-                        url = publish_photo(photo, title)
+                        url = publish_photo(photo, title or None, tags)
                     except (FileNotFoundError,
                             subprocess.CalledProcessError) as e:
                         print(f"  Error: couldn't publish: {error_text(e)}")
                         continue
                     print(f"  Will be at {url}")
-                    published_titles.append(title)
+                    published_titles.append(
+                        title or caption_summary(photo.caption)
+                    )
                     break
                 if choice == "e":
                     edit_caption(photo)
@@ -458,7 +564,11 @@ def main():
     sub.add_parser("list", help="list photos that haven't been triaged")
     pub = sub.add_parser("publish", help="publish one photo")
     pub.add_argument("uuid")
-    pub.add_argument("--title", help="defaults to the caption's first line")
+    pub.add_argument("--title", help="omit for an untitled post")
+    pub.add_argument(
+        "--tags", default="",
+        help=f"comma separated tags besides {PHOTO_TAG}",
+    )
     ign = sub.add_parser("ignore", help="never offer these photos again")
     ign.add_argument("uuids", nargs="+")
     args = parser.parse_args()
@@ -483,12 +593,14 @@ def main():
         photo = find_photo(photos, args.uuid)
         if photo.uuid in published_photos():
             sys.exit(f"Error: {photo.uuid} is already published")
-        title = args.title or default_title(photo.caption)
         try:
-            print(f"Published: {publish_photo(photo, title)}")
+            url = publish_photo(
+                photo, args.title or None, parse_tag_input(args.tags),
+            )
+            print(f"Published: {url}")
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             sys.exit(f"Error: couldn't publish {photo.uuid}: {error_text(e)}")
-        published = [title]
+        published = [args.title or caption_summary(photo.caption)]
     elif args.command == "ignore":
         uuids = read_ignored()
         for uuid in args.uuids:

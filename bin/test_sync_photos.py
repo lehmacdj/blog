@@ -39,14 +39,14 @@ class SyncPhotosTests(unittest.TestCase):
             caption=caption,
         )
 
-    def test_default_title_uses_short_first_line(self):
+    def test_caption_summary_uses_short_first_line(self):
         self.assertEqual(
-            self.g["default_title"]("Pink water\nmore detail"), "Pink water"
+            self.g["caption_summary"]("Pink water\nmore detail"), "Pink water"
         )
 
-    def test_default_title_shortens_at_word_boundary(self):
+    def test_caption_summary_shortens_at_word_boundary(self):
         caption = "word " * 30
-        title = self.g["default_title"](caption)
+        title = self.g["caption_summary"](caption)
         self.assertTrue(title.endswith("word…"))
         self.assertLessEqual(len(title), self.g["MAX_TITLE_LENGTH"] + 1)
 
@@ -68,6 +68,59 @@ class SyncPhotosTests(unittest.TestCase):
         self.assertEqual(
             note.read_text(), frontmatter + "![](/images/abc-x.jpeg)\n\nnew\n"
         )
+
+    def test_untitled_frontmatter(self):
+        fm = self.g["photo_frontmatter"](
+            "abc", None, "Pink water\nmore", "2026-01-01 00:00 +0000",
+            "abc-x.jpeg", "U1",
+        )
+        metadata, _ = self.g["parse_frontmatter"](fm + "\n")
+        self.assertEqual(metadata["title"], "Pink water")
+        self.assertEqual(metadata["untitled"], "true")
+        self.assertEqual(metadata["permalink"], "/abc")
+        self.assertNotIn("redirect_from", fm)
+        self.assertEqual(self.g["photo_note_name"]("abc", None), "abc.md")
+
+    def test_titled_frontmatter(self):
+        fm = self.g["photo_frontmatter"](
+            "abc", "My Title", "caption", "2026-01-01 00:00 +0000",
+            "abc-x.jpeg", "U1",
+        )
+        metadata, _ = self.g["parse_frontmatter"](fm + "\n")
+        self.assertEqual(metadata["title"], "My Title")
+        self.assertNotIn("untitled", metadata)
+        self.assertEqual(metadata["permalink"], "/abc/my-title")
+        self.assertEqual(
+            self.g["photo_note_name"]("abc", "My Title"), "abc-my-title.md"
+        )
+
+    def test_parse_tag_input(self):
+        self.assertEqual(
+            self.g["parse_tag_input"]("Mahjong, riichi  photo,mahjong Go Pro"),
+            ["mahjong", "riichi", "go", "pro"],
+        )
+        self.assertEqual(self.g["parse_tag_input"](""), [])
+
+    def test_frontmatter_tags_start_with_photo(self):
+        fm = self.g["photo_frontmatter"](
+            "abc", None, "c", "d", "abc-x.jpeg", "U1", ["mahjong"],
+        )
+        self.assertIn("tags: [photo, mahjong]\n", fm)
+
+    def test_refresh_caption_updates_untitled_summary(self):
+        note = self.g["NOTES_DIR"] / "abc.md"
+        note.write_text(
+            self.g["photo_frontmatter"](
+                "abc", None, "old", "d", "abc-x.jpeg", "U1",
+            ) + "\n\n" + self.g["note_body"]("abc-x.jpeg", "old")
+        )
+        self.assertTrue(
+            self.g["refresh_caption"](self.photo("U1", "new words"), note)
+        )
+        metadata, body = self.g["parse_frontmatter"](note.read_text())
+        self.assertEqual(metadata["title"], "new words")
+        self.assertEqual(metadata["untitled"], "true")
+        self.assertEqual(body, "![](/images/abc-x.jpeg)\n\nnew words\n")
 
     def test_untriaged_excludes_published_and_ignored(self):
         (self.g["NOTES_DIR"] / "abc-t.md").write_text(

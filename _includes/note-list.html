@@ -42,10 +42,8 @@
 {% assign sorted_notes = site.notes | sort: "date" | reverse %}
 <ul class="post-list">
   {% for post in sorted_notes %}{% if post.tags contains 'unlisted' %}{% continue %}{% endif %}
-    <li data-tags="{{ post.tags | join: ' ' }}">
-      <h2>
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-      </h2>
+    {% assign post_url = post.url | prepend: site.baseurl %}
+    {% capture subtitle %}
       <div class="post-subtitle">
         <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
         {% assign display_tags = post.tags | where_exp: "t", "t != 'recommended'" | sort %}
@@ -54,7 +52,26 @@
           <span>{{ display_tags | join: ", " }}</span>
         {% endif %}
       </div>
+    {% endcapture %}
+    {% if post.untitled %}
+    {% comment %}Untitled (photo) posts show their image and caption instead of a title{% endcomment %}
+    <li class="untitled-post" data-tags="{{ post.tags | join: ' ' }}">
+      {% if post.image %}
+      <a class="untitled-post-thumb" href="{{ post_url }}" tabindex="-1" aria-hidden="true"><img src="{{ post.image | uri_escape | prepend: site.baseurl }}" alt="" loading="lazy"></a>
+      {% endif %}
+      <div class="untitled-post-text">
+        <a class="untitled-post-link" href="{{ post_url }}">{{ post.content | strip_html | strip | truncatewords: 40 }}</a>
+        {{ subtitle }}
+      </div>
     </li>
+    {% else %}
+    <li data-tags="{{ post.tags | join: ' ' }}">
+      <h2>
+        <a class="post-link" href="{{ post_url }}">{{ post.title }}</a>
+      </h2>
+      {{ subtitle }}
+    </li>
+    {% endif %}
   {% endfor %}
 </ul>
 

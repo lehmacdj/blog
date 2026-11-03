@@ -10,7 +10,7 @@
     <generator>Jekyll v{{ jekyll.version }}</generator>
     {% if page.feed_tag %}{% assign feed_notes = sorted_notes | where_exp: "post", "post.tags contains page.feed_tag" %}{% else %}{% assign feed_notes = sorted_notes %}{% endif %}{% assign count = 0 %}{% for post in feed_notes %}{% if count >= 10 %}{% break %}{% endif %}{% if post.tags contains 'unlisted' %}{% continue %}{% endif %}{% assign count = count | plus: 1 %}
     <item>
-      <title>{{ post.title | xml_escape }}</title>
+      {% unless post.untitled %}<title>{{ post.title | xml_escape }}</title>{% endunless %}
       <description>{{ post.content | xml_escape }}</description>
       <pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
       <link>{{ post.url | prepend: site.baseurl | prepend: site.url }}</link>
