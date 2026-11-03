@@ -387,7 +387,7 @@ def edit_text(text: str) -> str:
     """Let the user edit text in $VISUAL or $EDITOR (default vi)."""
     editor = os.environ.get("VISUAL") or os.environ.get("EDITOR") or "vi"
     with tempfile.NamedTemporaryFile(
-        "w+", suffix=".txt", prefix="caption-", delete=False,
+        "w+", suffix=".md", prefix="caption-", delete=False,
     ) as f:
         f.write(text + "\n")
         path = Path(f.name)
