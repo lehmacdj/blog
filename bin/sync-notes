@@ -183,11 +183,13 @@ def main():
     if args.note_ids:
         note_ids = args.note_ids
     else:
-        # Sync all notes in _notes/, skipping test- prefixed notes
+        # Sync all notes in _notes/, skipping test- prefixed notes and
+        # photo notes (those come from the Photos library: see sync-photos)
         note_ids = [
             extract_note_id(p.name)
             for p in NOTES_DIR.glob("*.md")
             if not p.name.startswith("test-")
+            and "photo" not in parse_frontmatter(p.read_text())[0]
         ]
 
     if not note_ids:

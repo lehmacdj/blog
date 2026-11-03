@@ -501,7 +501,7 @@ _ORIENTATION_TO_ROTATION = {
 }
 
 
-def _heic_rotation(source: Path) -> int | None:
+def _exif_rotation(source: Path) -> int | None:
     """Return sips -r degrees needed to bake EXIF orientation,
     or None if no rotation is needed."""
     result = subprocess.run(
@@ -540,17 +540,47 @@ def _copy_wiki_image(
     if dest.exists() and source.stat().st_mtime <= dest.stat().st_mtime:
         return dest, False
 
+    import_image(source, dest)
+    return dest, True
+
+
+def import_image(
+    source: Path, dest: Path, max_size: int | None = None,
+) -> None:
+    """Copy an image into the blog, converting HEIC to JPEG, optionally
+    shrinking it so its longest side is at most max_size pixels, and
+    stripping all metadata."""
     if source.suffix.lower() == ".heic":
-        rot = _heic_rotation(source)
-        cmd = ["sips", "-s", "format", "jpeg"]
-        if rot:
-            cmd += ["-r", str(rot)]
-        cmd += [str(source), "--out", str(dest)]
-        subprocess.run(cmd, check=True, capture_output=True)
+        subprocess.run(
+            ["sips", "-s", "format", "jpeg", str(source), "--out", str(dest)],
+            check=True, capture_output=True,
+        )
     else:
         shutil.copy2(source, dest)
+    # Bake in the EXIF orientation, since scrubbing removes the tag.
+    rot = _exif_rotation(source)
+    if rot:
+        subprocess.run(
+            ["sips", "-r", str(rot), str(dest)],
+            check=True, capture_output=True,
+        )
+    if max_size:
+        _shrink_image(dest, max_size)
     scrub_metadata(dest)
-    return dest, True
+
+
+def _shrink_image(path: Path, max_size: int) -> None:
+    """Resize path in place so its longest side is at most max_size."""
+    result = subprocess.run(
+        ["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(path)],
+        check=True, capture_output=True, text=True,
+    )
+    dims = [int(n) for n in re.findall(r"pixel\w+: (\d+)", result.stdout)]
+    if dims and max(dims) > max_size:
+        subprocess.run(
+            ["sips", "-Z", str(max_size), str(path)],
+            check=True, capture_output=True,
+        )
 
 
 def _wc_status() -> tuple[bool, str]:

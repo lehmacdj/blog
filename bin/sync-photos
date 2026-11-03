@@ -1,0 +1,438 @@
+#!/usr/bin/env python3
+"""
+Publish captioned photos from the Photos library as photo posts.
+
+Usage: ./sync-photos           # refresh captions of published photos
+       ./sync-photos triage    # decide which captioned photos to publish
+       ./sync-photos list      # list photos that haven't been triaged
+       ./sync-photos publish <uuid> [--title TITLE]
+       ./sync-photos ignore <uuid> ...
+
+Any photo with a caption is a candidate. Nothing from the library enters the
+repo until you choose to publish it. Publishing assigns the photo a note ID,
+copies a resized, metadata-free image to images/, and writes a note tagged
+`photo` with the caption as its body.
+
+A published note records its source in `photo: <uuid>` frontmatter. Photos you
+choose never to publish are listed by UUID in IGNORED_FILE.
+"""
+
+import argparse
+import random
+import sqlite3
+import string
+import subprocess
+import sys
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+from blog_utils import (
+    BASE_URL,
+    BLOG_DIR,
+    IMAGES_DIR,
+    NOTES_DIR,
+    WIKI_DIR,
+    blog_image_name,
+    build_frontmatter,
+    commit_if_pending,
+    import_image,
+    jj_tug,
+    parse_frontmatter,
+    slugify,
+    sync_all_tag_artifacts,
+)
+
+PHOTOS_LIBRARY = Path.home() / "Pictures" / "Photos Library.photoslibrary"
+IGNORED_FILE = BLOG_DIR / "_ignored-photos.txt"
+PHOTO_TAG = "photo"
+MAX_IMAGE_SIZE = 2048
+MAX_TITLE_LENGTH = 60
+# Core Data timestamps count seconds from 2001-01-01 UTC.
+CORE_DATA_EPOCH = datetime(2001, 1, 1, tzinfo=timezone.utc)
+
+# Still images (ZKIND = 0) that have a caption and aren't trashed or hidden.
+CANDIDATES_QUERY = """
+SELECT a.ZUUID, a.ZDATECREATED, aa.ZTIMEZONEOFFSET, a.ZDIRECTORY,
+       a.ZFILENAME, aa.ZORIGINALFILENAME, a.ZADJUSTMENTSSTATE,
+       d.ZLONGDESCRIPTION
+FROM ZASSETDESCRIPTION d
+JOIN ZADDITIONALASSETATTRIBUTES aa ON aa.Z_PK = d.ZASSETATTRIBUTES
+JOIN ZASSET a ON a.Z_PK = aa.ZASSET
+WHERE TRIM(d.ZLONGDESCRIPTION) != ''
+  AND a.ZKIND = 0 AND a.ZTRASHEDSTATE = 0 AND a.ZHIDDEN = 0
+ORDER BY a.ZDATECREATED DESC
+"""
+
+
+@dataclass
+class Photo:
+    uuid: str
+    taken: datetime
+    original_filename: str
+    source: Path
+    caption: str
+
+
+def _image_source(row) -> Path:
+    """The edited render if the photo was edited, else the original."""
+    _, _, _, directory, filename, _, adjustments, _ = row
+    if adjustments:
+        uuid = row[0]
+        renders = PHOTOS_LIBRARY / "resources" / "renders" / directory
+        for render in sorted(renders.glob(f"{uuid}_1_201_a.*")):
+            return render
+    return PHOTOS_LIBRARY / "originals" / directory / filename
+
+
+def load_candidates() -> list[Photo]:
+    """Read captioned photos from the Photos library, newest first."""
+    db_path = PHOTOS_LIBRARY / "database" / "Photos.sqlite"
+    if not db_path.exists():
+        sys.exit(f"Error: Photos library not found at {PHOTOS_LIBRARY}")
+    db = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    try:
+        rows = db.execute(CANDIDATES_QUERY).fetchall()
+    except sqlite3.OperationalError as e:
+        sys.exit(
+            "Error: couldn't read captions from the Photos library; its "
+            f"database layout may have changed in a macOS update ({e})"
+        )
+    finally:
+        db.close()
+
+    photos = []
+    for row in rows:
+        uuid, created, tz_offset, *_, original, _, caption = row
+        tz = timezone(timedelta(seconds=tz_offset or 0))
+        taken = (CORE_DATA_EPOCH + timedelta(seconds=created)).astimezone(tz)
+        photos.append(Photo(
+            uuid=uuid,
+            taken=taken,
+            original_filename=original or row[4],
+            source=_image_source(row),
+            caption=caption.strip(),
+        ))
+    return photos
+
+
+def read_ignored() -> set[str]:
+    if not IGNORED_FILE.exists():
+        return set()
+    return {
+        line.strip() for line in IGNORED_FILE.read_text().splitlines()
+        if line.strip()
+    }
+
+
+def write_ignored(uuids: set[str]) -> None:
+    IGNORED_FILE.write_text("".join(f"{u}\n" for u in sorted(uuids)))
+
+
+def published_photos() -> dict[str, Path]:
+    """Map photo UUID -> note path for every published photo note."""
+    published = {}
+    for path in NOTES_DIR.glob("*.md"):
+        metadata, _ = parse_frontmatter(path.read_text())
+        if metadata.get("photo"):
+            published[metadata["photo"]] = path
+    return published
+
+
+def default_title(caption: str) -> str:
+    """The caption's first line, shortened at a word boundary if long."""
+    first_line = caption.strip().splitlines()[0].strip()
+    if len(first_line) <= MAX_TITLE_LENGTH:
+        return first_line
+    cut = first_line[:MAX_TITLE_LENGTH].rsplit(" ", 1)[0]
+    return cut.rstrip(" ,;:.-") + "…"
+
+
+def note_body(image_name: str, caption: str) -> str:
+    path = f"</images/{image_name}>" if " " in image_name else (
+        f"/images/{image_name}"
+    )
+    # Each line of a caption is its own paragraph, so line breaks survive
+    # Markdown rendering.
+    paragraphs = [line.strip() for line in caption.splitlines()]
+    text = "\n\n".join(p for p in paragraphs if p)
+    return f"![]({path})\n\n{text}\n"
+
+
+def new_note_id() -> str:
+    """A random 12 character ID unused by blog and wiki notes."""
+    alphabet = string.ascii_letters + string.digits
+    while True:
+        note_id = "".join(random.choices(alphabet, k=12))
+        taken = (
+            any(NOTES_DIR.glob(f"{note_id}*"))
+            or (WIKI_DIR / f"{note_id}.md").exists()
+        )
+        if not taken:
+            return note_id
+
+
+def publish_photo(photo: Photo, title: str) -> str:
+    """Write the image and note for photo. Returns the published URL."""
+    if not photo.source.exists():
+        raise FileNotFoundError(
+            f"image file isn't in the library (it may only be in iCloud): "
+            f"{photo.source}"
+        )
+    note_id = new_note_id()
+    # Name the image after the original file, with the extension of the
+    # file actually exported (an edited render may differ).
+    stem = Path(photo.original_filename).stem
+    named_source = Path(stem + photo.source.suffix)
+    image_name = blog_image_name(note_id, named_source)
+    import_image(photo.source, IMAGES_DIR / image_name, MAX_IMAGE_SIZE)
+
+    now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %z")
+    frontmatter = build_frontmatter(note_id, title, now, [PHOTO_TAG], {})
+    frontmatter = frontmatter.removesuffix("---") + (
+        f"image: /images/{image_name}\nphoto: {photo.uuid}\n---"
+    )
+    slug = slugify(title)
+    path = NOTES_DIR / f"{note_id}-{slug}.md"
+    path.write_text(frontmatter + "\n\n" + note_body(image_name, photo.caption))
+    print(f"Created: _notes/{path.name}")
+    return f"{BASE_URL}/{note_id}/{slug}"
+
+
+def refresh_caption(photo: Photo, note_path: Path) -> bool:
+    """Update a published note's body to the photo's current caption.
+    Title, date and image are left alone. Returns True if changed."""
+    content = note_path.read_text()
+    metadata, body = parse_frontmatter(content)
+    image_name = metadata.get("image", "").removeprefix("/images/")
+    new_body = note_body(image_name, photo.caption)
+    if body == new_body:
+        return False
+    frontmatter = content[: len(content) - len(body)]
+    note_path.write_text(frontmatter + new_body)
+    return True
+
+
+def untriaged(photos: list[Photo]) -> list[Photo]:
+    done = read_ignored() | published_photos().keys()
+    return [p for p in photos if p.uuid not in done]
+
+
+def describe(photo: Photo) -> str:
+    taken = photo.taken.strftime("%Y-%m-%d %H:%M")
+    return f"{photo.uuid}  {taken}  {photo.original_filename}"
+
+
+def preview(photo: Photo) -> subprocess.Popen | None:
+    """Show photo in Quick Look; returns the process to close later."""
+    try:
+        return subprocess.Popen(
+            ["qlmanage", "-p", str(photo.source)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+    except OSError as e:
+        print(f"  (couldn't open a preview: {e})")
+        return None
+
+
+def close_preview(proc: subprocess.Popen | None) -> None:
+    if proc and proc.poll() is None:
+        proc.terminate()
+        proc.wait()
+
+
+def ask(prompt: str) -> str:
+    try:
+        return input(prompt).strip()
+    except EOFError:
+        return "q"
+
+
+def confirm_title(photo: Photo) -> str | None:
+    """Ask for a title, defaulting to one derived from the caption.
+    Returns None if the user backs out."""
+    suggested = default_title(photo.caption)
+    print(f"  Title: {suggested}")
+    answer = ask("  Enter to accept, type a new title, or '-' to go back: ")
+    if answer == "-":
+        return None
+    return answer or suggested
+
+
+TRIAGE_HELP = """\
+  p  publish this photo (you'll confirm the title first)
+  i  ignore: never offer this photo again
+  s  skip: decide later
+  v  view the photo again
+  q  quit (publishes and ignores so far are committed)"""
+
+
+def triage(photos: list[Photo]) -> tuple[list[str], int]:
+    """Interactively decide on untriaged photos.
+    Returns (titles of published photos, number ignored)."""
+    pending = untriaged(photos)
+    if not pending:
+        print("No untriaged captioned photos.")
+        return [], 0
+    print(f"{len(pending)} captioned photo(s) to triage, newest first.")
+    print(TRIAGE_HELP)
+
+    ignored = read_ignored()
+    published_titles: list[str] = []
+    ignored_count = 0
+    for index, photo in enumerate(pending, start=1):
+        print(f"\n[{index}/{len(pending)}] {describe(photo)}")
+        print("  " + photo.caption.replace("\n", "\n  "))
+        proc = preview(photo)
+        try:
+            while True:
+                choice = ask("  [p]ublish [i]gnore [s]kip [v]iew [q]uit? ")
+                choice = choice[:1].lower()
+                if choice == "p":
+                    title = confirm_title(photo)
+                    if title is None:
+                        continue
+                    try:
+                        url = publish_photo(photo, title)
+                    except (FileNotFoundError,
+                            subprocess.CalledProcessError) as e:
+                        print(f"  Error: couldn't publish: {error_text(e)}")
+                        continue
+                    print(f"  Will be at {url}")
+                    published_titles.append(title)
+                    break
+                if choice == "i":
+                    ignored.add(photo.uuid)
+                    write_ignored(ignored)
+                    ignored_count += 1
+                    break
+                if choice == "s":
+                    break
+                if choice == "v":
+                    close_preview(proc)
+                    proc = preview(photo)
+                    continue
+                if choice == "q":
+                    return published_titles, ignored_count
+                print(TRIAGE_HELP)
+        finally:
+            close_preview(proc)
+    return published_titles, ignored_count
+
+
+def error_text(e: Exception) -> str:
+    """Describe e, including a failed command's own error output."""
+    if isinstance(e, subprocess.CalledProcessError):
+        output = e.stderr or e.stdout or b""
+        if isinstance(output, bytes):
+            output = output.decode(errors="replace")
+        tool = Path(str(e.cmd[0])).name
+        return f"{tool} failed (exit {e.returncode}): {output.strip()}"
+    return str(e)
+
+
+def find_photo(photos: list[Photo], uuid: str) -> Photo:
+    for photo in photos:
+        if photo.uuid == uuid:
+            return photo
+    sys.exit(f"Error: no captioned photo with UUID {uuid}")
+
+
+def commit_message(published: list[str], ignored: int, refreshed: int) -> str:
+    parts = []
+    if published:
+        parts.append(
+            f"Publish photo {published[0]}" if len(published) == 1
+            else f"Publish {len(published)} photos"
+        )
+    if refreshed:
+        parts.append(f"refresh {refreshed} photo caption(s)")
+    if ignored:
+        parts.append(f"ignore {ignored} photo(s)")
+    subject = ", ".join(parts)
+    subject = subject[:1].upper() + subject[1:]
+    if len(published) > 1:
+        subject += "\n\n" + "\n".join(f"- {t}" for t in published)
+    return subject
+
+
+def refresh_all(photos: list[Photo]) -> int:
+    """Refresh captions of every published photo. Returns count changed."""
+    by_uuid = {p.uuid: p for p in photos}
+    changed = 0
+    for uuid, note_path in sorted(published_photos().items()):
+        photo = by_uuid.get(uuid)
+        if photo is None:
+            print(
+                f"  {note_path.name}: warning: photo {uuid} is no longer a "
+                "captioned photo in the library; leaving the note as is"
+            )
+            continue
+        if refresh_caption(photo, note_path):
+            print(f"  {note_path.name}: caption updated")
+            changed += 1
+    return changed
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Publish captioned photos from the Photos library."
+    )
+    sub = parser.add_subparsers(dest="command")
+    sub.add_parser("triage", help="decide which captioned photos to publish")
+    sub.add_parser("list", help="list photos that haven't been triaged")
+    pub = sub.add_parser("publish", help="publish one photo")
+    pub.add_argument("uuid")
+    pub.add_argument("--title", help="defaults to the caption's first line")
+    ign = sub.add_parser("ignore", help="never offer these photos again")
+    ign.add_argument("uuids", nargs="+")
+    args = parser.parse_args()
+
+    photos = load_candidates()
+
+    if args.command == "list":
+        for photo in untriaged(photos):
+            first_line = photo.caption.splitlines()[0]
+            print(f"{describe(photo)}  {first_line}")
+        return
+
+    # Separate any pre-existing WIP from this run.
+    commit_if_pending()
+
+    published: list[str] = []
+    ignored = 0
+    refreshed = 0
+    if args.command == "triage":
+        published, ignored = triage(photos)
+    elif args.command == "publish":
+        photo = find_photo(photos, args.uuid)
+        if photo.uuid in published_photos():
+            sys.exit(f"Error: {photo.uuid} is already published")
+        title = args.title or default_title(photo.caption)
+        try:
+            print(f"Published: {publish_photo(photo, title)}")
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            sys.exit(f"Error: couldn't publish {photo.uuid}: {error_text(e)}")
+        published = [title]
+    elif args.command == "ignore":
+        uuids = read_ignored()
+        for uuid in args.uuids:
+            uuids.add(find_photo(photos, uuid).uuid)
+        ignored = len(uuids - read_ignored())
+        write_ignored(uuids)
+    else:
+        refreshed = refresh_all(photos)
+        remaining = len(untriaged(photos))
+        print(
+            f"Done. Refreshed {refreshed} caption(s); {remaining} captioned "
+            "photo(s) untriaged (run `sync-photos triage`)."
+        )
+
+    if published:
+        sync_all_tag_artifacts()
+    if commit_if_pending(commit_message(published, ignored, refreshed)):
+        jj_tug()
+
+
+if __name__ == "__main__":
+    main()
