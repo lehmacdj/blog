@@ -470,8 +470,8 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
         try:
             while True:
                 choice = ask(
-                    "  [p]ublish, publish with [t]itle, [e]dit, [i]gnore, "
-                    "[s]kip, [v]iew, [q]uit? "
+                    "  [p]ublish (with [t]itle), [e]dit, [i]gnore, [s]kip, "
+                    "[v]iew, [q]uit? "
                 )
                 choice = choice[:1].lower()
                 if choice in ("p", "t"):
