@@ -28,3 +28,10 @@ collections:
   notes:
     output: true
     sort_by: date
+
+# GitHub Pages builds with an old Sass compiler that doesn't support Sass
+# modules (`@use`, `color.adjust`), so keep the legacy syntax and silence
+# Dart Sass's deprecation warnings for it in local Jekyll 4 builds. The old
+# compiler ignores this option.
+sass:
+  silence_deprecations: [import, global-builtin, color-functions]
