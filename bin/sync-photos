@@ -2,7 +2,7 @@
 """
 Publish captioned photos from the Photos library as photo posts.
 
-Usage: ./sync-photos           # refresh captions of published photos
+Usage: ./sync-photos           # update published photos from the library
        ./sync-photos triage    # decide which captioned photos to publish
        ./sync-photos list      # list photos that haven't been triaged
        ./sync-photos publish <uuid> [--title TITLE]
@@ -11,7 +11,7 @@ Usage: ./sync-photos           # refresh captions of published photos
 Any photo with a caption is a candidate. Nothing from the library enters the
 repo until you choose to publish it. Publishing assigns the photo a note ID,
 copies a resized, metadata-free image to images/, and writes a note tagged
-`photo` with the caption as its body.
+`photo` with the caption as its body, dated when the photo was taken.
 
 Photo posts are untitled unless you give them a title. An untitled post is
 marked `untitled: true`, lives at /<id>, and is shown as its photo and caption
@@ -251,9 +251,9 @@ def publish_photo(
     image_name = blog_image_name(note_id, named_source)
     import_image(photo.source, IMAGES_DIR / image_name, MAX_IMAGE_SIZE)
 
-    now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %z")
     frontmatter = photo_frontmatter(
-        note_id, title, photo.caption, now, image_name, photo.uuid, tags,
+        note_id, title, photo.caption, post_date(photo), image_name,
+        photo.uuid, tags,
     )
     path = NOTES_DIR / photo_note_name(note_id, title)
     path.write_text(frontmatter + "\n\n" + note_body(image_name, photo.caption))
@@ -262,20 +262,30 @@ def publish_photo(
     return BASE_URL + permalink
 
 
-def refresh_caption(photo: Photo, note_path: Path) -> bool:
-    """Update a published note to the photo's current caption: its body,
-    and for an untitled note its caption summary title. A chosen title,
-    date and image are left alone. Returns True if changed."""
+def post_date(photo: Photo) -> str:
+    """The post date: when the photo was taken, in its own time zone."""
+    return photo.taken.strftime("%Y-%m-%d %H:%M %z")
+
+
+def _set_field(frontmatter: str, key: str, value: str) -> str:
+    return re.sub(
+        rf"^{key}: .*$", lambda _: f"{key}: {value}", frontmatter,
+        count=1, flags=re.MULTILINE,
+    )
+
+
+def refresh_note(photo: Photo, note_path: Path) -> bool:
+    """Update a published note from the photo in the library: its date,
+    its caption body, and for an untitled note its caption summary title.
+    A chosen title and the image are left alone. Returns True if changed."""
     content = note_path.read_text()
     metadata, body = parse_frontmatter(content)
     image_name = metadata.get("image", "").removeprefix("/images/")
     frontmatter = content[: len(content) - len(body)]
+    frontmatter = _set_field(frontmatter, "date", post_date(photo))
     if metadata.get("untitled") == "true":
         summary = serialize_yaml_scalar(caption_summary(photo.caption))
-        frontmatter = re.sub(
-            r"^title: .*$", lambda _: f"title: {summary}", frontmatter,
-            count=1, flags=re.MULTILINE,
-        )
+        frontmatter = _set_field(frontmatter, "title", summary)
     new_content = frontmatter + note_body(image_name, photo.caption)
     if new_content == content:
         return False
@@ -529,7 +539,7 @@ def commit_message(published: list[str], refreshed: int) -> str:
             else f"Publish {len(published)} photos"
         )
     if refreshed:
-        parts.append(f"refresh {refreshed} photo caption(s)")
+        parts.append(f"update {refreshed} photo post(s) from Photos")
     subject = ", ".join(parts)
     subject = subject[:1].upper() + subject[1:]
     if len(published) > 1:
@@ -538,7 +548,8 @@ def commit_message(published: list[str], refreshed: int) -> str:
 
 
 def refresh_all(photos: list[Photo]) -> int:
-    """Refresh captions of every published photo. Returns count changed."""
+    """Update every published photo note from the library.
+    Returns the number changed."""
     by_uuid = {p.uuid: p for p in photos}
     changed = 0
     for uuid, note_path in sorted(published_photos().items()):
@@ -549,8 +560,8 @@ def refresh_all(photos: list[Photo]) -> int:
                 "captioned photo in the library; leaving the note as is"
             )
             continue
-        if refresh_caption(photo, note_path):
-            print(f"  {note_path.name}: caption updated")
+        if refresh_note(photo, note_path):
+            print(f"  {note_path.name}: updated from Photos")
             changed += 1
     return changed
 
@@ -611,7 +622,7 @@ def main():
         refreshed = refresh_all(photos)
         remaining = len(untriaged(photos))
         print(
-            f"Done. Refreshed {refreshed} caption(s); {remaining} captioned "
+            f"Done. Updated {refreshed} photo post(s); {remaining} captioned "
             "photo(s) untriaged (run `sync-photos triage`)."
         )
 

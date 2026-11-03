@@ -5,7 +5,7 @@ import runpy
 import subprocess
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 SYNC_PHOTOS = Path(__file__).parent / "sync-photos"
@@ -54,20 +54,32 @@ class SyncPhotosTests(unittest.TestCase):
         body = self.g["note_body"]("a b.png", "one\ntwo\n\nthree")
         self.assertEqual(body, "![](</images/a b.png>)\n\none\n\ntwo\n\nthree\n")
 
-    def test_refresh_caption_only_rewrites_body(self):
+    def test_refresh_note_updates_date_and_body_only(self):
         note = self.g["NOTES_DIR"] / "abc-title.md"
         frontmatter = (
-            "---\ntitle: \"Kept\"\nimage: /images/abc-x.jpeg\n"
+            "---\ntitle: \"Kept\"\ndate: {}\nimage: /images/abc-x.jpeg\n"
             "photo: U1\n---\n\n"
         )
-        note.write_text(frontmatter + self.g["note_body"]("abc-x.jpeg", "old"))
+        note.write_text(
+            frontmatter.format("2026-11-03 02:27 -0500")
+            + self.g["note_body"]("abc-x.jpeg", "old")
+        )
 
         photo = self.photo("U1", "new")
-        self.assertTrue(self.g["refresh_caption"](photo, note))
-        self.assertFalse(self.g["refresh_caption"](photo, note))
+        self.assertTrue(self.g["refresh_note"](photo, note))
+        self.assertFalse(self.g["refresh_note"](photo, note))
         self.assertEqual(
-            note.read_text(), frontmatter + "![](/images/abc-x.jpeg)\n\nnew\n"
+            note.read_text(),
+            frontmatter.format("2026-01-01 00:00 +0000")
+            + "![](/images/abc-x.jpeg)\n\nnew\n",
         )
+
+    def test_post_date_uses_photo_time_zone(self):
+        photo = self.photo("U1", "c")
+        photo.taken = datetime(
+            2026, 10, 26, 22, 46, tzinfo=timezone(timedelta(hours=-4)),
+        )
+        self.assertEqual(self.g["post_date"](photo), "2026-10-26 22:46 -0400")
 
     def test_untitled_frontmatter(self):
         fm = self.g["photo_frontmatter"](
@@ -107,7 +119,7 @@ class SyncPhotosTests(unittest.TestCase):
         )
         self.assertIn("tags: [photo, mahjong]\n", fm)
 
-    def test_refresh_caption_updates_untitled_summary(self):
+    def test_refresh_note_updates_untitled_summary(self):
         note = self.g["NOTES_DIR"] / "abc.md"
         note.write_text(
             self.g["photo_frontmatter"](
@@ -115,7 +127,7 @@ class SyncPhotosTests(unittest.TestCase):
             ) + "\n\n" + self.g["note_body"]("abc-x.jpeg", "old")
         )
         self.assertTrue(
-            self.g["refresh_caption"](self.photo("U1", "new words"), note)
+            self.g["refresh_note"](self.photo("U1", "new words"), note)
         )
         metadata, body = self.g["parse_frontmatter"](note.read_text())
         self.assertEqual(metadata["title"], "new words")
@@ -182,9 +194,12 @@ class SyncPhotosTests(unittest.TestCase):
         self.assertEqual(message(["Pink"], 0), "Publish photo Pink")
         self.assertEqual(
             message(["A", "B"], 1),
-            "Publish 2 photos, refresh 1 photo caption(s)\n\n- A\n- B",
+            "Publish 2 photos, update 1 photo post(s) from Photos"
+            "\n\n- A\n- B",
         )
-        self.assertEqual(message([], 3), "Refresh 3 photo caption(s)")
+        self.assertEqual(
+            message([], 3), "Update 3 photo post(s) from Photos"
+        )
 
 
 if __name__ == "__main__":
