@@ -15,6 +15,10 @@ For each published note:
 
 import argparse
 import re
+import subprocess
+import sys
+
+from image_captions import CaptionSync
 
 from blog_utils import (
     WIKI_DIR,
@@ -32,6 +36,7 @@ from blog_utils import (
     copy_images,
     sync_all_tag_artifacts,
     commit_if_pending,
+    error_text,
     jj_tug,
 )
 
@@ -40,7 +45,10 @@ class SkipNote(Exception):
     """Raised when a note can't be synced; nothing was changed for it."""
 
 
-def sync_note(note_id: str) -> list[str] | None:
+def sync_note(
+    note_id: str, *, captions: CaptionSync | None = None,
+    review_images: bool = False,
+) -> list[str] | None:
     """
     Sync a single note from wiki to blog.
 
@@ -62,11 +70,18 @@ def sync_note(note_id: str) -> list[str] | None:
 
     # Read current blog note to preserve blog-specific metadata
     blog_content = blog_path.read_text()
-    blog_meta, _ = parse_frontmatter(blog_content)
+    blog_meta, blog_body = parse_frontmatter(blog_content)
 
     title = wiki_meta.get("title")
     if not title:
         raise SkipNote(f"no `title:` in frontmatter of {wiki_path}")
+    captions = captions or CaptionSync()
+    updated = captions.sync(
+        wiki_content, note_id, blog_body, review=review_images,
+    )
+    if updated != wiki_content:
+        wiki_path.write_text(updated)
+        wiki_meta, wiki_body = parse_frontmatter(updated)
     _, body = extract_title(wiki_body)
 
     # Keep the original publication date from the blog
@@ -178,6 +193,10 @@ def main():
         nargs="*",
         help="Note IDs to sync (defaults to all published notes)"
     )
+    parser.add_argument(
+        "--review-images", action="store_true",
+        help="choose shared or manual alt text, including existing images",
+    )
     args = parser.parse_args()
 
     if args.note_ids:
@@ -203,9 +222,12 @@ def main():
 
     updated: dict[str, list[str]] = {}
     skipped = 0
+    captions = CaptionSync()
     for note_id in sorted(note_ids):
         try:
-            details = sync_note(note_id)
+            details = sync_note(
+                note_id, captions=captions, review_images=args.review_images,
+            )
         except SkipNote as e:
             skipped += 1
             print(f"  {note_id}: warning: {e}")
@@ -235,4 +257,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (OSError, RuntimeError, ValueError, subprocess.CalledProcessError) as e:
+        sys.exit(f"Error: {error_text(e)}")

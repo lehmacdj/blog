@@ -31,14 +31,16 @@ import contextlib
 import os
 import random
 import re
-import sqlite3
 import string
 import subprocess
 import sys
 import tempfile
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import unquote
+
+from photos import Photo, load_photos, set_caption
+from image_captions import CaptionSync, choose_alt
+from image_markup import images, markdown_alt, marker, plain_text
 
 from blog_utils import (
     BASE_URL,
@@ -49,6 +51,8 @@ from blog_utils import (
     blog_image_name,
     collect_all_tags,
     commit_if_pending,
+    error_text,
+    extract_note_id,
     import_image,
     jj_tug,
     parse_frontmatter,
@@ -57,77 +61,10 @@ from blog_utils import (
     sync_all_tag_artifacts,
 )
 
-PHOTOS_LIBRARY = Path.home() / "Pictures" / "Photos Library.photoslibrary"
 IGNORED_FILE = BLOG_DIR / "_ignored-photos.txt"
 PHOTO_TAG = "photo"
 MAX_IMAGE_SIZE = 2048
 MAX_TITLE_LENGTH = 60
-# Core Data timestamps count seconds from 2001-01-01 UTC.
-CORE_DATA_EPOCH = datetime(2001, 1, 1, tzinfo=timezone.utc)
-
-# Still images (ZKIND = 0) that have a caption and aren't trashed or hidden.
-CANDIDATES_QUERY = """
-SELECT a.ZUUID, a.ZDATECREATED, aa.ZTIMEZONEOFFSET, a.ZDIRECTORY,
-       a.ZFILENAME, aa.ZORIGINALFILENAME, a.ZADJUSTMENTSSTATE,
-       d.ZLONGDESCRIPTION
-FROM ZASSETDESCRIPTION d
-JOIN ZADDITIONALASSETATTRIBUTES aa ON aa.Z_PK = d.ZASSETATTRIBUTES
-JOIN ZASSET a ON a.Z_PK = aa.ZASSET
-WHERE TRIM(d.ZLONGDESCRIPTION) != ''
-  AND a.ZKIND = 0 AND a.ZTRASHEDSTATE = 0 AND a.ZHIDDEN = 0
-ORDER BY a.ZDATECREATED DESC
-"""
-
-
-@dataclass
-class Photo:
-    uuid: str
-    taken: datetime
-    original_filename: str
-    source: Path
-    caption: str
-
-
-def _image_source(row) -> Path:
-    """The edited render if the photo was edited, else the original."""
-    _, _, _, directory, filename, _, adjustments, _ = row
-    if adjustments:
-        uuid = row[0]
-        renders = PHOTOS_LIBRARY / "resources" / "renders" / directory
-        for render in sorted(renders.glob(f"{uuid}_1_201_a.*")):
-            return render
-    return PHOTOS_LIBRARY / "originals" / directory / filename
-
-
-def load_candidates() -> list[Photo]:
-    """Read captioned photos from the Photos library, newest first."""
-    db_path = PHOTOS_LIBRARY / "database" / "Photos.sqlite"
-    if not db_path.exists():
-        sys.exit(f"Error: Photos library not found at {PHOTOS_LIBRARY}")
-    db = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
-    try:
-        rows = db.execute(CANDIDATES_QUERY).fetchall()
-    except sqlite3.OperationalError as e:
-        sys.exit(
-            "Error: couldn't read captions from the Photos library; its "
-            f"database layout may have changed in a macOS update ({e})"
-        )
-    finally:
-        db.close()
-
-    photos = []
-    for row in rows:
-        uuid, created, tz_offset, *_, original, _, caption = row
-        tz = timezone(timedelta(seconds=tz_offset or 0))
-        taken = (CORE_DATA_EPOCH + timedelta(seconds=created)).astimezone(tz)
-        photos.append(Photo(
-            uuid=uuid,
-            taken=taken,
-            original_filename=original or row[4],
-            source=_image_source(row),
-            caption=caption.strip(),
-        ))
-    return photos
 
 
 def read_ignored() -> set[str]:
@@ -162,7 +99,10 @@ def caption_summary(caption: str) -> str:
     return cut.rstrip(" ,;:.-") + "…"
 
 
-def note_body(image_name: str, caption: str) -> str:
+def note_body(
+    image_name: str, caption: str, *, uuid: str = "",
+    alt: str | None = None,
+) -> str:
     path = f"</images/{image_name}>" if " " in image_name else (
         f"/images/{image_name}"
     )
@@ -170,7 +110,9 @@ def note_body(image_name: str, caption: str) -> str:
     # Markdown rendering.
     paragraphs = [line.strip() for line in caption.splitlines()]
     text = "\n\n".join(p for p in paragraphs if p)
-    return f"![]({path})\n\n{text}\n"
+    link = marker(uuid, manual=alt is not None) if uuid else ""
+    alt_text = markdown_alt(caption if alt is None else alt)
+    return f"![{alt_text}]({path}){link}\n\n{text}\n"
 
 
 def new_note_id() -> str:
@@ -235,6 +177,7 @@ def photo_note_name(note_id: str, title: str | None) -> str:
 
 def publish_photo(
     photo: Photo, title: str | None, tags: list[str] = (),
+    *, alt: str | None = None,
 ) -> str:
     """Write the image and note for photo; title None makes it untitled.
     Returns the published URL."""
@@ -256,7 +199,9 @@ def publish_photo(
         photo.uuid, tags,
     )
     path = NOTES_DIR / photo_note_name(note_id, title)
-    path.write_text(frontmatter + "\n\n" + note_body(image_name, photo.caption))
+    path.write_text(frontmatter + "\n\n" + note_body(
+        image_name, photo.caption, uuid=photo.uuid, alt=alt,
+    ))
     print(f"Created: _notes/{path.name}")
     permalink = parse_frontmatter(frontmatter + "\n")[0]["permalink"]
     return BASE_URL + permalink
@@ -281,12 +226,30 @@ def refresh_note(photo: Photo, note_path: Path) -> bool:
     content = note_path.read_text()
     metadata, body = parse_frontmatter(content)
     image_name = metadata.get("image", "").removeprefix("/images/")
+    refs = images(body)
+    alt = None
+    if refs:
+        image = refs[0]
+        if image.manual:
+            alt = image.alt
+        elif (not image.uuid and image.alt
+              and plain_text(image.alt) != plain_text(photo.caption)):
+            chosen, manual = choose_alt(
+                image_name, image.alt, photo.caption, True,
+            )
+            if manual:
+                alt = chosen
+            elif chosen != photo.caption:
+                set_caption(photo, chosen)
+                photo.caption = chosen
     frontmatter = content[: len(content) - len(body)]
     frontmatter = _set_field(frontmatter, "date", post_date(photo))
-    if metadata.get("untitled") == "true":
+    if metadata.get("untitled") == "true" and photo.caption:
         summary = serialize_yaml_scalar(caption_summary(photo.caption))
         frontmatter = _set_field(frontmatter, "title", summary)
-    new_content = frontmatter + note_body(image_name, photo.caption)
+    new_content = frontmatter + note_body(
+        image_name, photo.caption, uuid=photo.uuid, alt=alt,
+    )
     if new_content == content:
         return False
     note_path.write_text(new_content)
@@ -295,7 +258,57 @@ def refresh_note(photo: Photo, note_path: Path) -> bool:
 
 def untriaged(photos: list[Photo]) -> list[Photo]:
     done = read_ignored() | published_photos().keys()
-    return [p for p in photos if p.uuid not in done]
+    for path in NOTES_DIR.glob("*.md"):
+        done.update(image.uuid for image in images(path.read_text()) if image.uuid)
+    return [p for p in photos if p.caption and p.uuid not in done]
+
+
+def refresh_linked_notes(photos: list[Photo]) -> int:
+    """Refresh only linked image alt text in ordinary blog and wiki notes."""
+    captions = CaptionSync(photos)
+    changed = 0
+    for path in sorted(NOTES_DIR.glob("*.md")):
+        content = path.read_text()
+        metadata, _ = parse_frontmatter(content)
+        if "photo" in metadata:
+            continue
+        note_id = extract_note_id(path.name)
+        wiki_path = WIKI_DIR / f"{note_id}.md"
+        # The wiki owns the markers and manual alt text. Copy only marked
+        # image edits into the blog, without publishing other wiki edits.
+        if not wiki_path.exists():
+            continue
+        wiki_content = wiki_path.read_text()
+        if not any(image.uuid for image in images(wiki_content)):
+            continue
+        updated_wiki = captions.sync(wiki_content, note_id, linked_only=True)
+        if updated_wiki != wiki_content:
+            wiki_path.write_text(updated_wiki)
+        by_path: dict[str, list] = {}
+        for image in images(updated_wiki):
+            if image.path.startswith(("/", "http:", "https:")):
+                continue
+            blog_path = "/images/" + blog_image_name(
+                note_id, Path(unquote(image.path)),
+            )
+            by_path.setdefault(blog_path, []).append(image)
+        edits = []
+        for image in images(content):
+            matches = by_path.get(unquote(image.path), [])
+            if not matches:
+                continue
+            source = matches.pop(0)
+            if source.uuid:
+                edits.append((image.start, image.end, image.render(
+                    source.alt, source.uuid, source.manual,
+                )))
+        for start, end, replacement in reversed(edits):
+            content = content[:start] + replacement + content[end:]
+        if content != path.read_text():
+            path.write_text(content)
+            changed += 1
+            print(f"  {path.name}: updated linked image alt text")
+    return changed
 
 
 def describe(photo: Photo) -> str:
@@ -371,25 +384,6 @@ def ask_title() -> str | None:
     """Ask for a title. Returns None if the user backs out."""
     answer = ask("  Title (Enter to go back): ")
     return answer or None
-
-
-# Photos.app identifies media items as "<uuid>/L0/001".
-SET_CAPTION_SCRIPT = """
-on run argv
-  tell application "Photos"
-    set description of media item id (item 1 of argv) to (item 2 of argv)
-  end tell
-end run
-"""
-
-
-def set_caption(photo: Photo, caption: str) -> None:
-    """Save caption to the photo in the Photos library."""
-    subprocess.run(
-        ["osascript", "-e", SET_CAPTION_SCRIPT, f"{photo.uuid}/L0/001",
-         caption],
-        check=True, capture_output=True,
-    )
 
 
 def edit_text(text: str) -> str:
@@ -484,7 +478,16 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
                     if tags is None:
                         continue
                     try:
-                        url = publish_photo(photo, title, tags)
+                        alt = input(
+                            "  Alt text (Enter for caption, '-' to go back, "
+                            "or manual text): "
+                        ).strip()
+                    except EOFError:
+                        return published_titles, ignored_count
+                    if alt == "-":
+                        continue
+                    try:
+                        url = publish_photo(photo, title, tags, alt=alt or None)
                     except (FileNotFoundError,
                             subprocess.CalledProcessError) as e:
                         print(f"  Error: couldn't publish: {error_text(e)}")
@@ -514,17 +517,6 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
         finally:
             close_preview(proc)
     return published_titles, ignored_count
-
-
-def error_text(e: Exception) -> str:
-    """Describe e, including a failed command's own error output."""
-    if isinstance(e, subprocess.CalledProcessError):
-        output = e.stderr or e.stdout or b""
-        if isinstance(output, bytes):
-            output = output.decode(errors="replace")
-        tool = Path(str(e.cmd[0])).name
-        return f"{tool} failed (exit {e.returncode}): {output.strip()}"
-    return str(e)
 
 
 def find_photo(photos: list[Photo], uuid: str) -> Photo:
@@ -560,7 +552,7 @@ def refresh_all(photos: list[Photo]) -> int:
         if photo is None:
             print(
                 f"  {note_path.name}: warning: photo {uuid} is no longer a "
-                "captioned photo in the library; leaving the note as is"
+                "visible photo in the library; leaving the note as is"
             )
             continue
         if refresh_note(photo, note_path):
@@ -579,6 +571,7 @@ def main():
     pub = sub.add_parser("publish", help="publish one photo")
     pub.add_argument("uuid")
     pub.add_argument("--title", help="omit for an untitled post")
+    pub.add_argument("--alt", help="independent manual alt text (default: caption)")
     pub.add_argument(
         "--tags", default="",
         help=f"comma separated tags besides {PHOTO_TAG}",
@@ -587,7 +580,8 @@ def main():
     ign.add_argument("uuids", nargs="+")
     args = parser.parse_args()
 
-    photos = load_candidates()
+    all_photos = load_photos()
+    photos = [photo for photo in all_photos if photo.caption]
 
     if args.command == "list":
         for photo in untriaged(photos):
@@ -609,7 +603,7 @@ def main():
             sys.exit(f"Error: {photo.uuid} is already published")
         try:
             url = publish_photo(
-                photo, args.title or None, parse_tag_input(args.tags),
+                photo, args.title or None, parse_tag_input(args.tags), alt=args.alt,
             )
             print(f"Published: {url}")
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
@@ -622,12 +616,18 @@ def main():
         ignored = len(uuids - read_ignored())
         write_ignored(uuids)
     else:
-        refreshed = refresh_all(photos)
+        refreshed = refresh_all(all_photos)
         remaining = len(untriaged(photos))
         print(
             f"Done. Updated {refreshed} photo post(s); {remaining} captioned "
             "photo(s) untriaged (run `sync-photos triage`)."
         )
+
+    if args.command in (None, "triage", "publish"):
+        linked = refresh_linked_notes(all_photos)
+        if linked:
+            print(f"Updated alt text in {linked} linked note(s).")
+            refreshed += linked
 
     if published:
         sync_all_tag_artifacts()
@@ -638,4 +638,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (OSError, RuntimeError, ValueError, subprocess.CalledProcessError) as e:
+        sys.exit(f"Error: {error_text(e)}")

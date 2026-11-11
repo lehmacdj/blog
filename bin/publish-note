@@ -16,7 +16,10 @@ Transforms:
 """
 
 import sys
+import subprocess
 from datetime import datetime, timezone
+
+from image_captions import CaptionSync
 
 from blog_utils import (
     WIKI_DIR,
@@ -32,6 +35,7 @@ from blog_utils import (
     copy_images,
     sync_all_tag_artifacts,
     commit_if_pending,
+    error_text,
     jj_tug,
 )
 
@@ -62,6 +66,10 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     title = metadata.get("title")
     if not title:
         raise ValueError(f"No `title:` in frontmatter of {wiki_path}")
+    updated = CaptionSync().sync(content, note_id)
+    if updated != content:
+        wiki_path.write_text(updated)
+        metadata, body = parse_frontmatter(updated)
     _, body = extract_title(body)
 
     # Separate any pre-existing WIP from this publish run.
@@ -139,11 +147,8 @@ def main():
     try:
         url = publish_note(note_id, extra_tags)
         print(f"\nPublished: {url}")
-    except FileNotFoundError as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
-    except ValueError as e:
-        print(f"Error: {e}", file=sys.stderr)
+    except (OSError, RuntimeError, ValueError, subprocess.CalledProcessError) as e:
+        print(f"Error: {error_text(e)}", file=sys.stderr)
         sys.exit(1)
 
 

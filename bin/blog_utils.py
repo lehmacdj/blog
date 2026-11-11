@@ -8,7 +8,9 @@ import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import unquote
+
+from image_markup import images
 
 WIKI_DIR = Path.home() / "wiki"
 BLOG_DIR = Path(__file__).parent.parent.resolve()
@@ -17,6 +19,18 @@ FEED_DIR = BLOG_DIR / "feed"
 TAGS_DIR = BLOG_DIR / "tagged"
 IMAGES_DIR = BLOG_DIR / "images"
 BASE_URL = "https://unformeddelta.wiki"
+
+
+def error_text(error: Exception) -> str:
+    """Describe a failed command, including its diagnostic output."""
+    if isinstance(error, subprocess.CalledProcessError):
+        output = error.stderr or error.stdout or b""
+        if isinstance(output, bytes):
+            output = output.decode(errors="replace")
+        tool = Path(str(error.cmd[0])).name
+        return f"{tool} failed (exit {error.returncode}): {output.strip()}"
+    return str(error)
+
 
 TZ_OFFSETS = {
     "EST": "-0500",
@@ -445,42 +459,9 @@ def blog_image_name(note_id: str, source: Path) -> str:
 
 
 def extract_image_paths(body: str) -> list[str]:
-    """
-    Extract image paths from markdown content.
-
-    Handles:
-      - ![alt](path) - standard markdown
-      - ![alt](<path>) - markdown with angle brackets (allows spaces)
-      - ![[path]] - Obsidian-style wikilinks
-      - <img src="path" ...> - inline HTML, single or double-quoted src
-    """
-    paths = []
-
-    # Angle-bracket paths: ![alt](<path with spaces>)
-    angle_pattern = r'!\[[^\]]*\]\(<([^>]+)>\)'
-    for match in re.finditer(angle_pattern, body):
-        paths.append(match.group(1))
-
-    # Standard markdown images without angle brackets: ![alt](path)
-    std_pattern = r'!\[[^\]]*\]\(([^)<>\s]+)\)'
-    for match in re.finditer(std_pattern, body):
-        paths.append(match.group(1))
-
-    # Obsidian-style wikilinks: ![[path]]
-    obsidian_pattern = r'!\[\[([^\]]+)\]\]'
-    for match in re.finditer(obsidian_pattern, body):
-        paths.append(match.group(1))
-
-    # HTML <img> tags: <img ... src="path" ...> or src='path'
-    html_pattern = r'<img\s[^>]*\bsrc\s*=\s*(?:"([^"]+)"|\'([^\']+)\')'
-    for match in re.finditer(html_pattern, body):
-        src = match.group(1) or match.group(2)
-        # Skip absolute URLs and site-root-relative paths
-        if src.startswith(("http://", "https://", "//", "/")):
-            continue
-        paths.append(src)
-
-    return paths
+    """Local paths from supported Markdown/HTML images, excluding code."""
+    return [image.path for image in images(body)
+            if not image.path.startswith(("http://", "https://", "//", "/"))]
 
 
 def scrub_metadata(image_path: Path) -> None:
@@ -523,7 +504,7 @@ def _copy_wiki_image(
     found. was_copied_fresh is True only when a copy or conversion actually
     ran this call (not when the destination was already up to date).
     """
-    clean_path = img_path.replace("%20", " ")
+    clean_path = unquote(img_path)
     if clean_path.startswith("./"):
         clean_path = clean_path[2:]
 
@@ -642,48 +623,15 @@ def copy_images(
     if frontmatter_image:
         process(frontmatter_image)
 
-    for img_path in extract_image_paths(body):
-        dest = process(img_path)
-        if dest is None:
+    edits = []
+    for image in images(body):
+        if image.path.startswith(("http://", "https://", "//", "/")):
             continue
-        dest_name = dest.name
-
-        # Update the path in the body to point to the blog images directory
-        # Only use angle brackets when filename contains spaces
-        if " " in dest_name:
-            new_path = f"</images/{dest_name}>"
-        else:
-            new_path = f"/images/{dest_name}"
-
-        # Replace the original path with the new one
-        # Handle both regular and angle-bracket syntax
-        old_patterns = [
-            re.escape(img_path),
-            re.escape(f"<{img_path}>"),
-            re.escape(img_path.replace(" ", "%20")),
-        ]
-        for pattern in old_patterns:
-            body = re.sub(
-                rf'(!\[[^\]]*\]\()<?{pattern}>?(\))',
-                rf'\g<1>{new_path}\2',
-                body
-            )
-
-        # Handle Obsidian-style wikilinks - convert to standard markdown
-        body = re.sub(
-            rf'!\[\[{re.escape(img_path)}\]\]',
-            f'![]({new_path})',
-            body
-        )
-
-        # Rewrite <img src="..."> references (both encoded and unencoded)
-        html_new_src = "/images/" + quote(dest_name)
-        html_src_variants = {img_path, img_path.replace(" ", "%20")}
-        for variant in html_src_variants:
-            body = re.sub(
-                rf'(<img\s[^>]*\bsrc\s*=\s*)(["\']){re.escape(variant)}\2',
-                rf'\g<1>\g<2>{html_new_src}\g<2>',
-                body
-            )
+        dest = process(image.path)
+        if dest is not None:
+            edits.append((image.start, image.end,
+                          image.rewrite_path(f"/images/{dest.name}")))
+    for start, end, replacement in reversed(edits):
+        body = body[:start] + replacement + body[end:]
 
     return body, copied

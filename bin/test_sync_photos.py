@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 SYNC_PHOTOS = Path(__file__).parent / "sync-photos"
 
@@ -52,7 +53,9 @@ class SyncPhotosTests(unittest.TestCase):
 
     def test_note_body_keeps_caption_lines_as_paragraphs(self):
         body = self.g["note_body"]("a b.png", "one\ntwo\n\nthree")
-        self.assertEqual(body, "![](</images/a b.png>)\n\none\n\ntwo\n\nthree\n")
+        self.assertEqual(
+            body, "![one two three](</images/a b.png>)\n\none\n\ntwo\n\nthree\n",
+        )
 
     def test_refresh_note_updates_date_and_body_only(self):
         note = self.g["NOTES_DIR"] / "abc-title.md"
@@ -62,7 +65,7 @@ class SyncPhotosTests(unittest.TestCase):
         )
         note.write_text(
             frontmatter.format("2026-11-03 02:27 -0500")
-            + self.g["note_body"]("abc-x.jpeg", "old")
+            + self.g["note_body"]("abc-x.jpeg", "old", uuid="U1")
         )
 
         photo = self.photo("U1", "new")
@@ -71,7 +74,7 @@ class SyncPhotosTests(unittest.TestCase):
         self.assertEqual(
             note.read_text(),
             frontmatter.format("2026-01-01 00:00 +0000")
-            + "![](/images/abc-x.jpeg)\n\nnew\n",
+            + "![new](/images/abc-x.jpeg) <!-- photo-alt: U1 -->\n\nnew\n",
         )
 
     def test_post_date_uses_photo_time_zone(self):
@@ -124,7 +127,7 @@ class SyncPhotosTests(unittest.TestCase):
         note.write_text(
             self.g["photo_frontmatter"](
                 "abc", None, "old", "d", "abc-x.jpeg", "U1",
-            ) + "\n\n" + self.g["note_body"]("abc-x.jpeg", "old")
+            ) + "\n\n" + self.g["note_body"]("abc-x.jpeg", "old", uuid="U1")
         )
         self.assertTrue(
             self.g["refresh_note"](self.photo("U1", "new words"), note)
@@ -132,7 +135,10 @@ class SyncPhotosTests(unittest.TestCase):
         metadata, body = self.g["parse_frontmatter"](note.read_text())
         self.assertEqual(metadata["title"], "new words")
         self.assertEqual(metadata["untitled"], "true")
-        self.assertEqual(body, "![](/images/abc-x.jpeg)\n\nnew words\n")
+        self.assertEqual(
+            body, "![new words](/images/abc-x.jpeg) "
+            "<!-- photo-alt: U1 -->\n\nnew words\n",
+        )
 
     def test_untriaged_excludes_published_and_ignored(self):
         (self.g["NOTES_DIR"] / "abc-t.md").write_text(
@@ -142,6 +148,63 @@ class SyncPhotosTests(unittest.TestCase):
         photos = [self.photo(u, "c") for u in ("PUB", "IGN", "NEW")]
         remaining = [p.uuid for p in self.g["untriaged"](photos)]
         self.assertEqual(remaining, ["NEW"])
+
+    def test_refresh_preserves_manual_alt_including_empty(self):
+        for alt in ("Manual description", ""):
+            with self.subTest(alt=alt):
+                note = self.g["NOTES_DIR"] / "abc.md"
+                note.write_text(
+                    self.g["photo_frontmatter"](
+                        "abc", None, "old", "d", "abc-x.jpeg", "U1",
+                    ) + "\n\n" + self.g["note_body"](
+                        "abc-x.jpeg", "old", uuid="U1", alt=alt,
+                    )
+                )
+                self.g["refresh_note"](self.photo("U1", "new"), note)
+                body = self.g["parse_frontmatter"](note.read_text())[1]
+                image = self.g["images"](body)[0]
+                self.assertEqual(image.alt, alt)
+                self.assertTrue(image.manual)
+                self.assertTrue(body.endswith("\n\nnew\n"))
+
+    def test_refresh_migrates_legacy_empty_alt_to_shared(self):
+        note = self.g["NOTES_DIR"] / "abc.md"
+        note.write_text(
+            self.g["photo_frontmatter"](
+                "abc", None, "old", "d", "abc-x.jpeg", "U1",
+            ) + "\n\n![](/images/abc-x.jpeg)\n\nold\n"
+        )
+        self.g["refresh_note"](self.photo("U1", "new"), note)
+        self.assertIn("![new]", note.read_text())
+        self.assertIn("<!-- photo-alt: U1 -->", note.read_text())
+
+    def test_linked_note_sync_updates_images_without_publishing_other_edits(self):
+        root = Path(self.tmp.name)
+        wiki = root / "wiki"
+        wiki.mkdir()
+        source = wiki / "note1234.md"
+        source.write_text(
+            "Draft prose that must stay private\n"
+            "![Old](images/x.jpeg) <!-- photo-alt: U1 -->\n"
+            "![Manual edit](images/y.jpeg) <!-- photo-alt: U2 manual -->\n"
+        )
+        blog = self.g["NOTES_DIR"] / "note1234-title.md"
+        blog.write_text(
+            "---\ntitle: Title\n---\n\nPublished prose\n"
+            "![Old](/images/note1234-x.jpeg) <!-- photo-alt: U1 -->\n"
+            "![Old manual](/images/note1234-y.jpeg) "
+            "<!-- photo-alt: U2 manual -->\n"
+        )
+        photos = [self.photo("U1", "New caption"), self.photo("U2", "Other")]
+        with patch.dict(self.g, {"WIKI_DIR": wiki}):
+            self.assertEqual(self.g["refresh_linked_notes"](photos), 1)
+            self.assertEqual(self.g["refresh_linked_notes"](photos), 0)
+        self.assertIn("![New caption]", source.read_text())
+        self.assertIn("![New caption]", blog.read_text())
+        self.assertIn("![Manual edit]", blog.read_text())
+        self.assertIn("Published prose", blog.read_text())
+        self.assertNotIn("Draft prose", blog.read_text())
+        self.assertEqual(self.g["untriaged"](photos), [])
 
     def edit_with(self, new_text: str, fail_save: bool = False):
         """Run edit_caption with an editor that writes new_text and a fake
