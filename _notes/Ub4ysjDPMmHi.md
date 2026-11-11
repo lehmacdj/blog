@@ -9,6 +9,6 @@ image: /images/Ub4ysjDPMmHi-IMG_7048.jpeg
 photo: 720365C3-FA54-404F-B265-FF04AAB6CBCA
 ---
 
-![](/images/Ub4ysjDPMmHi-IMG_7048.jpeg)
+![Weird tree branch stuck through tree](/images/Ub4ysjDPMmHi-IMG_7048.jpeg) <!-- photo-alt: 720365C3-FA54-404F-B265-FF04AAB6CBCA -->
 
 Weird tree branch stuck through tree

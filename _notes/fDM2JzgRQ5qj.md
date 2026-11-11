@@ -9,6 +9,6 @@ image: /images/fDM2JzgRQ5qj-IMG_7342.jpeg
 photo: 21C55A82-91E7-4D0F-8A50-CF667A223105
 ---
 
-![](/images/fDM2JzgRQ5qj-IMG_7342.jpeg)
+![The Eye of Sauron; a sunset from Mt. LeConte.](/images/fDM2JzgRQ5qj-IMG_7342.jpeg) <!-- photo-alt: 21C55A82-91E7-4D0F-8A50-CF667A223105 -->
 
 The Eye of Sauron; a sunset from Mt. LeConte.

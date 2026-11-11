@@ -9,6 +9,6 @@ image: /images/0bc5NidlL4qf-IMG_1085.png
 photo: 4AB3FBE9-5C8A-4C58-88E0-D51218103346
 ---
 
-![](/images/0bc5NidlL4qf-IMG_1085.png)
+![This shape is way better than a random isolated tile. Don’t cut from it.](/images/0bc5NidlL4qf-IMG_1085.png) <!-- photo-alt: 4AB3FBE9-5C8A-4C58-88E0-D51218103346 -->
 
 This shape is way better than a random isolated tile. Don’t cut from it.

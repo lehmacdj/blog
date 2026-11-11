@@ -9,6 +9,6 @@ image: /images/6B7fnkSIKpsG-IMG_1087.png
 photo: 469EA0DB-F82D-458B-82B1-191457706C69
 ---
 
-![](/images/6B7fnkSIKpsG-IMG_1087.png)
+![Yes we decided to cut 68p earlier and make 55p our pair, but notice that we can do better now.](/images/6B7fnkSIKpsG-IMG_1087.png) <!-- photo-alt: 469EA0DB-F82D-458B-82B1-191457706C69 -->
 
 Yes we decided to cut 68p earlier and make 55p our pair, but notice that we can do better now.

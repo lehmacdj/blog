@@ -9,6 +9,6 @@ image: /images/CjBeOTfaJJan-IMG_1099.png
 photo: 9A5E4004-7BA1-489F-93C5-271B707211D0
 ---
 
-![](/images/CjBeOTfaJJan-IMG_1099.png)
+![Missed chanta](/images/CjBeOTfaJJan-IMG_1099.png) <!-- photo-alt: 9A5E4004-7BA1-489F-93C5-271B707211D0 -->
 
 Missed chanta
