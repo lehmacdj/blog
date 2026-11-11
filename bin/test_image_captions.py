@@ -225,7 +225,7 @@ class ImageCaptionTests(unittest.TestCase):
         with patch.object(blog_utils, "_copy_wiki_image", return_value=(
             Path("note1234-IMG_6908.jpeg"), True,
         )):
-            result, copied = blog_utils.copy_images(content, "note1234")
+            result, copied, _ = blog_utils.copy_images(content, "note1234")
         image = captions.images(result)[0]
         self.assertEqual(image.path, "/images/note1234-IMG_6908.jpeg")
         self.assertEqual(image.alt, self.photo.caption)
@@ -242,8 +242,8 @@ class ImageCaptionTests(unittest.TestCase):
         with patch.object(blog_utils, "_copy_wiki_image", return_value=(
             Path("note1234-a b.jpeg"), True,
         )) as copy:
-            result, _ = blog_utils.copy_images(content, "note1234")
-        copy.assert_called_once_with("images/a%20b.jpeg", "note1234")
+            result, _, _ = blog_utils.copy_images(content, "note1234")
+        copy.assert_called_once_with("images/a%20b.jpeg", "note1234", "PHOTO-UUID")
         self.assertIn('data-src="lazy.jpeg"', result)
         self.assertIn('src="/images/note1234-a%20b.jpeg"', result)
         self.assertIn('alt="Text &amp; more" loading="lazy"', result)

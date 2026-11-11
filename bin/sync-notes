@@ -91,8 +91,9 @@ def sync_note(
     body = resolve_wikilinks(body)
 
     # Copy images from wiki to blog
-    body, copied_images = copy_images(
+    body, copied_images, cover = copy_images(
         body, note_id, frontmatter_image=wiki_meta.get("image", ""),
+        frontmatter_photo=wiki_meta.get("image_photo", ""),
     )
 
     # Build slug and permalink
@@ -120,7 +121,7 @@ def sync_note(
     # Build Jekyll frontmatter
     frontmatter = build_frontmatter(
         note_id, title, jekyll_date, merged_tags,
-        wiki_meta, extra_redirects=old_redirects,
+        wiki_meta, extra_redirects=old_redirects, image_path=cover,
     )
 
     new_content = frontmatter + "\n\n" + body

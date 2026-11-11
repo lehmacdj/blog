@@ -83,8 +83,9 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
     body = resolve_wikilinks(body)
 
     # Copy images from wiki to blog
-    body, _ = copy_images(
+    body, _, cover = copy_images(
         body, note_id, frontmatter_image=metadata.get("image", ""),
+        frontmatter_photo=metadata.get("image_photo", ""),
     )
 
     # Build slug and permalink
@@ -97,7 +98,7 @@ def publish_note(note_id: str, extra_tags: list[str] | None = None) -> str:
 
     # Build Jekyll frontmatter
     frontmatter = build_frontmatter(
-        note_id, title, jekyll_date, tags, metadata,
+        note_id, title, jekyll_date, tags, metadata, image_path=cover,
     )
 
     jekyll_content = frontmatter + "\n\n" + body

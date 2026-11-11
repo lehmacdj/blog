@@ -9,12 +9,13 @@ caption, but cannot follow later edits in Photos.
 """
 
 import json
+import re
 import subprocess
 from collections import Counter
 from pathlib import Path
 from urllib.parse import unquote
 
-from blog_utils import WIKI_DIR, blog_image_name
+from blog_utils import WIKI_DIR, blog_image_name, parse_frontmatter
 from photos import Photo, load_photos, set_caption
 from image_markup import images, plain_text
 
@@ -33,8 +34,10 @@ def match_photo(path: Path, metadata: dict, photos: list[Photo]) -> Photo | None
     taken = metadata.get("DateTimeOriginal")
     if not taken:
         return None
+    exported_uuid = re.match(r"^([0-9A-Fa-f-]{36})(?:_|\.|$)", path.name)
     matches = [p for p in photos
-               if Path(p.original_filename).stem.casefold() == path.stem.casefold()
+               if (Path(p.original_filename).stem.casefold() == path.stem.casefold()
+                   or (exported_uuid and exported_uuid[1].upper() == p.uuid))
                and p.taken.strftime("%Y:%m:%d %H:%M:%S") == taken]
     return matches[0] if len(matches) == 1 else None
 
@@ -146,4 +149,20 @@ class CaptionSync:
             replacements.append((image.start, image.end, replacement))
         for start, end, replacement in reversed(replacements):
             content = content[:start] + replacement + content[end:]
+        # A cover-only image has no inline comment to hold its identity.
+        metadata, _ = parse_frontmatter(content)
+        cover = metadata.get("image", "")
+        if cover and not metadata.get("image_photo") and not linked_only:
+            uuid = next((image.uuid for image in images(content)
+                         if unquote(image.path) == unquote(cover)
+                         and image.uuid), "")
+            source = WIKI_DIR / unquote(cover)
+            if not uuid and source.is_file():
+                photo = match_photo(source, image_metadata(source), self.photos)
+                uuid = photo.uuid if photo else ""
+            if uuid:
+                content = re.sub(
+                    r"^(image:.*)$", lambda m: m[0] + f"\nimage_photo: {uuid}",
+                    content, count=1, flags=re.MULTILINE,
+                )
         return content

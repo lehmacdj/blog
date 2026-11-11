@@ -3,9 +3,11 @@ Shared utilities for blog publishing scripts.
 """
 
 import json
+import hashlib
 import re
 import shutil
 import subprocess
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import unquote
@@ -19,6 +21,7 @@ FEED_DIR = BLOG_DIR / "feed"
 TAGS_DIR = BLOG_DIR / "tagged"
 IMAGES_DIR = BLOG_DIR / "images"
 BASE_URL = "https://unformeddelta.wiki"
+MAX_IMAGE_SIZE = 2048
 
 
 def error_text(error: Exception) -> str:
@@ -419,6 +422,7 @@ def build_frontmatter(
     tags: list[str],
     wiki_meta: dict,
     extra_redirects: set[str] | None = None,
+    image_path: str = "",
 ) -> str:
     """Build Jekyll frontmatter string."""
     slug = slugify(title)
@@ -442,10 +446,8 @@ def build_frontmatter(
     if tags:
         lines.append(f"tags: [{', '.join(tags)}]")
 
-    wiki_image = wiki_meta.get("image", "").strip()
-    if wiki_image:
-        dest = blog_image_name(note_id, Path(wiki_image))
-        lines.append(f"image: /images/{dest}")
+    if image_path:
+        lines.append(f"image: {image_path}")
 
     lines.append("---")
     return "\n".join(lines)
@@ -453,9 +455,15 @@ def build_frontmatter(
 
 def blog_image_name(note_id: str, source: Path) -> str:
     """Compute the blog-side filename for a wiki image."""
-    if source.suffix.lower() == ".heic":
-        return f"{note_id}-{source.stem}.jpeg"
+    if source.suffix.lower() in {".heic", ".webp"}:
+        return f"{note_id}-{source.stem}{image_suffix(source)}"
     return f"{note_id}-{source.name}"
+
+
+def image_suffix(source: Path) -> str:
+    return {".heic": ".jpeg", ".webp": ".png"}.get(
+        source.suffix.lower(), source.suffix.lower(),
+    )
 
 
 def extract_image_paths(body: str) -> list[str]:
@@ -469,7 +477,7 @@ def scrub_metadata(image_path: Path) -> None:
     subprocess.run(
         ["exiftool", "-all=", "--icc_profile:all",
          "-overwrite_original", str(image_path)],
-        check=True,
+        check=True, timeout=15,
         capture_output=True,
     )
 
@@ -487,14 +495,14 @@ def _exif_rotation(source: Path) -> int | None:
     or None if no rotation is needed."""
     result = subprocess.run(
         ["exiftool", "-s3", "-orientation", str(source)],
-        capture_output=True, text=True,
+        capture_output=True, text=True, timeout=15,
     )
     tag = result.stdout.strip()
     return _ORIENTATION_TO_ROTATION.get(tag)
 
 
 def _copy_wiki_image(
-    img_path: str, note_id: str,
+    img_path: str, note_id: str, uuid: str = "",
 ) -> tuple[Path, bool] | None:
     """
     Resolve a wiki-relative image path and copy/convert it into the blog
@@ -515,10 +523,14 @@ def _copy_wiki_image(
         print(f"  Warning: image not found: {img_path}")
         return None
 
+    if uuid:
+        return export_photo_image(source, uuid)
+
     dest_name = blog_image_name(note_id, source)
     dest = IMAGES_DIR / dest_name
 
-    if dest.exists() and source.stat().st_mtime <= dest.stat().st_mtime:
+    if (dest.exists() and source.stat().st_mtime <= dest.stat().st_mtime
+            and max(image_size(dest)) <= MAX_IMAGE_SIZE):
         return dest, False
 
     import_image(source, dest)
@@ -526,15 +538,22 @@ def _copy_wiki_image(
 
 
 def import_image(
-    source: Path, dest: Path, max_size: int | None = None,
+    source: Path, dest: Path,
 ) -> None:
-    """Copy an image into the blog, converting HEIC to JPEG, optionally
-    shrinking it so its longest side is at most max_size pixels, and
-    stripping all metadata."""
-    if source.suffix.lower() == ".heic":
+    """Atomically export a metadata-free image, at most 2048 pixels per side."""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".image-", dir=dest.parent) as directory:
+        staged = Path(directory) / dest.name
+        _render_image(source, staged)
+        staged.replace(dest)
+
+
+def _render_image(source: Path, dest: Path) -> None:
+    conversion = {".heic": "jpeg", ".webp": "png"}.get(source.suffix.lower())
+    if conversion:
         subprocess.run(
-            ["sips", "-s", "format", "jpeg", str(source), "--out", str(dest)],
-            check=True, capture_output=True,
+            ["sips", "-s", "format", conversion, str(source), "--out", str(dest)],
+            check=True, capture_output=True, timeout=15,
         )
     else:
         shutil.copy2(source, dest)
@@ -543,24 +562,56 @@ def import_image(
     if rot:
         subprocess.run(
             ["sips", "-r", str(rot), str(dest)],
-            check=True, capture_output=True,
+            check=True, capture_output=True, timeout=15,
         )
-    if max_size:
-        _shrink_image(dest, max_size)
+    _shrink_image(dest, MAX_IMAGE_SIZE)
     scrub_metadata(dest)
+    width, height = image_size(dest)
+    if not (0 < width <= MAX_IMAGE_SIZE and 0 < height <= MAX_IMAGE_SIZE):
+        raise ValueError(f"Invalid exported image dimensions: {width} x {height}")
+
+
+def export_photo_image(
+    source: Path, uuid: str, *, directory: Path | None = None,
+) -> tuple[Path, bool]:
+    """Share identical exports of a source photo; retain distinct renditions.
+
+    UUIDs identify source photos, while the exported-byte hash identifies the
+    rendition. No Photos database access is needed once the UUID is known.
+    """
+    suffix = image_suffix(source)
+    output = directory if directory is not None else IMAGES_DIR
+    output.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".photo-", dir=output) as scratch:
+        staged = Path(scratch) / ("image" + suffix)
+        _render_image(source, staged)
+        digest = hashlib.sha256(staged.read_bytes()).hexdigest()[:16]
+        dest = output / f"{uuid}-{digest}{suffix}"
+        if dest.exists():
+            if dest.read_bytes() != staged.read_bytes():
+                raise ValueError(f"Conflicting image fingerprint: {dest.name}")
+            return dest, False
+        staged.replace(dest)
+        return dest, True
+
+
+def image_size(path: Path) -> tuple[int, int]:
+    result = subprocess.run(
+        ["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(path)],
+        check=True, capture_output=True, text=True, timeout=15,
+    )
+    dims = [int(n) for n in re.findall(r"pixel\w+: (\d+)", result.stdout)]
+    if len(dims) != 2:
+        raise ValueError(f"Couldn't read image dimensions: {path}")
+    return tuple(dims)
 
 
 def _shrink_image(path: Path, max_size: int) -> None:
     """Resize path in place so its longest side is at most max_size."""
-    result = subprocess.run(
-        ["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(path)],
-        check=True, capture_output=True, text=True,
-    )
-    dims = [int(n) for n in re.findall(r"pixel\w+: (\d+)", result.stdout)]
-    if dims and max(dims) > max_size:
+    if max(image_size(path)) > max_size:
         subprocess.run(
             ["sips", "-Z", str(max_size), str(path)],
-            check=True, capture_output=True,
+            check=True, capture_output=True, timeout=15,
         )
 
 
@@ -596,21 +647,26 @@ def jj_tug() -> None:
 
 def copy_images(
     body: str, note_id: str, frontmatter_image: str = "",
-) -> tuple[str, list[Path]]:
+    frontmatter_photo: str = "",
+) -> tuple[str, list[Path], str]:
     """
     Copy images referenced by the note (body and optional frontmatter image)
     from wiki to blog.
 
     Returns:
-        Tuple of (updated body with fixed paths, list of copied image paths)
+        Updated body, copied image paths, and the exported frontmatter image.
     """
     copied: list[Path] = []
     dest_by_path: dict[str, Path] = {}
+    uuids = {unquote(image.path): image.uuid for image in images(body)
+             if image.uuid}
+    if frontmatter_photo:
+        uuids[unquote(frontmatter_image)] = frontmatter_photo
 
     def process(img_path: str) -> Path | None:
         if img_path in dest_by_path:
             return dest_by_path[img_path]
-        result = _copy_wiki_image(img_path, note_id)
+        result = _copy_wiki_image(img_path, note_id, uuids.get(unquote(img_path), ""))
         if result is None:
             return None
         dest, was_copied = result
@@ -620,8 +676,9 @@ def copy_images(
         return dest
 
     frontmatter_image = frontmatter_image.strip()
+    cover = None
     if frontmatter_image:
-        process(frontmatter_image)
+        cover = process(frontmatter_image)
 
     edits = []
     for image in images(body):
@@ -634,4 +691,4 @@ def copy_images(
     for start, end, replacement in reversed(edits):
         body = body[:start] + replacement + body[end:]
 
-    return body, copied
+    return body, copied, f"/images/{cover.name}" if cover else ""

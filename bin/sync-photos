@@ -52,6 +52,7 @@ from blog_utils import (
     collect_all_tags,
     commit_if_pending,
     error_text,
+    export_photo_image,
     extract_note_id,
     import_image,
     jj_tug,
@@ -63,7 +64,6 @@ from blog_utils import (
 
 IGNORED_FILE = BLOG_DIR / "_ignored-photos.txt"
 PHOTO_TAG = "photo"
-MAX_IMAGE_SIZE = 2048
 MAX_TITLE_LENGTH = 60
 
 
@@ -187,12 +187,8 @@ def publish_photo(
             f"{photo.source}"
         )
     note_id = new_note_id()
-    # Name the image after the original file, with the extension of the
-    # file actually exported (an edited render may differ).
-    stem = Path(photo.original_filename).stem
-    named_source = Path(stem + photo.source.suffix)
-    image_name = blog_image_name(note_id, named_source)
-    import_image(photo.source, IMAGES_DIR / image_name, MAX_IMAGE_SIZE)
+    image_path, _ = export_photo_image(photo.source, photo.uuid)
+    image_name = image_path.name
 
     frontmatter = photo_frontmatter(
         note_id, title, photo.caption, post_date(photo), image_name,
@@ -285,6 +281,7 @@ def refresh_linked_notes(photos: list[Photo]) -> int:
         if updated_wiki != wiki_content:
             wiki_path.write_text(updated_wiki)
         by_path: dict[str, list] = {}
+        by_uuid: dict[str, list] = {}
         for image in images(updated_wiki):
             if image.path.startswith(("/", "http:", "https:")):
                 continue
@@ -292,9 +289,12 @@ def refresh_linked_notes(photos: list[Photo]) -> int:
                 note_id, Path(unquote(image.path)),
             )
             by_path.setdefault(blog_path, []).append(image)
+            if image.uuid:
+                by_uuid.setdefault(image.uuid, []).append(image)
         edits = []
         for image in images(content):
-            matches = by_path.get(unquote(image.path), [])
+            matches = (by_uuid.get(image.uuid, []) if image.uuid
+                       else by_path.get(unquote(image.path), []))
             if not matches:
                 continue
             source = matches.pop(0)

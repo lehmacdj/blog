@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""Migrate published images to 2048px exports and UUID/rendition filenames.
+
+Dry-run by default; --apply writes the prepared images and note references.
+Existing blog pixels and alt text are preserved, apart from downscaling.
+"""
+
+import argparse
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from urllib.parse import quote, unquote
+
+import blog_utils as blog
+from image_captions import image_metadata, match_photo
+from image_markup import images, marker
+from photos import load_photos
+
+RASTER = {".jpeg", ".jpg", ".png", ".webp", ".heic", ".tif", ".tiff", ".gif"}
+TEXT = {".md", ".html", ".xml", ".css", ".scss", ".js", ".json", ".yml", ".yaml"}
+
+
+def text_files():
+    for directory, dirs, files in os.walk(blog.BLOG_DIR):
+        dirs[:] = [d for d in dirs if not d.startswith(".")
+                   and d not in {"_site", "__pycache__"}]
+        for name in files:
+            path = Path(directory) / name
+            if path.suffix in TEXT:
+                yield path
+
+
+def migration_links(photos) -> tuple[dict[Path, str], dict[Path, str]]:
+    """Return existing blog image identities and proposed wiki marker edits."""
+    identities = {}
+    wiki_updates = {}
+    for note in sorted(blog.NOTES_DIR.glob("*.md")):
+        metadata, body = blog.parse_frontmatter(note.read_text())
+        refs = images(body)
+        for image in refs:
+            if image.uuid and image.path.startswith("/images/"):
+                identities[blog.BLOG_DIR / unquote(image.path.lstrip("/"))] = image.uuid
+        if metadata.get("photo"):
+            cover = metadata.get("image", "").removeprefix("/images/")
+            if cover:
+                identities[blog.IMAGES_DIR / unquote(cover)] = metadata["photo"]
+            continue
+        note_id = blog.extract_note_id(note.name)
+        wiki = blog.WIKI_DIR / f"{note_id}.md"
+        if not wiki.exists():
+            continue
+        content = wiki.read_text()
+        wiki_meta, _ = blog.parse_frontmatter(content)
+        found = {}
+        edits = []
+        for image in images(content):
+            source = blog.WIKI_DIR / unquote(image.path)
+            uuid = image.uuid
+            if not uuid and source.is_file():
+                photo = match_photo(source, image_metadata(source), photos)
+                uuid = photo.uuid if photo else ""
+            if not uuid:
+                continue
+            found[unquote(image.path)] = uuid
+            identities[blog.IMAGES_DIR / blog.blog_image_name(note_id, source)] = uuid
+            if not image.uuid:
+                # Establish source identity without changing caption policy.
+                edits.append((image.end, marker(uuid, manual=True)))
+        for end, suffix in reversed(edits):
+            content = content[:end] + suffix + content[end:]
+        cover = wiki_meta.get("image", "")
+        if cover:
+            source = blog.WIKI_DIR / unquote(cover)
+            uuid = wiki_meta.get("image_photo") or found.get(unquote(cover), "")
+            if not uuid and source.is_file():
+                photo = match_photo(source, image_metadata(source), photos)
+                uuid = photo.uuid if photo else ""
+            if uuid:
+                identities[blog.IMAGES_DIR / blog.blog_image_name(note_id, source)] = uuid
+                if not wiki_meta.get("image_photo"):
+                    content = re.sub(
+                        r"^(image:.*)$", lambda m: m[0] + f"\nimage_photo: {uuid}",
+                        content, count=1, flags=re.MULTILINE,
+                    )
+        if content != wiki.read_text():
+            wiki_updates[wiki] = content
+    return identities, wiki_updates
+
+
+def rewrite_paths(content: str, renames: dict[str, str]) -> str:
+    for old, new in sorted(renames.items(), key=lambda pair: -len(pair[0])):
+        for name in {old, quote(old)}:
+            content = content.replace("images/" + name, "images/" + new)
+    return content
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--apply", action="store_true")
+    args = parser.parse_args()
+    identities, wiki_updates = migration_links(load_photos())
+    assets = sorted(p for p in blog.IMAGES_DIR.iterdir()
+                    if p.is_file() and p.suffix.lower() in RASTER)
+    with tempfile.TemporaryDirectory(prefix="blog-image-migration-") as directory:
+        staged = Path(directory)
+        renames = {}
+        resized = 0
+        for source in assets:
+            resized += max(blog.image_size(source)) > blog.MAX_IMAGE_SIZE
+            uuid = identities.get(source)
+            if uuid:
+                target, _ = blog.export_photo_image(source, uuid, directory=staged)
+                renames[source.name] = target.name
+            else:
+                target = staged / (source.stem + blog.image_suffix(source))
+                blog.import_image(source, target)
+                if target.name != source.name:
+                    renames[source.name] = target.name
+        updates = {}
+        for path in text_files():
+            content = path.read_text()
+            updated = rewrite_paths(content, renames)
+            if updated != content:
+                updates[path] = updated
+        # Persist manual source markers in the published copies too.
+        for wiki, content in wiki_updates.items():
+            note = blog.find_blog_note(wiki.stem)
+            if note is None:
+                continue
+            published = updates.get(note, note.read_text())
+            by_path = {}
+            for image in images(content):
+                old = blog.blog_image_name(wiki.stem, Path(unquote(image.path)))
+                by_path["/images/" + renames.get(old, old)] = image
+            edits = []
+            for image in images(published):
+                source = by_path.get(unquote(image.path))
+                if source and source.uuid and not image.uuid:
+                    edits.append((image.end, marker(source.uuid, source.manual)))
+            for end, suffix in reversed(edits):
+                published = published[:end] + suffix + published[end:]
+            if published != note.read_text():
+                updates[note] = published
+        renamed = sum(old != new for old, new in renames.items())
+        print(f"{len(assets)} raster images; {resized} need resizing; "
+              f"{renamed} receive UUID/rendition names.")
+        print(f"{len(updates)} blog text files; {len(wiki_updates)} wiki notes change.")
+        if not args.apply:
+            print("Dry run; no files changed. Use --apply to migrate.")
+            return
+        # Every export is rendered and verified before references are changed.
+        for path in staged.iterdir():
+            dest = blog.IMAGES_DIR / path.name
+            if not dest.exists() or dest.read_bytes() != path.read_bytes():
+                shutil.copyfile(path, dest)
+        for path, content in {**updates, **wiki_updates}.items():
+            path.write_text(content)
+        for old, new in renames.items():
+            if old != new:
+                (blog.IMAGES_DIR / old).unlink()
+        print("Migration applied.")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, RuntimeError, ValueError, subprocess.CalledProcessError) as e:
+        sys.exit(f"Error: {blog.error_text(e)}")
