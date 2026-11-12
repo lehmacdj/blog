@@ -26,10 +26,9 @@ For the first several months after Inkhaven, I lived under the delusion that I w
 
 As the months wore on, it became harder to lie to myself: I didn't care about publishing lengthier higher quality think pieces or resuming my Foreverhaven streak.
 
----
 
 > Thinking about trying to do an Inkhaven like writing month again this month. I should have plenty of time in theory.
-> - me, in my notes/journal, August 1st 2026
+> —me, in my notes/journal, August 1st 2026
 
 I did less writing in the subsequent month than the past 5 years. The contrast between telling myself I wanted to publish blog posts and my lack of desire to write freed me of my promise to write/publish more often.
 
