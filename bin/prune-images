@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""List unused blog images; pass --apply to remove them.
+
+Any filename mention in source text counts as a reference, including drafts,
+frontmatter, templates, CSS and SVG. Generated output and caches do not count.
+This deliberately favors keeping a possibly used image over deleting it.
+"""
+
+import argparse
+import html
+import os
+from pathlib import Path
+from urllib.parse import unquote
+
+from blog_utils import BLOG_DIR
+
+GENERATED = {
+    ".git", ".jj", "_site", ".jekyll-cache", ".sass-cache",
+    "__pycache__", "node_modules", ".venv",
+}
+IMAGE_SUFFIXES = {
+    ".jpeg", ".jpg", ".png", ".webp", ".heic", ".tif", ".tiff",
+    ".gif", ".svg", ".avif", ".ico",
+}
+
+
+def unused_images(root: Path) -> list[Path]:
+    candidates = {
+        path for path in (root / "images").rglob("*")
+        if path.is_file() and not path.is_symlink()
+        and path.suffix.lower() in IMAGE_SUFFIXES
+    }
+    for directory, dirs, files in os.walk(root):
+        dirs[:] = [d for d in dirs if d not in GENERATED]
+        for name in files:
+            path = Path(directory) / name
+            if path.is_symlink():
+                continue
+            try:
+                content = path.read_text()
+            except UnicodeDecodeError:
+                continue
+            content = unquote(html.unescape(content)).replace("\\ ", " ")
+            candidates = {image for image in candidates
+                          if image.name not in content}
+    return sorted(candidates)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--apply", action="store_true")
+    args = parser.parse_args()
+    unused = unused_images(BLOG_DIR)
+    size = sum(path.stat().st_size for path in unused)
+    for path in unused:
+        print(path.relative_to(BLOG_DIR))
+    print(f"{len(unused)} unused image(s), {size:,} bytes.")
+    if args.apply:
+        for path in unused:
+            path.unlink()
+        print("Removed unused images.")
+    elif unused:
+        print("Dry run; use --apply to remove these files.")
+
+
+if __name__ == "__main__":
+    main()
