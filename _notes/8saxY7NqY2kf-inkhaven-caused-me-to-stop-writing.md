@@ -5,6 +5,7 @@ date: 2026-11-11 22:33 -0800
 permalink: /8saxY7NqY2kf/inkhaven-caused-me-to-stop-writing
 redirect_from:
   - /8saxY7NqY2kf
+tags: [recommended, inkhaven, personal]
 ---
 
 Before Inkhaven, I only published when I was inspired to. I would do or discover something, decide it was worth writing about, start writing, and 3-4 hours later have published a blog post. I didn't have a goal of publishing before, it was just a bonus when it happened. More than anything else, I applied to Inkhaven because I was writing quite a bit and thought it would be good to publish more of my writing.

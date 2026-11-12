@@ -43,4 +43,4 @@ Essentially they're a single feature bundling together:
 - [recursive (µ) types](/EJjBX51KQ1Yy/recursive-µ-types)
 - [nominative (ν) types](/qQ783yMXPPbQ/nominative-ν-types)
 
-Common object oriented programming languages use a lot of boilerplate when representing ADTs because they represent these as class hierarchies.
+Common object oriented programming (OOP) languages use a lot of boilerplate when representing ADTs because they represent these as class hierarchies.

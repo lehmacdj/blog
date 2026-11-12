@@ -6,10 +6,10 @@ permalink: /zNOgDl79cBzf/500mg-niacin
 redirect_from:
   - /zNOgDl79cBzf
 tags: [inkhaven]
-image: /images/4107BF7F-7EA8-4778-ACA4-20767893C64D-97e3122f359f98cd.jpeg
+image: /images/4107BF7F-7EA8-4778-ACA4-20767893C64D-0ec2421a529b0cff.jpeg
 ---
 
-![Niacin bottle label. Description in quote below.](/images/4107BF7F-7EA8-4778-ACA4-20767893C64D-97e3122f359f98cd.jpeg) <!-- photo-alt: 4107BF7F-7EA8-4778-ACA4-20767893C64D manual -->
+![Niacin bottle label. Description in quote below.](/images/4107BF7F-7EA8-4778-ACA4-20767893C64D-0ec2421a529b0cff.jpeg) <!-- photo-alt: 4107BF7F-7EA8-4778-ACA4-20767893C64D manual -->
 
 > Experience: Temp full body sunburn
 >
@@ -32,7 +32,9 @@ Taking it was [unexpectedly mindful](/shWm4speAqvp/5-unexpectedly-mindful-activi
 
 As I edit this post, I just took another.
 
-One tip: no matter how itchy you get, resist itching.
+One tip: no matter how itchy you get, resist itching.[^itching]
+
+[^itching]: I gave this advice because it was given to me when I first took it. I have since tried scratching, and find that it's main effect is to make your skin feel fiery. The sensation lasts for a few seconds but then passes. It's actually kind of interesting in some ways.
 
 *Disclaimer: This is not medical advice. Read the label and exercise appropriate caution.*
 

@@ -76,7 +76,7 @@ When bringing somewhere I cut off the edges which are slightly drier.
 ![Cake into squares](/images/pI5A62E7dfuR-E1FB5519-EC6D-4E6F-B9C6-E8E6142CB7D3_1_201_a.jpeg)
 
 The plums ended up being a little bit too dry layered like this, aim for a little more overlap.
-![Fruit layout with plumbs and blueberries](</images/9C4BF226-5C7D-4F8F-BDCF-5C5E762F4E00-d351667f453799a1.jpeg>) <!-- photo-alt: 9C4BF226-5C7D-4F8F-BDCF-5C5E762F4E00 manual -->
+![Fruit layout with plumbs and blueberries](/images/9C4BF226-5C7D-4F8F-BDCF-5C5E762F4E00-d351667f453799a1.jpeg) <!-- photo-alt: 9C4BF226-5C7D-4F8F-BDCF-5C5E762F4E00 manual -->
 
 This is probably as dense as you'd want to go with berries.
 ![Fruit layout with raspberries, blackberries and blueberries](/images/72A2F484-9449-4CB5-A2F6-8C5F31796443-d5d47d079d7e73a2.jpeg) <!-- photo-alt: 72A2F484-9449-4CB5-A2F6-8C5F31796443 manual -->

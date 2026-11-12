@@ -6,11 +6,11 @@ permalink: /br2DXvbqAAkw/vibe-planning-a-trip-to-japan
 redirect_from:
   - /br2DXvbqAAkw
 tags: [inkhaven, travel, personal, recommended, japan]
-image: /images/37005D07-95FE-4A6E-B9B1-7A0AFDBF35E6-d75f579645ef9676.jpeg
+image: /images/37005D07-95FE-4A6E-B9B1-7A0AFDBF35E6-0e5d843bdda3e1f9.jpeg
 ---
 
 Yesterday I arrived at Inkhaven from my most thoroughly planned trip ever: a 3 week trip to Japan. My highlights from the trip were: attending Idolm@ster Million Live! 11th Live 百合咲く誇るレムリア, a couple of action-packed days hiking the Nakasendo + seeing Matsumoto castle/Lake Suwa, an overnight bikepacking trip from Fujiyoshida to Minobu with a stunning view of Mount Fuji from my campsite, and a memorable dinner at a tiny home restaurant in Shuzenji after seeing at least 8 waterfalls on the Izu peninsula.
-![Mount Fuji reflected in Lake Motosu from Kouan campground](/images/37005D07-95FE-4A6E-B9B1-7A0AFDBF35E6-d75f579645ef9676.jpeg) <!-- photo-alt: 37005D07-95FE-4A6E-B9B1-7A0AFDBF35E6 manual -->
+![Mount Fuji reflected in Lake Motosu from Kouan campground](/images/37005D07-95FE-4A6E-B9B1-7A0AFDBF35E6-0e5d843bdda3e1f9.jpeg) <!-- photo-alt: 37005D07-95FE-4A6E-B9B1-7A0AFDBF35E6 manual -->
 
 A few years ago, I wouldn't have been able to plan such a trip. On my first trip to Japan, I hadn't even booked a hotel for my first night in Tokyo before my plane landed. I enjoy the spontaneity afforded by last minute planning, but mostly that trip was a product of my laziness/procrastination. The last minute planning led to days with more time spent researching than actually doing things plus significant stress from making same-day hotel bookings while on the train in the afternoon.
 

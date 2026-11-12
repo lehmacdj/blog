@@ -49,7 +49,7 @@ let _wb =      extend (\this -> expr1) wa
     wc =      extend (\this -> expr2) _wb
  in extract $ extend (\this -> expr3) wc
 ```
-where expr1, expr2, and expr3 may contain `this` a reference to the "current" comonadic value, which plays a similar role to `this` or `self` in object oriented programming.
+where expr1, expr2, and expr3 may contain `this` a reference to the "current" comonadic value, which plays a similar role to `this` or `self` in object oriented programming (OOP).
 
 In other words, a comonadic computation is expressed as subsequent values of comonadic type composed together. The prompts[^prompt] `wa>` and `wc>` bring previous values into scope for all subsequent statements kind of like creating a copy of an object in the object oriented analogy[^immutability].
 

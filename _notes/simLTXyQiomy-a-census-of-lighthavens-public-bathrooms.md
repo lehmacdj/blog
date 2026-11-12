@@ -66,7 +66,7 @@ That rounds up Aumann's bathrooms.
 Bayes has the last shower, conveniently tucked away in the comfiest room: Bayes Attic.
 ![Bayes Attic](/images/B43AF7D7-D2E3-4ABB-9909-C50094F8E3DC-a5159a81eba71bf5.jpeg) <!-- photo-alt: B43AF7D7-D2E3-4ABB-9909-C50094F8E3DC manual -->
 I think the shower is rarely used, there were some insects in the drain when I tried taking a shower here.
-![Bayes attic shower](</images/FA865367-91A5-41D5-95EC-8ACD025047DC-5a8f50e567049870.jpeg>) <!-- photo-alt: FA865367-91A5-41D5-95EC-8ACD025047DC manual -->
+![Bayes attic shower](/images/FA865367-91A5-41D5-95EC-8ACD025047DC-5a8f50e567049870.jpeg) <!-- photo-alt: FA865367-91A5-41D5-95EC-8ACD025047DC manual -->
 
 Bayes also has two bathrooms hidden behind this sometimes locked door on the ground floor.
 ![locked door](/images/94E26055-64B0-4DA4-8891-17FAE3F7B4B0-5a99a378181e54c2.jpeg) <!-- photo-alt: 94E26055-64B0-4DA4-8891-17FAE3F7B4B0 manual -->
@@ -78,13 +78,13 @@ I had no difficulty finding the sink in this one.
 ~~The final~~ There is also another bidet is in Bayes' basement. It automatically dispenses blue cleaning liquid too.
 ![Bayes' basement](/images/AC987B22-5DD3-4D9B-87BA-CCCF55C22E4C-e728ac4d024d1c1d.jpeg) <!-- photo-alt: AC987B22-5DD3-4D9B-87BA-CCCF55C22E4C manual -->
 It turns out that the Bayesment hides a huge amount of toilets/showers/bidets that I initially missed not wanting to intrude too deep into the depths.
-![hallway into the depths of the Bayesment](/images/02E14C66-A989-4E9B-8203-4FEEC329532A-e7236d3608b27378.jpeg) <!-- photo-alt: 02E14C66-A989-4E9B-8203-4FEEC329532A manual -->
+![hallway into the depths of the Bayesment](/images/02E14C66-A989-4E9B-8203-4FEEC329532A-035fe6df92616568.jpeg) <!-- photo-alt: 02E14C66-A989-4E9B-8203-4FEEC329532A manual -->
 There's a total of 4 more bathrooms: 3 showers and 2 toilets with bidets.
-![shower](/images/43357544-35BD-4C7B-955E-BEED78B2E80D-74f0cd3fd886dc0b.jpeg) <!-- photo-alt: 43357544-35BD-4C7B-955E-BEED78B2E80D manual -->
-![shower](/images/A39E9FEA-3703-4C15-98C6-FAF7C37FAD1A-ecc992ec6127516c.jpeg) <!-- photo-alt: A39E9FEA-3703-4C15-98C6-FAF7C37FAD1A manual -->
-![bidet](/images/0E97852C-C52C-4E12-BB42-37C58FAD98C0-af42452395c72c4e.jpeg) <!-- photo-alt: 0E97852C-C52C-4E12-BB42-37C58FAD98C0 manual -->
+![shower](/images/43357544-35BD-4C7B-955E-BEED78B2E80D-037bacac4ea151b4.jpeg) <!-- photo-alt: 43357544-35BD-4C7B-955E-BEED78B2E80D manual -->
+![shower](/images/A39E9FEA-3703-4C15-98C6-FAF7C37FAD1A-445c0741ff643f3c.jpeg) <!-- photo-alt: A39E9FEA-3703-4C15-98C6-FAF7C37FAD1A manual -->
+![bidet](/images/0E97852C-C52C-4E12-BB42-37C58FAD98C0-e6b998ba23c7b5de.jpeg) <!-- photo-alt: 0E97852C-C52C-4E12-BB42-37C58FAD98C0 manual -->
 Yes that does add up.
-![shower + bidet](/images/3F802946-8889-4E5E-AECD-25BCFC45DB2E-1bf6b1c0b9c88660.jpeg) <!-- photo-alt: 3F802946-8889-4E5E-AECD-25BCFC45DB2E manual -->
+![shower + bidet](/images/3F802946-8889-4E5E-AECD-25BCFC45DB2E-78c0375b40cbda3d.jpeg) <!-- photo-alt: 3F802946-8889-4E5E-AECD-25BCFC45DB2E manual -->
 I appreciate the signs explaining the available amenities.
 
 | ![bathroom sign](/images/18876FA1-97D5-4BFB-8EC9-5AC4786F5CA9-2f529dbd9c35ec71.jpeg) <!-- photo-alt: 18876FA1-97D5-4BFB-8EC9-5AC4786F5CA9 manual --> | ![bathroom sign](/images/0722CAF0-F4B8-41E2-A63D-61E2E9FEB326-42cec6a0cec329c2.jpeg) <!-- photo-alt: 0722CAF0-F4B8-41E2-A63D-61E2E9FEB326 manual --> |
