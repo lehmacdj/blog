@@ -45,7 +45,6 @@ from image_markup import images, markdown_alt, marker, plain_text
 from blog_utils import (
     BASE_URL,
     BLOG_DIR,
-    IMAGES_DIR,
     NOTES_DIR,
     WIKI_DIR,
     blog_image_name,
@@ -54,7 +53,6 @@ from blog_utils import (
     error_text,
     export_photo_image,
     extract_note_id,
-    import_image,
     jj_tug,
     parse_frontmatter,
     serialize_yaml_scalar,

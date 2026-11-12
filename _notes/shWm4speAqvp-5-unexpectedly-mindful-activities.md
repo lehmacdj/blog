@@ -6,7 +6,7 @@ permalink: /shWm4speAqvp/5-unexpectedly-mindful-activities
 redirect_from:
   - /shWm4speAqvp
 tags: [mindfulness, inkhaven, recommended]
-image: /images/shWm4speAqvp-D2Hp3DTuBFS9.webp
+image: /images/shWm4speAqvp-D2Hp3DTuBFS9.png
 ---
 
 I've been increasingly interested in mindfulness over the past year, starting to meditate about ~2 months ago. Overall, it has been fairly transformative in terms of my qualitative stress and overall sense of well being. These are activities that didn't seem mindful, but I ended up finding meditation like benefits in.

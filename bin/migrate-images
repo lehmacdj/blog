@@ -109,7 +109,7 @@ def main():
         staged = Path(directory)
         renames = {}
         resized = 0
-        for source in assets:
+        for index, source in enumerate(assets, 1):
             resized += max(blog.image_size(source)) > blog.MAX_IMAGE_SIZE
             uuid = identities.get(source)
             if uuid:
@@ -120,6 +120,8 @@ def main():
                 blog.import_image(source, target)
                 if target.name != source.name:
                     renames[source.name] = target.name
+            if index % 10 == 0 or index == len(assets):
+                print(f"Prepared {index}/{len(assets)} images", flush=True)
         updates = {}
         for path in text_files():
             content = path.read_text()
@@ -147,7 +149,7 @@ def main():
                 updates[note] = published
         renamed = sum(old != new for old, new in renames.items())
         print(f"{len(assets)} raster images; {resized} need resizing; "
-              f"{renamed} receive UUID/rendition names.")
+              f"{renamed} receive new filenames.")
         print(f"{len(updates)} blog text files; {len(wiki_updates)} wiki notes change.")
         if not args.apply:
             print("Dry run; no files changed. Use --apply to migrate.")
