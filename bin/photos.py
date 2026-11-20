@@ -1,8 +1,9 @@
-"""Read photos and captions from the local Photos library."""
+"""Read photos, captions, and keywords from the local Photos library."""
 
+import re
 import sqlite3
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -22,6 +23,11 @@ WHERE a.ZKIND = 0 AND a.ZTRASHEDSTATE = 0 AND a.ZHIDDEN = 0
 ORDER BY a.ZDATECREATED DESC
 """
 
+# Keywords link to assets through a Core Data join table whose numbered
+# table and column names change between macOS versions (e.g. Z_1KEYWORDS
+# with columns Z_1ASSETATTRIBUTES and Z_53KEYWORDS).
+KEYWORDS_TABLE = re.compile(r"Z_\d+KEYWORDS")
+
 
 @dataclass
 class Photo:
@@ -30,6 +36,7 @@ class Photo:
     original_filename: str
     source: Path
     caption: str
+    keywords: list[str] = field(default_factory=list)
 
 
 def _image_source(row) -> Path:
@@ -43,6 +50,36 @@ def _image_source(row) -> Path:
     return PHOTOS_LIBRARY / "originals" / directory / filename
 
 
+def _keywords_query(db: sqlite3.Connection) -> str:
+    """A query for (asset UUID, keyword) rows in this library's layout."""
+    tables = [
+        name for (name,) in db.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        )
+        if KEYWORDS_TABLE.fullmatch(name)
+    ]
+    if len(tables) != 1:
+        raise sqlite3.OperationalError(
+            f"expected one keywords join table, found {tables or 'none'}"
+        )
+    table = tables[0]
+    columns = [row[1] for row in db.execute(f"PRAGMA table_info({table})")]
+    asset = [c for c in columns if c.endswith("ASSETATTRIBUTES")]
+    keyword = [c for c in columns if KEYWORDS_TABLE.fullmatch(c)]
+    if len(asset) != 1 or len(keyword) != 1:
+        raise sqlite3.OperationalError(
+            f"unexpected columns in {table}: {', '.join(columns)}"
+        )
+    return f"""
+SELECT a.ZUUID, k.ZTITLE
+FROM {table} j
+JOIN ZKEYWORD k ON k.Z_PK = j.{keyword[0]}
+JOIN ZADDITIONALASSETATTRIBUTES aa ON aa.Z_PK = j.{asset[0]}
+JOIN ZASSET a ON a.Z_PK = aa.ZASSET
+ORDER BY k.ZTITLE
+"""
+
+
 def load_photos() -> list[Photo]:
     """Read visible still photos, including ones with cleared captions."""
     db_path = PHOTOS_LIBRARY / "database" / "Photos.sqlite"
@@ -54,9 +91,14 @@ def load_photos() -> list[Photo]:
         raise RuntimeError(f"couldn't open the Photos library database: {e}") from e
     try:
         rows = db.execute(PHOTOS_QUERY).fetchall()
+        keywords: dict[str, list[str]] = {}
+        for uuid, keyword in db.execute(_keywords_query(db)):
+            if keyword:
+                keywords.setdefault(uuid, []).append(keyword)
     except sqlite3.OperationalError as e:
         raise RuntimeError(
-            "couldn't read captions from the Photos library; its "
+            "couldn't read captions and keywords from the Photos library; "
+            "its "
             f"database layout may have changed in a macOS update ({e})"
         )
     finally:
@@ -73,6 +115,7 @@ def load_photos() -> list[Photo]:
             original_filename=original or row[4],
             source=_image_source(row),
             caption=(caption or "").strip(),
+            keywords=keywords.get(uuid, []),
         ))
     return photos
 
@@ -95,3 +138,21 @@ def set_caption(photo: Photo, caption: str) -> None:
         check=True, capture_output=True,
     )
 
+
+
+SET_KEYWORDS_SCRIPT = """
+on run argv
+  tell application "Photos"
+    set keywords of media item id (item 1 of argv) to (rest of argv)
+  end tell
+end run
+"""
+
+
+def set_keywords(photo: Photo, keywords: list[str]) -> None:
+    """Replace the photo's keywords in the Photos library."""
+    subprocess.run(
+        ["osascript", "-e", SET_KEYWORDS_SCRIPT, f"{photo.uuid}/L0/001",
+         *keywords],
+        check=True, capture_output=True,
+    )

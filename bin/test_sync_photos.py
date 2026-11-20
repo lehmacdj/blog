@@ -252,6 +252,59 @@ class SyncPhotosTests(unittest.TestCase):
         photo, saved = self.edit_with("new", fail_save=True)
         self.assertEqual(photo.caption, "old caption")
 
+    def test_edit_tags_adds_and_removes(self):
+        edit = self.g["edit_tags"]
+        self.assertEqual(
+            edit(["balloons", "travel"], "-travel Sunset, balloons"),
+            ["balloons", "sunset"],
+        )
+        self.assertEqual(edit(["a"], "-a"), [])
+        self.assertEqual(edit([], "photo, Go"), ["go"])
+
+    def test_describe_tags_flags_new(self):
+        describe = self.g["describe_tags"]
+        self.assertEqual(
+            describe(["mahjong", "balloons"], {"mahjong"}),
+            "mahjong, balloons (new)",
+        )
+        self.assertEqual(describe([], set()), "none")
+
+    def test_sync_keywords_sets_post_tags(self):
+        (self.g["NOTES_DIR"] / "a.md").write_text(
+            "---\ntags: [photo, mahjong, riichi]\nphoto: U1\n---\n\nb\n"
+        )
+        (self.g["NOTES_DIR"] / "b.md").write_text(
+            "---\ntags: [photo, same]\nphoto: U2\n---\n\nb\n"
+        )
+        (self.g["NOTES_DIR"] / "c.md").write_text(
+            "---\ntags: [photo]\nphoto: U3\n---\n\nb\n"
+        )
+        photos = [self.photo(u, "c") for u in ("U1", "U2", "U3")]
+        photos[0].keywords = ["Balloons", "mahjong"]
+        photos[1].keywords = ["same"]
+        photos[2].keywords = ["photo"]
+        saved = []
+        with patch.dict(self.g, {
+            "set_keywords": lambda photo, tags: saved.append((photo.uuid, tags)),
+        }), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.g["sync_keywords"](photos), 2)
+            self.assertEqual(self.g["sync_keywords"](photos), 0)
+        self.assertEqual(saved, [("U1", ["mahjong", "riichi"]), ("U3", [])])
+
+    def test_sync_keywords_continues_after_failure(self):
+        (self.g["NOTES_DIR"] / "a.md").write_text(
+            "---\ntags: [photo, x]\nphoto: U1\n---\n\nb\n"
+        )
+        photo = self.photo("U1", "c")
+
+        def fail(photo, tags):
+            raise subprocess.CalledProcessError(1, ["osascript"])
+
+        with patch.dict(self.g, {"set_keywords": fail}), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.g["sync_keywords"]([photo]), 0)
+        self.assertEqual(photo.keywords, [])
+
     def test_commit_message(self):
         message = self.g["commit_message"]
         self.assertEqual(message(["Pink"], 0), "Publish photo Pink")

@@ -5,7 +5,7 @@ Publish captioned photos from the Photos library as photo posts.
 Usage: ./sync-photos           # update published photos from the library
        ./sync-photos triage    # decide which captioned photos to publish
        ./sync-photos list      # list photos that haven't been triaged
-       ./sync-photos publish <uuid> [--title TITLE]
+       ./sync-photos publish <uuid> [--title TITLE] [--tags TAGS]
        ./sync-photos ignore <uuid> ...
 
 Any photo with a caption is a candidate. Nothing from the library enters the
@@ -24,6 +24,11 @@ choose never to publish are listed by UUID in IGNORED_FILE, which is
 gitignored so those choices stay private. Editing a caption
 during triage saves it back to the Photos library, which stays the source of
 truth for captions.
+
+Tags start from the photo's keywords in Photos (flagged when a keyword isn't
+yet a tag on any post). Once a photo is published its post owns the tags:
+every run sets the photo's keywords to the post's tags (without the implied
+`photo` tag), replacing keywords added or removed in Photos.
 """
 
 import argparse
@@ -38,7 +43,7 @@ import tempfile
 from pathlib import Path
 from urllib.parse import unquote
 
-from photos import Photo, load_photos, set_caption
+from photos import Photo, load_photos, set_caption, set_keywords
 from image_captions import CaptionSync, choose_alt
 from image_markup import images, markdown_alt, marker, plain_text
 
@@ -55,6 +60,7 @@ from blog_utils import (
     extract_note_id,
     jj_tug,
     parse_frontmatter,
+    parse_tags,
     serialize_yaml_scalar,
     slugify,
     sync_all_tag_artifacts,
@@ -339,19 +345,51 @@ def ask(prompt: str) -> str:
         return "q"
 
 
-def ask_tags() -> list[str] | None:
-    """Ask for extra tags, with tab completion of existing ones.
-    Returns None if the user backs out."""
-    known = sorted(collect_all_tags() - {PHOTO_TAG})
-    print(f"  Existing tags: {', '.join(known)}")
-    with tag_completion(known):
-        answer = ask("  Tags (Enter for none, '-' to go back): ")
-    return None if answer == "-" else parse_tag_input(answer)
+def edit_tags(tags: list[str], text: str) -> list[str]:
+    """Apply typed edits to tags: each word adds a tag, -word removes one."""
+    tags = list(tags)
+    for word in re.split(r"[,\s]+", text):
+        if word.startswith("-"):
+            removed = slugify(word[1:])
+            tags = [t for t in tags if t != removed]
+        else:
+            tags += [t for t in parse_tag_input(word) if t not in tags]
+    return tags
+
+
+def describe_tags(tags: list[str], known: set[str]) -> str:
+    """Tags as a list, flagging ones that no post uses yet."""
+    if not tags:
+        return "none"
+    return ", ".join(t if t in known else f"{t} (new)" for t in tags)
+
+
+def ask_tags(keywords: list[str]) -> list[str] | None:
+    """Ask for extra tags, starting from the photo's keywords, with tab
+    completion of existing ones. Returns None if the user backs out."""
+    known = collect_all_tags() - {PHOTO_TAG}
+    tags = parse_tag_input(", ".join(keywords))
+    print(f"  Existing tags: {', '.join(sorted(known))}")
+    if tags:
+        print("  Starting from the photo's keywords in Photos.")
+    while True:
+        print(f"  Tags: {describe_tags(tags, known)}")
+        with tag_completion(sorted(known), lambda: tags):
+            answer = ask(
+                "  Add tags, remove with -tag "
+                "(Enter to accept, '-' to go back): "
+            )
+        if answer == "-":
+            return None
+        if not answer:
+            return tags
+        tags = edit_tags(tags, answer)
 
 
 @contextlib.contextmanager
-def tag_completion(tags: list[str]):
-    """Tab-complete the word being typed from tags, if readline exists."""
+def tag_completion(tags: list[str], current=lambda: []):
+    """Tab-complete the word being typed from tags, or a -word being
+    removed from current(), if readline exists."""
     try:
         import readline
     except ImportError:
@@ -359,7 +397,10 @@ def tag_completion(tags: list[str]):
         return
 
     def complete(text: str, state: int) -> str | None:
-        matches = [t for t in tags if t.startswith(text)]
+        if text.startswith("-"):
+            matches = [f"-{t}" for t in current() if t.startswith(text[1:])]
+        else:
+            matches = [t for t in tags if t.startswith(text)]
         return matches[state] if state < len(matches) else None
 
     old_completer = readline.get_completer()
@@ -432,7 +473,7 @@ def edit_caption(photo: Photo) -> None:
 
 
 TRIAGE_HELP = """\
-  p  publish this photo untitled (you can add tags first)
+  p  publish this photo untitled (you can edit its tags first)
   t  publish this photo with a title (and tags)
   e  edit the caption (saved back to Photos)
   i  ignore: never offer this photo again
@@ -472,7 +513,7 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
                         title = ask_title()
                         if title is None:
                             continue
-                    tags = ask_tags()
+                    tags = ask_tags(photo.keywords)
                     if tags is None:
                         continue
                     try:
@@ -559,6 +600,45 @@ def refresh_all(photos: list[Photo]) -> int:
     return changed
 
 
+def post_tags(note_path: Path) -> list[str]:
+    """A post's tags, without the implied photo tag."""
+    metadata, _ = parse_frontmatter(note_path.read_text())
+    return [
+        t for t in parse_tags(metadata.get("tags", "")) if t != PHOTO_TAG
+    ]
+
+
+def sync_keywords(photos: list[Photo]) -> int:
+    """Set each published photo's keywords in Photos to its post's tags.
+    Returns the number of photos changed."""
+    by_uuid = {p.uuid: p for p in photos}
+    changed = 0
+    for uuid, note_path in sorted(published_photos().items()):
+        photo = by_uuid.get(uuid)
+        if photo is None:
+            continue
+        tags = post_tags(note_path)
+        if sorted(tags) == sorted(photo.keywords):
+            continue
+        try:
+            set_keywords(photo, tags)
+        except (OSError, subprocess.CalledProcessError) as e:
+            print(
+                f"  {note_path.name}: warning: couldn't set the photo's "
+                "keywords in Photos (macOS may need permission for your "
+                "terminal to control Photos, under System Settings > "
+                f"Privacy & Security > Automation): {error_text(e)}"
+            )
+            continue
+        photo.keywords = tags
+        print(
+            f"  {note_path.name}: set Photos keywords to "
+            f"{', '.join(tags) or 'none'}"
+        )
+        changed += 1
+    return changed
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Publish captioned photos from the Photos library."
@@ -571,8 +651,9 @@ def main():
     pub.add_argument("--title", help="omit for an untitled post")
     pub.add_argument("--alt", help="independent manual alt text (default: caption)")
     pub.add_argument(
-        "--tags", default="",
-        help=f"comma separated tags besides {PHOTO_TAG}",
+        "--tags",
+        help=f"comma separated tags besides {PHOTO_TAG} "
+        "(default: the photo's keywords in Photos)",
     )
     ign = sub.add_parser("ignore", help="never offer these photos again")
     ign.add_argument("uuids", nargs="+")
@@ -599,10 +680,11 @@ def main():
         photo = find_photo(photos, args.uuid)
         if photo.uuid in published_photos():
             sys.exit(f"Error: {photo.uuid} is already published")
+        tags = parse_tag_input(
+            ", ".join(photo.keywords) if args.tags is None else args.tags
+        )
         try:
-            url = publish_photo(
-                photo, args.title or None, parse_tag_input(args.tags), alt=args.alt,
-            )
+            url = publish_photo(photo, args.title or None, tags, alt=args.alt)
             print(f"Published: {url}")
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             sys.exit(f"Error: couldn't publish {photo.uuid}: {error_text(e)}")
@@ -622,6 +704,9 @@ def main():
         )
 
     if args.command in (None, "triage", "publish"):
+        keyworded = sync_keywords(all_photos)
+        if keyworded:
+            print(f"Updated keywords of {keyworded} photo(s) in Photos.")
         linked = refresh_linked_notes(all_photos)
         if linked:
             print(f"Updated alt text in {linked} linked note(s).")

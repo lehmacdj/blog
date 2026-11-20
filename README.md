@@ -26,6 +26,8 @@ Ordinary syncs leave existing unmarked images alone. To link an existing image o
 
 `bin/sync-photos` refreshes linked alt text in both the wiki and published blog without publishing unrelated wiki prose changes. Linked photos are excluded from its untriaged list. Standalone photo posts also use caption alt text by default; triage offers a manual alternative, and `bin/sync-photos publish <uuid> --alt "Description"` supplies one directly. Their markers live in the blog note because standalone photo posts have no wiki source.
 
+Photo post tags sync with keywords in Photos. Triage starts each photo's tags from its keywords (flagging any that no post uses yet), and `publish` uses them unless `--tags` is given. After that the post owns the tags: every `sync-photos` run sets each published photo's keywords to its post's tags, without the implied `photo` tag.
+
 All blog image exports have a maximum dimension of 2048 pixels, without upscaling smaller images. Photos-linked exports use `images/<UUID>-<fingerprint>.<extension>`, where the fingerprint is derived from the exported file. Identical exports share storage across notes and standalone photo posts; different crops, edits, or encodings stay separate. The UUID identifies the source photo, not its crop. Unmatched images retain their note-based names. HEIC is exported as JPEG and WebP as PNG.
 
 Image export uses the wiki image or the standalone post's Photos source without substituting another rendition. A known UUID is enough to name the asset; export does not read SQLite. Photos lookup is used to discover missing UUIDs and refresh shared captions. A cover image's UUID is recorded as `image_photo:` in the wiki frontmatter, so it also works when there is no inline image marker.
