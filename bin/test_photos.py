@@ -1,7 +1,7 @@
 import sqlite3
 import unittest
 
-from photos import _keywords_query
+from photos import _keywords_query, normalize_caption
 
 
 class KeywordsQueryTests(unittest.TestCase):
@@ -28,6 +28,14 @@ class KeywordsQueryTests(unittest.TestCase):
         db = sqlite3.connect(":memory:")
         with self.assertRaises(sqlite3.OperationalError):
             _keywords_query(db)
+
+
+class NormalizeCaptionTests(unittest.TestCase):
+    def test_line_separators_become_newlines(self):
+        self.assertEqual(
+            normalize_caption(" One.\u2028\u2028Two.\r\nThree.\n"),
+            "One.\n\nTwo.\nThree.",
+        )
 
 
 if __name__ == "__main__":

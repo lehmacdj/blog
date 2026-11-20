@@ -39,6 +39,12 @@ class Photo:
     keywords: list[str] = field(default_factory=list)
 
 
+def normalize_caption(caption: str) -> str:
+    """Caption with every line break as \\n. Photos on iOS writes U+2028
+    LINE SEPARATOR, which terminals don't display as a line break."""
+    return "\n".join(caption.strip().splitlines())
+
+
 def _image_source(row) -> Path:
     """The edited render if the photo was edited, else the original."""
     _, _, _, directory, filename, _, adjustments, _ = row
@@ -114,7 +120,7 @@ def load_photos() -> list[Photo]:
             taken=taken,
             original_filename=original or row[4],
             source=_image_source(row),
-            caption=(caption or "").strip(),
+            caption=normalize_caption(caption or ""),
             keywords=keywords.get(uuid, []),
         ))
     return photos
