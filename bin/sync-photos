@@ -364,26 +364,22 @@ def describe_tags(tags: list[str], known: set[str]) -> str:
     return ", ".join(t if t in known else f"{t} (new)" for t in tags)
 
 
-def ask_tags(keywords: list[str]) -> list[str] | None:
-    """Ask for extra tags, starting from the photo's keywords, with tab
-    completion of existing ones. Returns None if the user backs out."""
+def ask_tags(tags: list[str]) -> list[str] | None:
+    """Edit the current tags with tab completion, or return None to go back."""
     known = collect_all_tags() - {PHOTO_TAG}
-    tags = parse_tag_input(", ".join(keywords))
     print(f"  Existing tags: {', '.join(sorted(known))}")
-    if tags:
-        print("  Starting from the photo's keywords in Photos.")
-    while True:
-        print(f"  Tags: {describe_tags(tags, known)}")
-        with tag_completion(sorted(known), lambda: tags):
-            answer = ask(
-                "  Add tags, remove with -tag "
-                "(Enter to accept, '-' to go back): "
-            )
-        if answer == "-":
-            return None
-        if not answer:
-            return tags
+    print(f"  Tags: {describe_tags(tags, known)}")
+    with tag_completion(sorted(known), lambda: tags):
+        answer = ask(
+            "  Add tags, remove with -tag "
+            "(Enter to keep current tags, '-' to go back): "
+        )
+    if answer == "-":
+        return None
+    if answer:
         tags = edit_tags(tags, answer)
+        print(f"  Tags: {describe_tags(tags, known)}")
+    return tags
 
 
 @contextlib.contextmanager
@@ -513,17 +509,23 @@ def triage(photos: list[Photo]) -> tuple[list[str], int]:
                         title = ask_title()
                         if title is None:
                             continue
-                    tags = ask_tags(photo.keywords)
+                    tags = parse_tag_input(", ".join(photo.keywords))
+                    if tags:
+                        print("  Starting from the photo's keywords in Photos.")
+                    while True:
+                        tags = ask_tags(tags)
+                        if tags is None:
+                            break
+                        try:
+                            alt = input(
+                                "  Alt text (Enter for caption, '-' to edit "
+                                "tags, or manual text): "
+                            ).strip()
+                        except EOFError:
+                            return published_titles, ignored_count
+                        if alt != "-":
+                            break
                     if tags is None:
-                        continue
-                    try:
-                        alt = input(
-                            "  Alt text (Enter for caption, '-' to go back, "
-                            "or manual text): "
-                        ).strip()
-                    except EOFError:
-                        return published_titles, ignored_count
-                    if alt == "-":
                         continue
                     try:
                         url = publish_photo(photo, title, tags, alt=alt or None)

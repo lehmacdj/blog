@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 SYNC_PHOTOS = Path(__file__).parent / "sync-photos"
 
@@ -268,6 +268,32 @@ class SyncPhotosTests(unittest.TestCase):
             "mahjong, balloons (new)",
         )
         self.assertEqual(describe([], set()), "none")
+
+    def test_triage_advances_to_alt_and_can_go_back_to_edit_tags(self):
+        photo = self.photo("U1", "A caption")
+        photo.keywords = ["Old"]
+        publish = Mock(return_value="/abc/my-title")
+        output = io.StringIO()
+        with (
+            patch.dict(self.g, {
+                "collect_all_tags": lambda: {"photo", "old"},
+                "preview": lambda photo: None,
+                "publish_photo": publish,
+            }),
+            patch("builtins.input", side_effect=[
+                "t", "A title", "sunset", "-", "-old travel", "A description",
+            ]) as read_input,
+            contextlib.redirect_stdout(output),
+        ):
+            self.assertEqual(self.g["triage"]([photo]), (["A title"], 0))
+        prompts = [call.args[0].strip() for call in read_input.call_args_list]
+        self.assertEqual(len(prompts), 6)
+        self.assertTrue(prompts[3].startswith("Alt text"))
+        self.assertTrue(prompts[4].startswith("Add tags"))
+        self.assertIn("Tags: old, sunset (new)", output.getvalue())
+        publish.assert_called_once_with(
+            photo, "A title", ["sunset", "travel"], alt="A description",
+        )
 
     def test_sync_keywords_sets_post_tags(self):
         (self.g["NOTES_DIR"] / "a.md").write_text(
